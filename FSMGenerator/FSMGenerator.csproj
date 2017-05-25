@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MikroPicDesigns.FSMCompiler.v1</RootNamespace>
+    <AssemblyName>FSMGenerator</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\Out\bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>..\Out\bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>signature.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Generator\CodeBuilder.cs" />
+    <Compile Include="Generator\CPP\StateIdHeaderVisitor.cs" />
+    <Compile Include="Generator\CPP\EventIdHeaderVisitor.cs" />
+    <Compile Include="Generator\CPP\CPPGeneratorOptions.cs" />
+    <Compile Include="Generator\CPP\StateCodeVisitor.cs" />
+    <Compile Include="Generator\CPP\CPPGenerator.cs" />
+    <Compile Include="Generator\CPP\MachineCodeVisitor.cs" />
+    <Compile Include="Generator\CPP\MachineHeaderVisitor.cs" />
+    <Compile Include="Generator\CPP\StateHeaderVisitor.cs" />
+    <Compile Include="Generator\C\CGenerator.cs" />
+    <Compile Include="Generator\C\StateHeaderVisitor.cs" />
+    <Compile Include="Generator\C\StateCodeVisitor.cs" />
+    <Compile Include="Generator\GeneratorBase.cs" />
+    <Compile Include="Generator\GeneratorParameters.cs" />
+    <Compile Include="Generator\IGenerator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="signature.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FSMModel\FSMModel.csproj">
+      <Project>{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}</Project>
+      <Name>FSMModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Generator\FSMLang\" />
+    <Folder Include="Generator\Verilog\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

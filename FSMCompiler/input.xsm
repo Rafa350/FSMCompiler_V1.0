@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Maquina d'estats pel programa 0 -->
+<machine name="program0" initialState="ArmUp:Start">
+
+    <!-- Declara els events -->
+    <events>
+        <event name="TriggerChanged"/>               <!-- Detector de producte  (INP_TR) -->
+        <event name="INP_Restart"/>                  <!-- Boto restart          (INP_ST) -->
+        <event name="PistonTopChanged"/>             <!-- Detector pisto amunt  (INP_PT) -->
+        <event name="PistonBottomChanged"/>          <!-- Detector pisto avall  (INP_PB) -->
+        <event name="INP_LabelReady"/>
+        <event name="INP_PrinterError"/>
+        <event name="TriggerDelayDone"/>
+        <event name="ArmUpPreDelayDone"/>
+        <event name="ArmUpPostDelayDone"/>
+        <event name="ArmUpTimeOutDone"/>
+        <event name="ArmDownPreDelayDone"/>
+        <event name="ArmDownPostDelayDone"/>
+        <event name="PrintLabelPreDelayDone"/>
+        <event name="PrintLabelPostDelayDone"/>
+        <event name="AirAssistDelayDone"/>
+        <event name="VacuumDelayDone"/>
+        <event name="PrintLabelTimeOutDone"/>
+        <event name="ApplyByContactPreDelayDone"/>
+        <event name="ApplyByContactPostDelayDone"/>
+        <event name="ApplyByContactTimeOutDone"/>
+    </events>
+    
+    <!-- Reinici -->
+    <state name="Restart">
+        <onEnter>
+            <inline>doPistonUp();</inline>
+            <inline>doAirJetOff();</inline>
+            <inline>doAirAssistOff();</inline>
+            <inline>doVacuumOff();</inline>
+            <inline>doSignalErrorOff();</inline>
+            <inline>doSignalWorkingOff();</inline>
+            <goto nextState="WaitTrigger:Start"/>
+        </onEnter>
+    </state>
+
+    <!-- Espera senyal de arrancada -->
+    <state name="WaitTrigger">
+        <state name="Start">
+            <onEvent event="TriggerChanged" nextState="Delay">
+                <raise event="TriggerDelayDone" delay="VAR_TriggerDelay"/>
+            </onEvent>
+        </state>
+        <state name="Delay">
+            <onEvent event="TriggerDelayDone" nextState="PrintLabel:Start"/>
+        </state>
+    </state>
+
+    <!-- Pujar el pisto -->
+    <state name="ArmUp">
+        <onEnter>
+            <inline>***ON_ENTER Comu per tots el subestats***</inline>
+        </onEnter>
+        <!-- Retard inicial de l'activitat -->
+        <state name="Start">
+            <onEnter>
+                <inline>notify(SIG_ArmUpStartActivity);</inline>
+                <raise event="ArmUpPreDelayDone" delay="VAR_ArmUpPreDelay"/>
+            </onEnter>
+            <onEvent event="ArmUpPreDelayDone" nextState="Move"/>
+        </state>
+        <!-- Realitza el moviment del pisto -->
+        <state name="Move">
+            <onEnter>
+                <inline>doPistonUp();</inline>
+                <raise event="ArmUpTimeOutDone" delay="VAR_ArmUpTimeout"/>
+            </onEnter>
+            <onEvent event="PistonTopChanged" nextState="End"/>
+            <onEvent event="ArmUpTimeOutDone" nextState="Error:Start">
+                <inline>notify(SIG_ArmUpTimeout);</inline>
+            </onEvent>
+        </state>
+        <!-- Retart final de l'activitat -->
+        <state name="End">
+            <onEnter>
+                <raise event="ArmUpPostDelayDone" delay="VAR_ArmUpPostDelay"/>
+            </onEnter>
+            <onExit>
+                <inline>notify(SIG_ArmUpEndActivity);</inline>
+            </onExit>
+            <onEvent event="ArmUpPostDelayDone" nextState="WaitTrigger:Start"/>
+        </state>
+    </state>
+
+    <!-- Baixa el pisto aplicador -->
+    <state name="ArmDown">
+        <state name="Start">
+            <onEnter>
+                <inline>notify(SIG_ArmDownStartActivity);</inline>
+                <raise event="ArmDownPreDelayDone" delay="VAR_ArmDownPreDelay"/>
+            </onEnter>
+            <onEvent event="ArmDownPreDelayDone" nextState="End"/>
+        </state>
+        <state name="End">
+            <onEnter>
+                <inline>doPistonDown();</inline>
+                <raise event="ArmDownPostDelayDone" delay="VAR_ArmDownPostDelay"/>
+            </onEnter>
+            <onExit>
+                <inline>notify(SIG_ArmDownEndActivity);</inline>
+            </onExit>
+            <onEvent event="ArmDownPostDelayDone" nextState="ApplyByContact:Start"/>
+        </state>
+
+    </state>
+
+    <!-- Imprimeix una etiqueta -->
+    <state name="PrintLabel">
+        <state name="Start">
+            <onEnter>
+                <raise event="PrintLabelPreDelayDone" delay="VAR_PrintLabelPreDelay"/>
+            </onEnter>
+            <onEvent event="PrintLabelPreDelayDone" nextState="Print"/>
+        </state>
+        <state name="Print">
+            <onEnter>
+                <inline condition="!inpGet(INP_PrinterError)">doPrintLabel();</inline>
+                <raise event="AirAssistDelayDone" delay="VAR_AirAssistDelay" condition="!inpGet(INP_PrinterError)"/>
+                <raise event="VacuumDelayDone" delay="VAR_VacuumDelay" condition="!inpGet(INP_PrinterError)"/>
+                <raise event="PrintLabelTimeOutDone" delay="VAR_PrintLabelTimeOut" condition="!inpGet(INP_PrinterError)"/>
+            </onEnter>
+            <onEvent event="AirAssistDelayDone">
+                <inline>doAirAssistOn();</inline>
+            </onEvent>
+            <onEvent event="VacuumDelayDone">
+                <inline>doVacuumOn();</inline>
+            </onEvent>
+            <onEvent event="PrintLabelTimeOutDone" nextState="Error:Start">
+                <inline>doAirAssistOff();</inline>
+                <inline>doVacuumOff();</inline>
+            </onEvent>
+            <onEvent event="INP_LabelReady" nextState="End">
+                <inline>doAirAssistOff();</inline>
+                <inline>doVacuumOn();</inline>
+            </onEvent>
+            <onEvent event="INP_PrinterError" nextState="Error:Start">
+                <abort event="AirAssistDelayDone"/>
+                <abort event="VacuumDelayDone"/>
+                <inline>doAirAssistOff();</inline>
+                <inline>doVacuumOff();</inline>
+            </onEvent>
+        </state>
+        <state name="End">
+            <onEnter>
+                <raise event="PrintLabelPostDelayDone" delay="VAR_PrintLabelPostDelay"/>
+            </onEnter>
+            <onEvent event="PrintLabelPostDelayDone" nextState="ArmDown:Start"/>
+        </state>
+    </state>
+
+    <!-- Aplica l'etiqueta per contacte -->
+    <state name="ApplyByContact">
+        <state name="Start">
+            <onEnter>
+                <raise event="ApplyByContactPreDelayDone" delay="VAR_ApplyByContactPreDelay"/>
+            </onEnter>
+            <onEvent event="ApplyByContactPreDelayDone" nextState="Apply"/>
+        </state>
+        <state name="Apply">
+            <onEnter>
+                <raise event="ApplyByContactTimeOutDone" delay="VAR_ApplyByContactTimeOut"/>
+            </onEnter>
+            <onEvent event="ApplyByContactTimeOutDone" nextState="Error:Start">
+                <inline>doVacuumOff();</inline>
+            </onEvent>
+            <onEvent event="PistonBottomChanged" nextState="End">
+                <inline>doSignalWorkingPulse();</inline>
+                <inline>doVacuumOff();</inline>
+                <inline>doAirJetPulse();</inline>
+            </onEvent>
+        </state>
+        <state name="End">
+            <onEnter>
+                <raise event="ApplyByContactPostDelayDone" delay="VAR_ApplyByContactPostDelay"/>
+            </onEnter>
+            <onEvent event="ApplyByContactPostDelayDone" nextState="ArmUp:Start"/>
+        </state>
+    </state>
+
+    <!-- Gestiona els errors -->
+    <state name="Error">
+        <state name="Start">
+            <onEnter>
+                <inline>doSignalErrorOn();</inline>
+                <inline>doSignalWorkingOff();</inline>
+            </onEnter>
+            <onEvent event="INP_Restart" nextState="WaitTrigger:Start">
+                <inline>doSignalErrorOff();</inline>
+                <inline>doPistonUp();</inline>
+            </onEvent>
+        </state>
+    </state>
+
+</machine>
