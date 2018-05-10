@@ -23,7 +23,7 @@
                 .WriteLine("#define __{0}", guardString)
                 .WriteLine()
                 .WriteLine()
-                .WriteLine("#include \"fsmDefines.hpp\"")
+                .WriteLine("#include \"fsmDefines.h\"")
                 .WriteLine()
                 .WriteLine();
 

@@ -107,7 +107,6 @@
             </onExit>
             <onEvent event="ArmDownPostDelayDone" nextState="ApplyByContact:Start"/>
         </state>
-
     </state>
 
     <!-- Imprimeix una etiqueta -->

@@ -1,11 +1,11 @@
-#include "fsmDefines.hpp"
-#include "fsmStateId.hpp"
-#include "fsmMachine.hpp"
-#include "fsmState.hpp"
+#include "fsmDefines.h"
+#include "fsmStateId.h"
+#include "fsmMachine.h"
+#include "fsmState.h"
 
 
-MyMachine::MyMachine(eosContext *context):
-    eosMachine(context) {
+MyMachine::MyMachine(EosContext *context):
+    EosMachine(context) {
 
     states[ST_Restart] = new RestartState(this);
     states[ST_WaitTriggerStart] = new WaitTriggerStartState(this);
@@ -29,5 +29,5 @@ MyMachine::MyMachine(eosContext *context):
     states[ST_ErrorStart] = new ErrorStartState(this);
     states[ST_Error] = new ErrorState(this);
 
-    start(stateArmUpStart);
+    start(states[ST_ArmUpStart]);
 }

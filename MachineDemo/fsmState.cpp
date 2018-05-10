@@ -1,12 +1,12 @@
-#include "fsmDefines.hpp"
-#include "fsmEventId.hpp"
-#include "fsmStateId.hpp"
-#include "fsmMachine.hpp"
-#include "fsmState.hpp"
+#include "fsmDefines.h"
+#include "fsmEventId.h"
+#include "fsmStateId.h"
+#include "fsmMachine.h"
+#include "fsmState.h"
 
 
-RestartState::RestartState(eosMachine *machine):
-    eosState(machine) {
+RestartState::RestartState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void RestartState::onEnter() {
@@ -19,8 +19,8 @@ void RestartState::onEnter() {
     doSignalWorkingOff();
 }
 
-WaitTriggerStartState::WaitTriggerStartState(eosMachine *machine):
-    eosState(machine) {
+WaitTriggerStartState::WaitTriggerStartState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void WaitTriggerStartState::onEvent(unsigned eventId) {
@@ -34,8 +34,8 @@ void WaitTriggerStartState::onEvent(unsigned eventId) {
     }
 }
 
-WaitTriggerDelayState::WaitTriggerDelayState(eosMachine *machine):
-    eosState(machine) {
+WaitTriggerDelayState::WaitTriggerDelayState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void WaitTriggerDelayState::onEvent(unsigned eventId) {
@@ -48,12 +48,12 @@ void WaitTriggerDelayState::onEvent(unsigned eventId) {
     }
 }
 
-WaitTriggerState::WaitTriggerState(eosMachine *machine):
-    eosState(machine) {
+WaitTriggerState::WaitTriggerState(EosMachine *machine):
+    EosState(machine) {
 }
 
-ArmUpStartState::ArmUpStartState(eosMachine *machine):
-    eosState(machine) {
+ArmUpStartState::ArmUpStartState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ArmUpStartState::onEnter() {
@@ -73,8 +73,8 @@ void ArmUpStartState::onEvent(unsigned eventId) {
     }
 }
 
-ArmUpMoveState::ArmUpMoveState(eosMachine *machine):
-    eosState(machine) {
+ArmUpMoveState::ArmUpMoveState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ArmUpMoveState::onEnter() {
@@ -99,8 +99,8 @@ void ArmUpMoveState::onEvent(unsigned eventId) {
     }
 }
 
-ArmUpEndState::ArmUpEndState(eosMachine *machine):
-    eosState(machine) {
+ArmUpEndState::ArmUpEndState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ArmUpEndState::onEnter() {
@@ -124,8 +124,8 @@ void ArmUpEndState::onEvent(unsigned eventId) {
     }
 }
 
-ArmUpState::ArmUpState(eosMachine *machine):
-    eosState(machine) {
+ArmUpState::ArmUpState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ArmUpState::onEnter() {
@@ -133,8 +133,8 @@ void ArmUpState::onEnter() {
     ***ON_ENTER Comu per tots el subestats***
 }
 
-ArmDownStartState::ArmDownStartState(eosMachine *machine):
-    eosState(machine) {
+ArmDownStartState::ArmDownStartState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ArmDownStartState::onEnter() {
@@ -153,8 +153,8 @@ void ArmDownStartState::onEvent(unsigned eventId) {
     }
 }
 
-ArmDownEndState::ArmDownEndState(eosMachine *machine):
-    eosState(machine) {
+ArmDownEndState::ArmDownEndState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ArmDownEndState::onEnter() {
@@ -178,12 +178,12 @@ void ArmDownEndState::onEvent(unsigned eventId) {
     }
 }
 
-ArmDownState::ArmDownState(eosMachine *machine):
-    eosState(machine) {
+ArmDownState::ArmDownState(EosMachine *machine):
+    EosState(machine) {
 }
 
-PrintLabelStartState::PrintLabelStartState(eosMachine *machine):
-    eosState(machine) {
+PrintLabelStartState::PrintLabelStartState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void PrintLabelStartState::onEnter() {
@@ -201,8 +201,8 @@ void PrintLabelStartState::onEvent(unsigned eventId) {
     }
 }
 
-PrintLabelPrintState::PrintLabelPrintState(eosMachine *machine):
-    eosState(machine) {
+PrintLabelPrintState::PrintLabelPrintState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void PrintLabelPrintState::onEnter() {
@@ -253,8 +253,8 @@ void PrintLabelPrintState::onEvent(unsigned eventId) {
     }
 }
 
-PrintLabelEndState::PrintLabelEndState(eosMachine *machine):
-    eosState(machine) {
+PrintLabelEndState::PrintLabelEndState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void PrintLabelEndState::onEnter() {
@@ -272,12 +272,12 @@ void PrintLabelEndState::onEvent(unsigned eventId) {
     }
 }
 
-PrintLabelState::PrintLabelState(eosMachine *machine):
-    eosState(machine) {
+PrintLabelState::PrintLabelState(EosMachine *machine):
+    EosState(machine) {
 }
 
-ApplyByContactStartState::ApplyByContactStartState(eosMachine *machine):
-    eosState(machine) {
+ApplyByContactStartState::ApplyByContactStartState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ApplyByContactStartState::onEnter() {
@@ -295,8 +295,8 @@ void ApplyByContactStartState::onEvent(unsigned eventId) {
     }
 }
 
-ApplyByContactApplyState::ApplyByContactApplyState(eosMachine *machine):
-    eosState(machine) {
+ApplyByContactApplyState::ApplyByContactApplyState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ApplyByContactApplyState::onEnter() {
@@ -322,8 +322,8 @@ void ApplyByContactApplyState::onEvent(unsigned eventId) {
     }
 }
 
-ApplyByContactEndState::ApplyByContactEndState(eosMachine *machine):
-    eosState(machine) {
+ApplyByContactEndState::ApplyByContactEndState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ApplyByContactEndState::onEnter() {
@@ -341,12 +341,12 @@ void ApplyByContactEndState::onEvent(unsigned eventId) {
     }
 }
 
-ApplyByContactState::ApplyByContactState(eosMachine *machine):
-    eosState(machine) {
+ApplyByContactState::ApplyByContactState(EosMachine *machine):
+    EosState(machine) {
 }
 
-ErrorStartState::ErrorStartState(eosMachine *machine):
-    eosState(machine) {
+ErrorStartState::ErrorStartState(EosMachine *machine):
+    EosState(machine) {
 }
 
 void ErrorStartState::onEnter() {
@@ -367,7 +367,7 @@ void ErrorStartState::onEvent(unsigned eventId) {
     }
 }
 
-ErrorState::ErrorState(eosMachine *machine):
-    eosState(machine) {
+ErrorState::ErrorState(EosMachine *machine):
+    EosState(machine) {
 }
 

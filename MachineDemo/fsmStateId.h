@@ -1,5 +1,5 @@
-#ifndef __FSMSTATEID_HPP
-#define __FSMSTATEID_HPP
+#ifndef __FSMSTATEID_H
+#define __FSMSTATEID_H
 
 
 #define ST_Restart 0 

@@ -25,7 +25,7 @@
             string stateIdHeaderFileName = Path.GetFileName(options.StateIdHeaderFileName);
 
             codeBuilder
-                .WriteLine("#include \"fsmDefines.hpp\"")
+                .WriteLine("#include \"fsmDefines.h\"")
                 .WriteLine("#include \"{0}\"", eventIdHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateIdHeaderFileName)
                 .WriteLine("#include \"{0}\"", machineHeaderFileName)

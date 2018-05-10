@@ -16,9 +16,9 @@
 
         public CPPGeneratorOptions() {
 
-            machineBaseClassName = "eos::fsm::Machine";
-            stateBaseClassName = "eos::fsm::State";
-            contextClassName = "eos::fsm::IContext";
+            machineBaseClassName = "FsmMachine";
+            stateBaseClassName = "FsmState";
+            contextClassName = "IFsmContext";
             
             useStateNames = true;
         }

@@ -1,5 +1,5 @@
-#ifndef __FSMEVENTID_HPP
-#define __FSMEVENTID_HPP
+#ifndef __FSMEVENTID_H
+#define __FSMEVENTID_H
 
 
 #define EV_TriggerChanged 0 

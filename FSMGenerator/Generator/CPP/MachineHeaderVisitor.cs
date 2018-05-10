@@ -24,7 +24,7 @@
                 .WriteLine("#define __{0}", guardString)
                 .WriteLine()    
                 .WriteLine()
-                .WriteLine("#include \"fsmDefines.hpp\"")
+                .WriteLine("#include \"fsmDefines.h\"")
                 .WriteLine()
                 .WriteLine()
                 .WriteLine("class {0}: public {1} {{", options.MachineClassName, options.MachineBaseClassName)

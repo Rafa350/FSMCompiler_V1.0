@@ -22,7 +22,7 @@
             string stateIdHeaderFileName = Path.GetFileName(options.StateIdHeaderFileName);
 
             codeBuilder
-                .WriteLine("#include \"fsmDefines.hpp\"")
+                .WriteLine("#include \"fsmDefines.h\"")
                 .WriteLine("#include \"{0}\"", stateIdHeaderFileName)
                 .WriteLine("#include \"{0}\"", machineHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateHeaderFileName)
@@ -38,7 +38,7 @@
             
             codeBuilder
                 .WriteLine()
-                .WriteLine("start(state{0});", machine.StartState.FullName)
+                .WriteLine("start(states[ST_{0}]);", machine.StartState.FullName)
                 .UnIndent()
                 .WriteLine("}");
 

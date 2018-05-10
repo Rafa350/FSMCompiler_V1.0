@@ -56,6 +56,7 @@
     <Compile Include="Generator\CPP\MachineHeaderVisitor.cs" />
     <Compile Include="Generator\CPP\StateHeaderVisitor.cs" />
     <Compile Include="Generator\C\CGenerator.cs" />
+    <Compile Include="Generator\C\GGeneratorOptions.cs" />
     <Compile Include="Generator\C\StateHeaderVisitor.cs" />
     <Compile Include="Generator\C\StateCodeVisitor.cs" />
     <Compile Include="Generator\GeneratorBase.cs" />
