@@ -38,7 +38,7 @@
             
             codeBuilder
                 .WriteLine()
-                .WriteLine("start(states[ST_{0}]);", machine.StartState.FullName)
+                .WriteLine("start(states[ST_{0}]);", machine.InitialState.FullName)
                 .UnIndent()
                 .WriteLine("}");
 

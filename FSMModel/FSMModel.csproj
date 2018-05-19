@@ -15,7 +15,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\Out\bin\x86\Debug\</OutputPath>
+    <OutputPath>..\bin\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -24,7 +24,7 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>..\Out\bin\x86\Release\</OutputPath>
+    <OutputPath>..\bin\x86\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -48,20 +48,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Loader\XmlLoader.cs" />
-    <Compile Include="Model\ActionBase.cs" />
-    <Compile Include="Model\ActionList.cs" />
+    <Compile Include="Model\Action.cs" />
+    <Compile Include="Model\CommandBase.cs" />
+    <Compile Include="Model\CommandList.cs" />
     <Compile Include="Model\DefaultVisitor.cs" />
-    <Compile Include="Model\Actions\EnqueueAction.cs" />
+    <Compile Include="Model\Actions\EnqueueCommand.cs" />
     <Compile Include="Model\Event.cs" />
-    <Compile Include="Model\Actions\GotoAction.cs" />
-    <Compile Include="Model\Actions\InlineAction.cs" />
+    <Compile Include="Model\Actions\InlineCommand.cs" />
+    <Compile Include="Model\Guard.cs" />
     <Compile Include="Model\IVisitable.cs" />
     <Compile Include="Model\IVisitor.cs" />
     <Compile Include="Model\Machine.cs" />
-    <Compile Include="Model\Actions\RaiseAction.cs" />
+    <Compile Include="Model\Actions\RaiseCommand.cs" />
     <Compile Include="Model\State.cs" />
     <Compile Include="Model\Transition.cs" />
-    <Compile Include="Model\TransitionList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

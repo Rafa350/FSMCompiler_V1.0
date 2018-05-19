@@ -2,20 +2,31 @@
 
     using System;
     using System.Collections.Generic;
-    
-    public sealed class State: IVisitable {
 
+    public sealed class State : IVisitable {
+
+        private readonly List<State> childs = new List<State>();
+        private readonly List<Transition> transitions = new List<Transition>();
         private readonly State parent;
         private readonly string name;
-        private List<State> childs;
-        private TransitionList transitions;
-        private ActionList enterActions;
-        private ActionList exitActions;
+        private Action enterAction;
+        private Action exitAction;
 
+        /// <summary>
+        /// Constructor de l'objecte.
+        /// </summary>
+        /// <param name="name">Nom.</param>
+        /// 
         public State(string name)
             : this(null, name) {
         }
 
+        /// <summary>
+        /// Constructor de l'objecte.
+        /// </summary>
+        /// <param name="parent">Estat pare.</param>
+        /// <param name="name">Nom.</param>
+        /// 
         public State(State parent, string name) {
 
             if (String.IsNullOrEmpty(name))
@@ -24,99 +35,125 @@
             this.parent = parent;
             this.name = name;
 
-            if (parent != null) {
-                if (parent.childs == null)
-                    parent.childs = new List<State>();
+            if (parent != null)
                 parent.childs.Add(this);
-            }
         }
 
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
         public void AcceptVisitor(IVisitor visitor) {
 
             visitor.Visit(this);
         }
 
+        /// <summary>
+        /// Afegeix una transicio.
+        /// </summary>
+        /// <param name="transition">La transisio a afeigir.</param>
+        /// 
+        public void AddTransition(Transition transition) {
+
+            if (transition == null)
+                throw new ArgumentNullException("transition");
+
+            transitions.Add(transition);
+        }
+
+        /// <summary>
+        /// Obte l'estat pare
+        /// </summary>
+        /// 
         public State Parent {
             get {
                 return parent;
             }
         }
 
+        /// <summary>
+        /// Obte el nom.
+        /// </summary>
+        /// 
         public string Name {
             get {
                 return name;
             }
         }
 
+        /// <summary>
+        /// Obte el nom complert, seguint la ruta pare-fill.
+        /// </summary>
+        /// 
         public string FullName {
             get {
-                if (parent == null)
-                    return name;
-                else
-                    return String.Format("{0}{1}", parent.FullName, name);
+                return (parent == null) ? name : String.Format("{0}{1}", parent.FullName, name);
             }
         }
 
-        public TransitionList Transitions {
+        /// <summary>
+        /// Obte un enumerador per les transicions.
+        /// </summary>
+        /// 
+        public IEnumerable<Transition> Transitions {
             get {
                 return transitions;
             }
-            set {
-                transitions = value;
+        }
+
+        /// <summary>
+        /// Indica si hi han transisions.
+        /// </summary>
+        /// 
+        public bool HasTransitions {
+            get {
+                return transitions.Count > 0;
             }
         }
 
-        public bool HasEnterActions {
+        /// <summary>
+        /// Obte o asigna l'accio d'entrada.
+        /// </summary>
+        /// 
+        public Action EnterAction {
             get {
-                State s = this;
-                while (s != null) {
-                    if (s.enterActions != null)
-                        return true;
-                    s = s.parent;
-                }
-                return false;
-            }
-        }
-
-        public ActionList EnterActions {
-            get {
-                return enterActions;
-            }
-            set {
-                enterActions = value;
-            }
-        }
-
-        public bool HasExitActions {
-            get {
-                State s = this;
-                while (s != null) {
-                    if (s.exitActions != null)
-                        return true;
-                    s = s.parent;
-                }
-                return false;
-            }
-        }
-
-        public ActionList ExitActions {
-            get {
-                return exitActions;
+                return enterAction;
             }
             set {
-                exitActions = value;
+                enterAction = value;
             }
         }
 
-        public bool HasChilds {
+        /// <summary>
+        /// Obte o asigna l'accio de sortida.
+        /// </summary>
+        /// 
+        public Action ExitAction {
             get {
-                return childs != null;
+                return exitAction;
+            }
+            set {
+                exitAction = value;
             }
         }
 
+        /// <summary>
+        /// Obte un enumerador dels fills.
+        /// </summary>
         public IEnumerable<State> Childs {
             get {
                 return childs;
+            }
+        }
+
+        /// <summary>
+        /// Indica si conte fills.
+        /// </summary>
+        /// 
+        public bool HasChilds {
+            get {
+                return childs.Count > 0;
             }
         }
     }

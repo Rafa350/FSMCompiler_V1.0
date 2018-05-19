@@ -54,8 +54,20 @@
 
             if (!String.IsNullOrEmpty(options.StateCodeFileName))
                 using (StreamWriter writer = File.CreateText(options.StateCodeFileName)) {
-                    StateCodeVisitor visitor = new StateCodeVisitor(writer, options);
-                    machine.AcceptVisitor(visitor);
+
+                    CodeBuilder codeBuilder = new CodeBuilder();
+
+                    codeBuilder
+                        .WriteLine("#include \"{0}\"", options.StateHeaderFileName)
+                        .WriteLine()
+                        .WriteLine();
+
+                    StateCodeGenerator.GenerateActionImplementation(codeBuilder, machine);
+                    StateCodeGenerator.GenerateGuardImplementation(codeBuilder, machine);
+                    StateCodeGenerator.GenerateTransitionTable(codeBuilder, machine);
+                    StateCodeGenerator.GenerateStateTable(codeBuilder, machine);
+
+                    writer.Write(codeBuilder.ToString());
                 }
         }
     }

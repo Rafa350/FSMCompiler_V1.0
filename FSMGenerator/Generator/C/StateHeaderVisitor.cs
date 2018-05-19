@@ -1,5 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.C {
 
+    using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
 
@@ -23,25 +24,61 @@
 
         public override void Visit(Machine machine) {
 
+            string[] stdIncludes = { "stdint.h", "stdbool.h", "stdlib.h" };
+
+            string guardName = String.Format("__{0}__", Path.GetFileNameWithoutExtension(options.StateHeaderFileName));
+
+            string template =
+                "typedef void (*Action)(Context *context);\n" +
+                "typedef bool (*Guard)(Context *context);\n" +
+                "\n" +
+                "typedef struct {\n" +
+                "  Event event;\n" +
+                "  State nect;\n" +
+                "  Action action;\n" +
+                "} EventDescriptor;\n\n" +
+                "typedef struct {\n" +
+                "  State state;\n" +
+                "  Action enter;\n" +
+                "  Action exit;\n" +
+                "  uint8_t transitionOffset;\n" +
+                "} StateDescriptor;\n\n" +
+                "typedef struct {\n" +
+                "   StateDescriptor states[MAX_STATES];\n" +
+                "} MachineDescriptor;\n\n" +
+                "typedef struct {\n" +
+                "  State state;\n" +
+                "} Context;\n" +
+                "\n";
+
             codeBuilder
-                .WriteLine("#include \"fsmDefines.h\"")
+                .WriteLine("#ifndef {0}", guardName)
+                .WriteLine("#define {0}", guardName)
                 .WriteLine()
                 .WriteLine();
 
+            // Includes standards
+            //
+            foreach (string include in stdIncludes)
+                codeBuilder
+                    .WriteLine("#include <{0}>", include);                    
             codeBuilder
-                .WriteLine("enum States {")
-                .Indent();
-            mode = Mode.generateEnums;
-            foreach (State state in machine.States)
-                state.AcceptVisitor(this);
-            codeBuilder
-                .UnIndent()
-                .WriteLine("};")
+                .WriteLine()
                 .WriteLine();
+
+            StateHeaderGenerator.GenerateStateTypedef(codeBuilder, machine);
+            StateHeaderGenerator.GenerateEventTypedef(codeBuilder, machine);
+
+            codeBuilder
+                .WriteLine(template);
 
             mode = Mode.generateForwards;
             foreach (State state in machine.States)
                 state.AcceptVisitor(this);
+
+            codeBuilder
+                .WriteLine()
+                .WriteLine("#endif // {0}", guardName);
 
             writer.Write(codeBuilder.ToString());
         }
@@ -50,21 +87,28 @@
 
             if (mode == Mode.generateEnums) {
                 codeBuilder
-                    .WriteLine("ST_{0}, ", state.Name);
+                    .WriteLine("State_{0}, ", state.Name);
             }
 
             else if (mode == Mode.generateForwards) {
-                if (state.EnterActions != null)
+                if (state.EnterAction != null)
                     codeBuilder
-                        .WriteLine("extern void {0}Enter(void);", state.Name);
+                        .WriteLine("extern void {0}State_OnEnter(void);", state.Name);
 
-                if (state.ExitActions != null)
+                if (state.ExitAction != null)
                     codeBuilder
-                        .WriteLine("extern void {0}Exit(void);", state.Name);
+                        .WriteLine("extern void {0}State_OnExit(void);", state.Name);
 
                 codeBuilder
-                    .WriteLine("extern void {0}Transition(uint8_t event);", state.Name);
+                    .WriteLine("extern void {0}State_OnEvent(uint8_t event);", state.Name);
             }
+        }
+
+        public override void Visit(Event ev) {
+
+            if (mode == Mode.generateEnums)
+                codeBuilder
+                    .WriteLine("Event_{0}, ", ev.Name);
         }
     }
 }

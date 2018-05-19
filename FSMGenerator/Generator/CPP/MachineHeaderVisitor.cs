@@ -31,7 +31,7 @@
                 .Indent()
                 .WriteLine("private:")
                 .Indent()
-                .WriteLine("{0} *states[{1}];", options.StateBaseClassName, machine.StateCount)
+                //.WriteLine("{0} *states[{1}];", options.StateBaseClassName, machine.StateCount)
                 .UnIndent()
                 .WriteLine("public:")
                 .Indent()

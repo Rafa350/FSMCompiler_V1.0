@@ -13,16 +13,25 @@
     public sealed class Transition: IVisitable {
 
         private Event ev;
-        private string condition;
-        private ActionList actions;
+        private Guard guard;
+        private Action action;
         private State next;
         private TransitionMode mode = TransitionMode.Null;
 
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
         public void AcceptVisitor(IVisitor visitor) {
 
             visitor.Visit(this);
         }
 
+        /// <summary>
+        /// Obte o asigna l'event associat a aquesta transicio.
+        /// </summary>
+        /// 
         public Event Event {
             get {
                 return ev;
@@ -32,24 +41,36 @@
             }
         }
 
-        public string Condition {
+        /// <summary>
+        /// Obte o asigna la guarda d'aquesta transicio.
+        /// </summary>
+        /// 
+        public Guard Guard {
             get {
-                return condition;
+                return guard;
             }
             set {
-                condition = value;
+                guard = value;
             }
         }
 
-        public ActionList Actions {
+        /// <summary>
+        /// Obte o asigna l'accio.
+        /// </summary>
+        /// 
+        public Action Action {
             get {
-                return actions;
+                return action;
             }
             set {
-                actions = value;
+                action = value;
             }
         }
 
+        /// <summary>
+        /// Obte o asigna el estat final de la transicio.
+        /// </summary>
+        /// 
         public State Next {
             get {
                 return next;

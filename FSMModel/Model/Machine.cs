@@ -5,10 +5,10 @@
 
     public sealed class Machine: IVisitable {
 
+        private readonly Dictionary<string, State> states = new Dictionary<string, State>();
+        private readonly Dictionary<string, Event> events = new Dictionary<string, Event>();
         private readonly string name;
-        private State startState;
-        private Dictionary<string, State> states = new Dictionary<string, State>();
-        private Dictionary<string, Event> events = new Dictionary<string, Event>();
+        private State initialState;
 
         public Machine(string name) {
 
@@ -23,6 +23,11 @@
             visitor.Visit(this);
         }
 
+        /// <summary>
+        /// Afegeix un estat a la maquina.
+        /// </summary>
+        /// <param name="state">L'estat a afeigir.</param>
+        /// 
         public void AddState(State state) {
 
             if (state == null)
@@ -35,6 +40,11 @@
             states.Add(state.FullName, state);
         }
 
+        /// <summary>
+        /// Afegeix un event a la maquina.
+        /// </summary>
+        /// <param name="ev">L'estat a afeigir.</param>
+        /// 
         public void AddEvent(Event ev) {
 
             if (ev == null)
@@ -47,26 +57,34 @@
             events.Add(ev.Name, ev);
         }
 
-        public State GetState(string fullName) {
+        public State GetState(string fullName, bool throwError = true) {
 
             if (String.IsNullOrEmpty(fullName))
                 throw new ArgumentNullException("fullName");
 
-            if (!states.ContainsKey(fullName))
-                throw new InvalidOperationException(
-                    String.Format("No se agrego ningun estado con el nombre '{0}'.", fullName));
+            if (!states.ContainsKey(fullName)) {
+                if (throwError)
+                    throw new InvalidOperationException(
+                        String.Format("No se agrego ningun estado con el nombre '{0}'.", fullName));
+                else
+                    return null;
+            }
 
             return states[fullName];
         }
 
-        public Event GetEvent(string name) {
+        public Event GetEvent(string name, bool throwError = true) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
-            if (!events.ContainsKey(name))
-                throw new InvalidOperationException(
-                    String.Format("No se agrego ningun evento con el nombre '{0}'.", name));
+            if (!events.ContainsKey(name)) {
+                if (throwError)
+                    throw new InvalidOperationException(
+                        String.Format("No se agrego ningun evento con el nombre '{0}'.", name));
+                else
+                    return null;
+            }
 
             return events[name];
         }
@@ -77,12 +95,12 @@
             }
         }
 
-        public State StartState {
+        public State InitialState {
             get {
-                return startState;
+                return initialState;
             }
             set {
-                startState = value;
+                initialState = value;
             }
         }
 
@@ -95,18 +113,6 @@
         public IEnumerable<string> EventNames {
             get {
                 return events.Keys;
-            }
-        }
-
-        public int StateCount {
-            get {
-                return states.Count;
-            }
-        }
-
-        public int EventCount {
-            get {
-                return events.Count;
             }
         }
 

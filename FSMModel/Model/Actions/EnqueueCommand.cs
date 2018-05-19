@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model.Actions {
 
-    public sealed class EnqueueAction: ActionBase {
+    public sealed class EnqueueCommand: CommandBase {
 
         public override void AcceptVisitor(IVisitor visitor) {
         

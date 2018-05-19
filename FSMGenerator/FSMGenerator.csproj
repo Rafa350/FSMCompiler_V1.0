@@ -15,7 +15,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\Out\bin\x86\Debug\</OutputPath>
+    <OutputPath>..\bin\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -24,7 +24,7 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>..\Out\bin\x86\Release\</OutputPath>
+    <OutputPath>..\bin\x86\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -57,8 +57,9 @@
     <Compile Include="Generator\CPP\StateHeaderVisitor.cs" />
     <Compile Include="Generator\C\CGenerator.cs" />
     <Compile Include="Generator\C\GGeneratorOptions.cs" />
+    <Compile Include="Generator\C\StateCodeGenerator.cs" />
+    <Compile Include="Generator\C\StateHeaderGenerator.cs" />
     <Compile Include="Generator\C\StateHeaderVisitor.cs" />
-    <Compile Include="Generator\C\StateCodeVisitor.cs" />
     <Compile Include="Generator\GeneratorBase.cs" />
     <Compile Include="Generator\GeneratorParameters.cs" />
     <Compile Include="Generator\IGenerator.cs" />

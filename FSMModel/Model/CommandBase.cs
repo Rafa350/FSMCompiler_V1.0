@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
     
-    public abstract class ActionBase: IVisitable {
+    public abstract class CommandBase: IVisitable {
 
         private string condition;
 

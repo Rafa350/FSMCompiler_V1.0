@@ -57,7 +57,7 @@
             hasActions = false;
             s = state;
             while (s != null) {
-                if (s.EnterActions != null) {
+                if (s.EnterAction != null) {
                     if (!hasActions) {
                         codeBuilder
                             .WriteLine("void {0}State::onEnter() {{", state.FullName)
@@ -65,7 +65,7 @@
                             .Indent();
                         hasActions = true;
                     }
-                    s.EnterActions.AcceptVisitor(this);
+                    s.EnterAction.AcceptVisitor(this);
                 }
                 s = s.Parent;
             }
@@ -80,7 +80,7 @@
             hasActions = false;
             s = state;
             while (s != null) {
-                if (s.ExitActions != null) {
+                if (s.ExitAction != null) {
                     if (!hasActions) {
                         codeBuilder
                             .WriteLine("void {0}State::onExit() {{", state.FullName)
@@ -88,7 +88,7 @@
                             .Indent();
                         hasActions = true;
                     }
-                    s.ExitActions.AcceptVisitor(this);
+                    s.ExitAction.AcceptVisitor(this);
                 }
                 s = s.Parent;
             }
@@ -99,7 +99,7 @@
                     .WriteLine("}")
                     .WriteLine();
 
-            if (state.Transitions.HasTransitions || state.Parent != null) {
+            if (state.HasTransitions || state.Parent != null) {
                 codeBuilder
                     .WriteLine("void {0}State::onEvent(unsigned eventId) {{", state.FullName)
                     .WriteLine()
@@ -109,8 +109,9 @@
                     .WriteLine("switch (eventId) {")
                     .Indent();
 
-                if (state.Transitions.HasTransitions)
-                    state.Transitions.AcceptVisitor(this);
+                if (state.HasTransitions)
+                    foreach (Transition transition in state.Transitions)
+                        transition.AcceptVisitor(this);
 
                 codeBuilder
                     .UnIndent()
@@ -130,14 +131,14 @@
                 .WriteLine("case EV_{0}:", transition.Event.Name)
                 .Indent();
 
-            if (!System.String.IsNullOrEmpty(transition.Condition)) {
+            if (transition.Guard != null) {
                 codeBuilder
-                    .WriteLine("if ({0}) {{", transition.Condition)
+                    .WriteLine("if ({0}) {{", transition.Guard.Condition)
                     .Indent();
             }
 
-            if (transition.Actions != null)
-                transition.Actions.AcceptVisitor(this);
+            if (transition.Action != null)
+                transition.Action.AcceptVisitor(this);
 
             switch (transition.Mode) {
                 case TransitionMode.Null:
@@ -155,7 +156,7 @@
                     codeBuilder.WriteLine("popState();");
                     break;
             }
-            if (!System.String.IsNullOrEmpty(transition.Condition)) {
+            if (transition.Guard.Condition != null) {
                 codeBuilder
                     .UnIndent()
                     .WriteLine("}");
@@ -166,7 +167,7 @@
                 .UnIndent();
         }
 
-        public override void Visit(InlineAction action) {
+        public override void Visit(InlineCommand action) {
 
             if (!String.IsNullOrEmpty(action.Condition)) {
                 codeBuilder
@@ -189,7 +190,7 @@
             }
         }
 
-        public override void Visit(RaiseAction action) {
+        public override void Visit(RaiseCommand action) {
 
             if (!String.IsNullOrEmpty(action.Condition)) {
                 codeBuilder

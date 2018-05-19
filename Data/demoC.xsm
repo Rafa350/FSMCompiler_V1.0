@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<machine name="StartControl" initialState="Reset">
+
+    <state name="Reset">
+        <onEnter>
+            <inline>
+                varSet(VAR_TEST_ACTIVE, 0)
+            </inline>
+            <goto state="Idle"/>
+        </onEnter>
+    </state>
+
+    <state name="Idle">
+    
+        <!-- Boto Start/Reset -->
+        <onEvent event="INP_ST_ON" state="Done">
+            <inline>
+                if (varGet(VAR_TEST_ACTIVE) == 1) {
+                    varSet(VAR_TEST_ACTIVE, 0);
+                    timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));
+                }        
+            </inline>
+        </onEvent>
+        
+        <onEvent event="Test" condition="a == 1"/>
+        <onEvent event="Test" condition="a == 2"/>
+        <onEvent event="Test"/>
+        
+        <!-- Test -->
+        <onEvent event="TIM_TEST_INTERVAL" state="Done">
+            <inline>
+                timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));
+            </inline>
+        </onEvent>
+        
+        <!-- Deteccio de producte INP_TR -->
+        <onEvent event="INP_TR_ON" state="Delay">
+            <inline>
+                timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));
+            </inline>
+        </onEvent>
+       
+    </state>
+    
+    <state name="Disabled">
+    </state>
+
+    <state name="Delay">
+        <onEvent event="TIM_TR_DELAY" state="Done"/>
+    </state>
+    
+    <state name="Done">
+        <onEnter>
+            <inline>trigger = true;</inline>
+        </onEnter>
+        <onEvent event="INP_ST_ON">
+            <inline>
+                timStop(TIM_TEST_INTERVAL);
+            </inline>
+        </onEvent>
+        <onEvent event="SIG_REARM_TRIGGER" condition="trigger == false" state="Idle"/>
+    </state>
+
+
+</machine>
