@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model.Actions {
 
-    public sealed class RaiseCommand: CommandBase {
+    public sealed class RaiseCommand: Command {
 
         private Event ev;
         private string delayText;

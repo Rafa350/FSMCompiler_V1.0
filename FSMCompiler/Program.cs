@@ -5,6 +5,7 @@
     using MikroPicDesigns.FSMCompiler.v1.Generator;
     using MikroPicDesigns.FSMCompiler.v1.Generator.C;
     using MikroPicDesigns.FSMCompiler.v1.Generator.CPP;
+    using MikroPicDesigns.FSMCompiler.v1.Generator.DOT;
     using MikroPicDesigns.FSMCompiler.v1.Loader;
     using MikroPicDesigns.FSMCompiler.v1.Model;
 
@@ -54,6 +55,10 @@
 
                     IGenerator generator = null;
                     switch (generatorName) {
+                        case "DOT":
+                            generator = new DOTGenerator(generatorParameters);
+                            break;
+
                         case "C":
                             generator = new CGenerator(generatorParameters);
                             break;

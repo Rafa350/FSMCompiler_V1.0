@@ -57,7 +57,7 @@
             hasActions = false;
             s = state;
             while (s != null) {
-                if (s.EnterAction != null) {
+                if (s.EntryAction != null) {
                     if (!hasActions) {
                         codeBuilder
                             .WriteLine("void {0}State::onEnter() {{", state.FullName)
@@ -65,7 +65,7 @@
                             .Indent();
                         hasActions = true;
                     }
-                    s.EnterAction.AcceptVisitor(this);
+                    s.EntryAction.AcceptVisitor(this);
                 }
                 s = s.Parent;
             }
@@ -169,12 +169,6 @@
 
         public override void Visit(InlineCommand action) {
 
-            if (!String.IsNullOrEmpty(action.Condition)) {
-                codeBuilder
-                    .WriteLine("if ({0}) {{", action.Condition)
-                    .Indent();
-            }
-
             if (!System.String.IsNullOrEmpty(action.Text)) {
                 string[] lines = action.Text.Split(new char[] { '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
 
@@ -182,29 +176,11 @@
                     if (!System.String.IsNullOrEmpty(line))
                         codeBuilder.WriteLine(line.Trim());
             }
-
-            if (!String.IsNullOrEmpty(action.Condition)) {
-                codeBuilder
-                    .UnIndent()
-                    .WriteLine("}");
-            }
         }
 
         public override void Visit(RaiseCommand action) {
 
-            if (!String.IsNullOrEmpty(action.Condition)) {
-                codeBuilder
-                    .WriteLine("if ({0}) {{", action.Condition)
-                    .Indent();
-            }
-
-            codeBuilder.WriteLine("raiseEvent(EV_{0}, {1});", action.Event.Name, action.DelayText);
-
-            if (!String.IsNullOrEmpty(action.Condition)) {
-                codeBuilder
-                    .UnIndent()
-                    .WriteLine("}");
-            }
+            codeBuilder.WriteLine("raiseEvent(Event_{0}, {1});", action.Event.Name, action.DelayText);
         }
     }
 }

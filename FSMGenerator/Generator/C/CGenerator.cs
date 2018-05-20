@@ -45,8 +45,58 @@
 
             if (!String.IsNullOrEmpty(options.StateHeaderFileName))
                 using (StreamWriter writer = File.CreateText(options.StateHeaderFileName)) {
-                    StateHeaderVisitor visitor = new StateHeaderVisitor(writer, options);
-                    machine.AcceptVisitor(visitor);
+
+                    CodeBuilder codeBuilder = new CodeBuilder();
+
+                    string[] stdIncludes = { "stdint.h", "stdbool.h", "stdlib.h" };
+
+                    string guardName = String.Format("__{0}__", Path.GetFileNameWithoutExtension(options.StateHeaderFileName));
+
+                    string template =
+                        "typedef void *Context;\n" +
+                        "typedef void (*Action)(Context *context);\n" +
+                        "typedef bool (*Guard)(Context *context);\n" +
+                        "\n" +
+                        "typedef struct {\n" +
+                        "  Event event;\n" +
+                        "  State next;\n" +
+                        "  const Guard guard;\n" +
+                        "  const Action action;\n" +
+                        "} TransitionDescriptor;\n\n" +
+                        "typedef struct {\n" +
+                        "  State state;\n" +
+                        "  const Action enter;\n" +
+                        "  const Action exit;\n" +
+                        "  uint8_t transitionOffset;\n" +
+                        "  uint8_t transitionCount;\n" +
+                        "} StateDescriptor;\n" +
+                        "\n";
+
+                    codeBuilder
+                        .WriteLine("#ifndef {0}", guardName)
+                        .WriteLine("#define {0}", guardName)
+                        .WriteLine()
+                        .WriteLine();
+
+                    // Includes standards
+                    //
+                    foreach (string include in stdIncludes)
+                        codeBuilder
+                            .WriteLine("#include <{0}>", include);
+                    codeBuilder
+                        .WriteLine()
+                        .WriteLine();
+
+                    StateHeaderGenerator.GenerateStateTypedef(codeBuilder, machine);
+                    StateHeaderGenerator.GenerateEventTypedef(codeBuilder, machine);
+
+                    codeBuilder
+                        .WriteLine(template);
+
+                    codeBuilder
+                        .WriteLine("#endif // {0}", guardName);
+
+                    writer.Write(codeBuilder.ToString());
                 }
         }
         

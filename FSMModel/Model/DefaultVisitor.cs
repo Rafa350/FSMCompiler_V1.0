@@ -12,8 +12,8 @@
 
         public virtual void Visit(State state) {
 
-            if (state.EnterAction != null)
-                state.EnterAction.AcceptVisitor(this);
+            if (state.EntryAction != null)
+                state.EntryAction.AcceptVisitor(this);
 
             if (state.ExitAction != null)
                 state.ExitAction.AcceptVisitor(this);
@@ -41,13 +41,6 @@
         }
 
         public virtual void Visit(RaiseCommand command) {
-        }
-
-        public virtual void Visit(CommandList commands) {
-
-            if (commands.HasCommands)
-                foreach (CommandBase command in commands.Commands)
-                    command.AcceptVisitor(this);
         }
     }
 }

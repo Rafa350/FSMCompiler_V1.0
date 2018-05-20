@@ -59,7 +59,7 @@
     <Compile Include="Generator\C\GGeneratorOptions.cs" />
     <Compile Include="Generator\C\StateCodeGenerator.cs" />
     <Compile Include="Generator\C\StateHeaderGenerator.cs" />
-    <Compile Include="Generator\C\StateHeaderVisitor.cs" />
+    <Compile Include="Generator\DOT\DOTGenerator.cs" />
     <Compile Include="Generator\GeneratorBase.cs" />
     <Compile Include="Generator\GeneratorParameters.cs" />
     <Compile Include="Generator\IGenerator.cs" />

@@ -13,6 +13,5 @@
 
         void Visit(RaiseCommand action);
         void Visit(InlineCommand action);
-        void Visit(CommandList actions);
     }
 }

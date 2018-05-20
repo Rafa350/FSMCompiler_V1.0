@@ -22,11 +22,7 @@
                 }        
             </inline>
         </onEvent>
-        
-        <onEvent event="Test" condition="a == 1"/>
-        <onEvent event="Test" condition="a == 2"/>
-        <onEvent event="Test"/>
-        
+               
         <!-- Test -->
         <onEvent event="TIM_TEST_INTERVAL" state="Done">
             <inline>

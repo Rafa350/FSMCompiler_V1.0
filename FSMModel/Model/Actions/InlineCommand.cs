@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model.Actions {
     
-    public sealed class InlineCommand: CommandBase {
+    public sealed class InlineCommand: Command {
 
         private string text;
 

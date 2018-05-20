@@ -49,8 +49,7 @@
   <ItemGroup>
     <Compile Include="Loader\XmlLoader.cs" />
     <Compile Include="Model\Action.cs" />
-    <Compile Include="Model\CommandBase.cs" />
-    <Compile Include="Model\CommandList.cs" />
+    <Compile Include="Model\Command.cs" />
     <Compile Include="Model\DefaultVisitor.cs" />
     <Compile Include="Model\Actions\EnqueueCommand.cs" />
     <Compile Include="Model\Event.cs" />

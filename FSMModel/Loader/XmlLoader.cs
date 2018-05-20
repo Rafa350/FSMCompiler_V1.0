@@ -57,7 +57,7 @@
 
             XmlNode onEnterNode = stateNode.SelectSingleNode("onEnter");
             if (onEnterNode != null)
-                state.EnterAction = ProcessActionNode(onEnterNode, machine);
+                state.EntryAction = ProcessActionNode(onEnterNode, machine);
 
             XmlNode onExitNode = stateNode.SelectSingleNode("onExit");
             if (onExitNode != null)
@@ -74,49 +74,44 @@
 
         private Model.Action ProcessActionNode(XmlNode actionNode, Machine machine) {
 
-            CommandList actions = new CommandList();
+            Model.Action action = new Model.Action();
 
             foreach (XmlNode node in actionNode.ChildNodes) {
                 switch (node.Name) {
                     case "inline": 
-                        actions.Add(ProcessInlineActionNode(node, machine));
+                        action.AddCommand(ProcessInlineActionNode(node, machine));
                         break;
 
                     case "raise":
-                        actions.Add(ProcessRaiseActionNode(node, machine));
+                        action.AddCommand(ProcessRaiseActionNode(node, machine));
                         break;
                 }
             }
 
-            return new Model.Action(actions);
-        }
-
-        private CommandBase ProcessInlineActionNode(XmlNode inlineActionNode, Machine machine) {
-
-            string condition = GetAttribute(inlineActionNode, "condition");
-
-            InlineCommand action = new InlineCommand();
-            action.Text = inlineActionNode.InnerText;
-            action.Condition = condition;
-
             return action;
         }
 
-        private CommandBase ProcessRaiseActionNode(XmlNode raiseActionNode, Machine machine) {
+        private Command ProcessInlineActionNode(XmlNode inlineActionNode, Machine machine) {
+
+            InlineCommand command = new InlineCommand();
+            command.Text = inlineActionNode.InnerText;
+
+            return command;
+        }
+
+        private Command ProcessRaiseActionNode(XmlNode raiseActionNode, Machine machine) {
 
             string eventName = GetAttribute(raiseActionNode, "event");
             string delayText = GetAttribute(raiseActionNode, "delay");
-            string condition = GetAttribute(raiseActionNode, "condition");
 
             if (String.IsNullOrEmpty(eventName))
                 throw new InvalidOperationException(String.Format("No se declaro el evento '{0}'.", eventName));
 
-            RaiseCommand action = new RaiseCommand();
-            action.Event = GetEvent(machine, eventName);
-            action.DelayText = delayText;
-            action.Condition = condition;
+            RaiseCommand command = new RaiseCommand();
+            command.Event = GetEvent(machine, eventName);
+            command.DelayText = delayText;
 
-            return action;
+            return command;
         }
 
         private Transition ProcessTransitionNode(XmlNode transitionNode, Machine machine) {
@@ -159,7 +154,8 @@
                 }
             }
 
-            transition.Action = ProcessActionNode(transitionNode, machine);
+            if (transitionNode.HasChildNodes)
+                transition.Action = ProcessActionNode(transitionNode, machine);
 
             return transition;
         }

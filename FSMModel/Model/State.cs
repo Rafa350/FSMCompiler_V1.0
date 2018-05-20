@@ -9,7 +9,7 @@
         private readonly List<Transition> transitions = new List<Transition>();
         private readonly State parent;
         private readonly string name;
-        private Action enterAction;
+        private Action entryAction;
         private Action exitAction;
 
         /// <summary>
@@ -116,12 +116,12 @@
         /// Obte o asigna l'accio d'entrada.
         /// </summary>
         /// 
-        public Action EnterAction {
+        public Action EntryAction {
             get {
-                return enterAction;
+                return entryAction;
             }
             set {
-                enterAction = value;
+                entryAction = value;
             }
         }
 
