@@ -9,8 +9,8 @@
         private readonly List<Transition> transitions = new List<Transition>();
         private readonly State parent;
         private readonly string name;
-        private Action entryAction;
-        private Action exitAction;
+        private Action enter;
+        private Action exit;
 
         /// <summary>
         /// Constructor de l'objecte.
@@ -116,12 +116,12 @@
         /// Obte o asigna l'accio d'entrada.
         /// </summary>
         /// 
-        public Action EntryAction {
+        public Action EnterAction {
             get {
-                return entryAction;
+                return enter;
             }
             set {
-                entryAction = value;
+                enter = value;
             }
         }
 
@@ -131,10 +131,10 @@
         /// 
         public Action ExitAction {
             get {
-                return exitAction;
+                return exit;
             }
             set {
-                exitAction = value;
+                exit = value;
             }
         }
 

@@ -15,7 +15,7 @@
         private Event ev;
         private Guard guard;
         private Action action;
-        private State next;
+        private State nextState;
         private TransitionMode mode = TransitionMode.Null;
 
         /// <summary>
@@ -71,12 +71,12 @@
         /// Obte o asigna el estat final de la transicio.
         /// </summary>
         /// 
-        public State Next {
+        public State NextState {
             get {
-                return next;
+                return nextState;
             }
             set {
-                next = value;
+                nextState = value;
             }
         }
 

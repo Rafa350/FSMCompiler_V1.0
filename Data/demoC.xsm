@@ -1,60 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<machine name="StartControl" initialState="Reset">
+<!-- Gestiona la senyal IN_TR -->
+<machine name="StartControl" start="Reset">
 
-    <state name="Reset">
+    <!-- Estat inicial -->
+    <state name="Reset" state="Idle">
+
+        <!-- Event d'entrada -->
         <onEnter>
             <inline>
-                varSet(VAR_TEST_ACTIVE, 0)
+                varSet(VAR_TEST_ACTIVE, 0);
             </inline>
-            <goto state="Idle"/>
         </onEnter>
+
     </state>
 
+    <!-- Estat en espera de canvis -->
     <state name="Idle">
     
-        <!-- Boto Start/Reset -->
+        <!-- Es prem el boto Start/Reset -->
         <onEvent event="INP_ST_ON" state="Done">
             <inline>
                 if (varGet(VAR_TEST_ACTIVE) == 1) {
                     varSet(VAR_TEST_ACTIVE, 0);
                     timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));
-                }        
+                }    
             </inline>
         </onEvent>
                
-        <!-- Test -->
+        <!-- El temporitzador d'interval de test arriva al final -->
         <onEvent event="TIM_TEST_INTERVAL" state="Done">
             <inline>
                 timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));
             </inline>
         </onEvent>
         
-        <!-- Deteccio de producte INP_TR -->
+        <!-- L'entrada INP_TR passa a estat actiu -->
         <onEvent event="INP_TR_ON" state="Delay">
             <inline>
                 timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));
             </inline>
         </onEvent>
+        
+        <!-- L'entrada IN_IH passa a estat actiu -->
+        <onEvent event="INP_IH_ON">
+            <inline>
+                timStart(TIM_IH_DISABLE_ON_DELAY, varGet(VAR_IH_ONDELAY));
+            </inline>
+        </onEvent>
+        
+        <!-- El temporitzador de retard a la inhibicio arriva al final -->
+        <onEvent event="TIM_IH_DISABLE_ON_DELAY" state="Disabled"/>
        
     </state>
     
+    <!-- Entrada inhibida -->
     <state name="Disabled">
+    
+        <!-- L'entrada INP_IH pasa a estat desactivat -->
+        <onEvent event="INP_IH_OFF">
+            <inline>
+                timStart(TIM_IH_DISABLE_OFF_DELAY, varGet(VAR_IH_OFFDELAY));
+            </inline>
+        </onEvent>
+        
+        <!-- El temporitzador de retart a la inhibicio arriba al final -->
+        <onEvent event="TIM_IH_DISABLE_OFF_DELAY" state="Idle"/>
     </state>
 
+    <!-- Retard de trigger -->
     <state name="Delay">
         <onEvent event="TIM_TR_DELAY" state="Done"/>
     </state>
     
+    <!-- Dispara i espera rearmat -->
     <state name="Done">
+    
+        <!-- Event d'entrada -->
         <onEnter>
             <inline>trigger = true;</inline>
         </onEnter>
+        
+        <!-- Es prem el boto Start/Reset -->
         <onEvent event="INP_ST_ON">
             <inline>
                 timStop(TIM_TEST_INTERVAL);
             </inline>
         </onEvent>
+        
+        <!-- Es reb el rearmat des d'un altre part del sistema -->
         <onEvent event="SIG_REARM_TRIGGER" condition="trigger == false" state="Idle"/>
     </state>
 

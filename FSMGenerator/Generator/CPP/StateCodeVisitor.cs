@@ -3,7 +3,7 @@
     using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Actions;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
 
     internal sealed class StateCodeVisitor: DefaultVisitor {
 
@@ -57,7 +57,7 @@
             hasActions = false;
             s = state;
             while (s != null) {
-                if (s.EntryAction != null) {
+                if (s.EnterAction != null) {
                     if (!hasActions) {
                         codeBuilder
                             .WriteLine("void {0}State::onEnter() {{", state.FullName)
@@ -65,7 +65,7 @@
                             .Indent();
                         hasActions = true;
                     }
-                    s.EntryAction.AcceptVisitor(this);
+                    s.EnterAction.AcceptVisitor(this);
                 }
                 s = s.Parent;
             }
@@ -145,11 +145,11 @@
                     break;
 
                 case TransitionMode.JumpToState:
-                    codeBuilder.WriteLine("setState(ST_{0});", transition.Next.FullName);
+                    codeBuilder.WriteLine("setState(ST_{0});", transition.NextState.FullName);
                     break;
 
                 case TransitionMode.CallToState:
-                    codeBuilder.WriteLine("pushState(ST_{0});", transition.Next.FullName);
+                    codeBuilder.WriteLine("pushState(ST_{0});", transition.NextState.FullName);
                     break;
 
                 case TransitionMode.ReturnFromState:

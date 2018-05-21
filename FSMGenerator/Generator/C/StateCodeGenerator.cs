@@ -1,7 +1,7 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.C {
 
     using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Actions;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
     using System.Text;
 
     internal static class StateCodeGenerator {
@@ -12,7 +12,7 @@
         /// <param name="codeBuilder">Constructor de codi font.</param>
         /// <param name="machine">La maquina a generar.</param>
         /// 
-        public static void GenerateStateTable(CodeBuilder codeBuilder, Machine machine) {
+        public static void GenerateStateDescriptorTable(CodeBuilder codeBuilder, Machine machine) {
 
             codeBuilder
                 .WriteLine("// -----------------------------------------------------------------------")
@@ -28,7 +28,7 @@
                 StringBuilder sb = new StringBuilder();
                 sb.Append("{ ");
                 sb.AppendFormat("State_{0}, ", state.Name);
-                if (state.EntryAction == null)
+                if (state.EnterAction == null)
                     sb.Append("NULL, ");
                 else
                     sb.AppendFormat("Action{0}, ", actionNum++);
@@ -70,7 +70,7 @@
         /// <param name="codeBuilder">Constructor de codi font.</param>
         /// <param name="machine">La maquina.</param>
         /// 
-        public static void GenerateTransitionTable(CodeBuilder codeBuilder, Machine machine) {
+        public static void GenerateTransitionDescriptorTable(CodeBuilder codeBuilder, Machine machine) {
 
             codeBuilder
                 .WriteLine("// -----------------------------------------------------------------------")
@@ -82,7 +82,7 @@
             int actionNum = 0;
             int guardNum = 0;            
             foreach (State state in machine.States) {
-                if (state.EntryAction != null)
+                if (state.EnterAction != null)
                     actionNum++;
                 if (state.ExitAction != null)
                     actionNum++;
@@ -91,10 +91,10 @@
                     StringBuilder sb = new StringBuilder();
                     sb.Append("{ ");
                     sb.AppendFormat("Event_{0}, ",transition.Event.Name);
-                    if (transition.Next == null)
+                    if (transition.NextState == null)
                         sb.AppendFormat("State_{0}, ", state.Name);
                     else
-                        sb.AppendFormat("State_{0}, ", transition.Next.Name);
+                        sb.AppendFormat("State_{0}, ", transition.NextState.Name);
                     if (transition.Guard == null)
                         sb.Append("NULL, ");
                     else
@@ -114,6 +114,25 @@
                 .WriteLine();
         }
 
+        public static void GenerateMachineDescriptor(CodeBuilder codeBuilder, Machine machine) {
+
+            codeBuilder
+                .WriteLine("// -----------------------------------------------------------------------")
+                .WriteLine("// Machine descriptor.")
+                .WriteLine("//")
+                .WriteLine("const MachineDescriptor machine = {")
+                .Indent();
+
+            codeBuilder
+                .WriteLine("  State_{0}", machine.Start.Name)
+                .WriteLine();
+
+            codeBuilder
+                .UnIndent()
+                .WriteLine("};")
+                .WriteLine();
+        }
+
         /// <summary>
         /// Genera les funcions d'accio.
         /// </summary>
@@ -124,7 +143,7 @@
 
             int actionNum = 0;
             foreach (State state in machine.States) {
-                if (state.EntryAction != null) {
+                if (state.EnterAction != null) {
                     codeBuilder
                         .WriteLine("// -----------------------------------------------------------------------")
                         .WriteLine("// Enter action")
@@ -133,7 +152,7 @@
                         .WriteLine("static void Action{0}(Context *context) {{", actionNum++)
                         .WriteLine();
 
-                    WriteAction(codeBuilder, state.EntryAction);
+                    WriteAction(codeBuilder, state.EnterAction);
 
                     codeBuilder
                         .WriteLine("}")

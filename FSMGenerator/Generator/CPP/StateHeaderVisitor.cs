@@ -50,7 +50,7 @@
                 .WriteLine("protected:")
                 .Indent();
             
-            if (state.EntryAction != null) 
+            if (state.EnterAction != null) 
                 codeBuilder.WriteLine("void onEnter();");
             if (state.ExitAction != null)
                 codeBuilder.WriteLine("void onExit();");

@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
-    using MikroPicDesigns.FSMCompiler.v1.Model.Actions;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
 
     public interface IVisitor {
 

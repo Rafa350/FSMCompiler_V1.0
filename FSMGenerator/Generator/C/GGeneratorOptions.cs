@@ -13,6 +13,8 @@
             useStateNames = true;
         }
 
+        public string OutputPath { get; set; }
+
         public string MachineHeaderFileName {
             get { return machineHeaderFileName; }
             set { machineHeaderFileName = value; }

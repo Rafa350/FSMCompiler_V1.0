@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
-    using MikroPicDesigns.FSMCompiler.v1.Model.Actions;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
 
     public abstract class DefaultVisitor: IVisitor {
 
@@ -12,8 +12,8 @@
 
         public virtual void Visit(State state) {
 
-            if (state.EntryAction != null)
-                state.EntryAction.AcceptVisitor(this);
+            if (state.EnterAction != null)
+                state.EnterAction.AcceptVisitor(this);
 
             if (state.ExitAction != null)
                 state.ExitAction.AcceptVisitor(this);

@@ -1,7 +1,7 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Loader {
 
     using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Actions;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
     using System;
     using System.Xml;
 
@@ -31,7 +31,7 @@
         private Machine ProcessMachineNode(XmlNode machineNode) {
 
             string machineName = GetAttribute(machineNode, "name");
-            string startStateName = GetAttribute(machineNode, "initialState");
+            string startStateName = GetAttribute(machineNode, "start");
 
             Machine machine = new Machine(machineName);
 
@@ -41,7 +41,7 @@
                 ProcessStateNode(stateNode, machine);
 
             startStateName = startStateName.Replace(":", "");
-            machine.InitialState = GetState(machine, startStateName);
+            machine.Start = GetState(machine, startStateName);
 
             return machine;
         }
@@ -57,7 +57,7 @@
 
             XmlNode onEnterNode = stateNode.SelectSingleNode("onEnter");
             if (onEnterNode != null)
-                state.EntryAction = ProcessActionNode(onEnterNode, machine);
+                state.EnterAction = ProcessActionNode(onEnterNode, machine);
 
             XmlNode onExitNode = stateNode.SelectSingleNode("onExit");
             if (onExitNode != null)
@@ -149,7 +149,7 @@
                         }
                     }
                     
-                    transition.Next = GetState(machine, name);
+                    transition.NextState = GetState(machine, name);
                     transition.Mode = TransitionMode.JumpToState;
                 }
             }
@@ -160,6 +160,13 @@
             return transition;
         }
 
+        /// <summary>
+        /// Obte l'estat especificat. Si no existeix, el crea
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// <param name="name">Nom de l'estat.</param>
+        /// <returns>L'estat.</returns>
+        /// 
         private static State GetState(Machine machine, string name) {
 
             State ev = machine.GetState(name, false);
@@ -170,6 +177,13 @@
             return ev;
         }
 
+        /// <summary>
+        /// Obte l'event especificat. Si no existeix, el crea.
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// <param name="name">Nom de l'event.</param>
+        /// <returns>L'event.</returns>
+        /// 
         private static Event GetEvent(Machine machine, string name) {
 
             Event ev = machine.GetEvent(name, false);

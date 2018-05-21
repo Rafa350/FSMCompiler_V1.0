@@ -3,8 +3,8 @@
     using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
-   
-    public sealed class CGenerator: GeneratorBase {
+
+    public sealed class CGenerator : GeneratorBase {
 
         private readonly CGeneratorOptions options;
 
@@ -18,107 +18,162 @@
         public override void Generate(Machine machine) {
 
             GenerateMachineHeader(machine);
-            GenerateMachineCode(machine);
             GenerateStateHeader(machine);
-            GenerateStateCode(machine);
+            GenerateEventHeader(machine);
+            GenerateMachineCode(machine);
         }
 
-        private void GenerateMachineHeader(Machine machine) {
-
-            if (!String.IsNullOrEmpty(options.MachineHeaderFileName))
-                using (StreamWriter writer = File.CreateText(options.MachineHeaderFileName)) {
-                    //MachineHeaderVisitor visitor = new MachineHeaderVisitor(writer, options);
-                    //machine.AcceptVisitor(visitor);
-                }
-        }
-
-        private void GenerateMachineCode(Machine machine) { 
-
-            if (!String.IsNullOrEmpty(options.MachineCodeFileName))
-                using (StreamWriter writer = File.CreateText(options.MachineCodeFileName)) {
-                    //MachineCodeVisitor visitor = new MachineCodeVisitor(writer, options);
-                    //machine.AcceptVisitor(visitor);
-                }
-        }
-        
+        /// <summary>
+        /// Genera el fitxer de capcelera amb la definicio dels estats.
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// 
         private void GenerateStateHeader(Machine machine) {
 
-            if (!String.IsNullOrEmpty(options.StateHeaderFileName))
-                using (StreamWriter writer = File.CreateText(options.StateHeaderFileName)) {
+            string folder = options.OutputPath;
+            if (String.IsNullOrEmpty(folder))
+                folder = @".\";
 
-                    CodeBuilder codeBuilder = new CodeBuilder();
+            // Crea el firxer fsm_<machine>_states.h
+            //
+            string fileName = String.Format("fsm_{0}_states.h", machine.Name);
+            string path = Path.Combine(folder, fileName);
+            using (StreamWriter writer = File.CreateText(path)) {
 
-                    string[] stdIncludes = { "stdint.h", "stdbool.h", "stdlib.h" };
+                string guardName = String.Format("__fsm_{0}_states__", machine.Name);
 
-                    string guardName = String.Format("__{0}__", Path.GetFileNameWithoutExtension(options.StateHeaderFileName));
+                CodeBuilder cb = new CodeBuilder();
+                cb
+                    .WriteLine("#ifndef {0}", guardName)
+                    .WriteLine("#define {0}", guardName)
+                    .WriteLine();
 
-                    string template =
-                        "typedef void *Context;\n" +
-                        "typedef void (*Action)(Context *context);\n" +
-                        "typedef bool (*Guard)(Context *context);\n" +
-                        "\n" +
-                        "typedef struct {\n" +
-                        "  Event event;\n" +
-                        "  State next;\n" +
-                        "  const Guard guard;\n" +
-                        "  const Action action;\n" +
-                        "} TransitionDescriptor;\n\n" +
-                        "typedef struct {\n" +
-                        "  State state;\n" +
-                        "  const Action enter;\n" +
-                        "  const Action exit;\n" +
-                        "  uint8_t transitionOffset;\n" +
-                        "  uint8_t transitionCount;\n" +
-                        "} StateDescriptor;\n" +
-                        "\n";
+                int stateNum = 0;
+                foreach (State state in machine.States)
+                    cb.WriteLine("#define State_{0} {1}", state.Name, stateNum++);
+                cb
+                    .WriteLine("#define MAX_STATES {0}", stateNum)
+                    .WriteLine();
 
-                    codeBuilder
-                        .WriteLine("#ifndef {0}", guardName)
-                        .WriteLine("#define {0}", guardName)
-                        .WriteLine()
-                        .WriteLine();
+                cb
+                    .WriteLine("#endif // {0}", guardName)
+                    .WriteLine();
 
-                    // Includes standards
-                    //
-                    foreach (string include in stdIncludes)
-                        codeBuilder
-                            .WriteLine("#include <{0}>", include);
-                    codeBuilder
-                        .WriteLine()
-                        .WriteLine();
-
-                    StateHeaderGenerator.GenerateStateTypedef(codeBuilder, machine);
-                    StateHeaderGenerator.GenerateEventTypedef(codeBuilder, machine);
-
-                    codeBuilder
-                        .WriteLine(template);
-
-                    codeBuilder
-                        .WriteLine("#endif // {0}", guardName);
-
-                    writer.Write(codeBuilder.ToString());
-                }
+                writer.WriteLine(cb.ToString());
+            }
         }
-        
-        private void GenerateStateCode(Machine machine) {
 
-            if (!String.IsNullOrEmpty(options.StateCodeFileName))
-                using (StreamWriter writer = File.CreateText(options.StateCodeFileName)) {
+        /// <summary>
+        /// Genera el fitxer de capcelera amb la definicio dels events
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// 
+        private void GenerateEventHeader(Machine machine) {
 
-                    CodeBuilder codeBuilder = new CodeBuilder();
+            string folder = options.OutputPath;
+            if (String.IsNullOrEmpty(folder))
+                folder = @".\";
 
-                    codeBuilder
-                        .WriteLine("#include \"{0}\"", options.StateHeaderFileName)
-                        .WriteLine()
-                        .WriteLine();
+            // Crea el fitxer fsm_<machine>_events.h
+            //
+            string fileName = String.Format("fsm_{0}_events.h", machine.Name);
+            string path = Path.Combine(folder, fileName);
+            using (StreamWriter writer = File.CreateText(path)) {
 
-                    StateCodeGenerator.GenerateActionImplementation(codeBuilder, machine);
-                    StateCodeGenerator.GenerateGuardImplementation(codeBuilder, machine);
-                    StateCodeGenerator.GenerateTransitionTable(codeBuilder, machine);
-                    StateCodeGenerator.GenerateStateTable(codeBuilder, machine);
+                string guardName = String.Format("__fsm_{0}_events__", machine.Name);
+                CodeBuilder cb = new CodeBuilder();
+                cb
+                    .WriteLine("#ifndef {0}", guardName)
+                    .WriteLine("#define {0}", guardName)
+                    .WriteLine();
 
-                    writer.Write(codeBuilder.ToString());
+                int eventNum = 0;
+                foreach (Event ev in machine.Events) {
+                    cb.WriteLine("#define Event_{0} {1}", ev.Name, eventNum++);
                 }
+                cb
+                    .WriteLine("#define MAX_EVENTS {0}", eventNum)
+                    .WriteLine();
+
+                cb
+                    .WriteLine("#endif // {0}", guardName)
+                    .WriteLine();
+
+                writer.WriteLine(cb.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Genera el fitxer de capcelera de la maquina.
+        /// </summary>
+        /// <param name="machine">Las maquina.</param>
+        /// 
+        private void GenerateMachineHeader(Machine machine) {
+
+            string folder = options.OutputPath;
+            if (String.IsNullOrEmpty(folder))
+                folder = @".\";
+
+            // Crea el fitxer "fsm_<machine>.h"
+            //
+            string fileName = String.Format("fsm_{0}.h", machine.Name);
+            string path = Path.Combine(folder, fileName);
+            using (StreamWriter writer = File.CreateText(path)) {
+
+                string guardName = String.Format("__fsm_{0}__", machine.Name);
+
+                CodeBuilder cb = new CodeBuilder();
+                cb
+                    .WriteLine("#ifndef {0}", guardName)
+                    .WriteLine("#define {0}", guardName)
+                    .WriteLine()
+                    .WriteLine();
+
+                // Includes standards
+                //
+                cb
+                    .WriteLine("#include \"fsm.h\"")
+                    .WriteLine("#include \"fsm_{0}_states.h\"", machine.Name)
+                    .WriteLine("#include \"fsm_{0}_events.h\"", machine.Name)
+                    .WriteLine()
+                    .WriteLine();
+
+                cb
+                    .WriteLine("#endif // {0}", guardName);
+
+                writer.Write(cb.ToString());
+
+            }
+        }
+
+        private void GenerateMachineCode(Machine machine) {
+
+            string folder = options.OutputPath;
+            if (String.IsNullOrEmpty(folder))
+                folder = @".\";
+
+            // Crea el fitxer "fsm_<machine>.c"
+            //
+            string fileName = String.Format("fsm_{0}.c", machine.Name);
+            string path = Path.Combine(folder, fileName);
+            using (StreamWriter writer = File.CreateText(path)) {
+
+                CodeBuilder codeBuilder = new CodeBuilder();
+
+                codeBuilder
+                    .WriteLine("#include \"fsm_{0}.h\"", machine.Name)
+                    .WriteLine("#include \"fsm_defs.h\"")
+                    .WriteLine()
+                    .WriteLine();
+
+                StateCodeGenerator.GenerateActionImplementation(codeBuilder, machine);
+                StateCodeGenerator.GenerateGuardImplementation(codeBuilder, machine);
+                StateCodeGenerator.GenerateTransitionDescriptorTable(codeBuilder, machine);
+                StateCodeGenerator.GenerateStateDescriptorTable(codeBuilder, machine);
+                StateCodeGenerator.GenerateMachineDescriptor(codeBuilder, machine);
+
+                writer.Write(codeBuilder.ToString());
+            }
         }
     }
 }

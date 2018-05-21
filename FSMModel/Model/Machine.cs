@@ -8,7 +8,7 @@
         private readonly Dictionary<string, State> states = new Dictionary<string, State>();
         private readonly Dictionary<string, Event> events = new Dictionary<string, Event>();
         private readonly string name;
-        private State initialState;
+        private State start;
 
         public Machine(string name) {
 
@@ -95,12 +95,12 @@
             }
         }
 
-        public State InitialState {
+        public State Start {
             get {
-                return initialState;
+                return start;
             }
             set {
-                initialState = value;
+                start = value;
             }
         }
 

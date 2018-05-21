@@ -1,4 +1,4 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model.Actions {
+﻿namespace MikroPicDesigns.FSMCompiler.v1.Model.Commands {
     
     public sealed class InlineCommand: Command {
 
