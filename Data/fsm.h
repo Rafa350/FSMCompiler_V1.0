@@ -13,21 +13,25 @@ typedef bool (*Guard)(Context *context);
 
 typedef struct {
   Event event;
-  State next;
+  State nextState;
   const Guard guard;
   const Action action;
 } TransitionDescriptor;
 
 typedef struct {
   State state;
-  const Action enter;
-  const Action exit;
+  const Action enterAction;
+  const Action exitAction;
   uint8_t transitionOffset;
   uint8_t transitionCount;
 } StateDescriptor;
 
 typedef struct{
   State start;
+  uint8_t maxStates;
+  uint8_t maxEvents;
+  StateDescriptor *states;
+  TransitionDescriptor *transitions;
 } MachineDescriptor;
 
 

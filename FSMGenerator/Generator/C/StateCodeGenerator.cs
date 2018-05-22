@@ -18,7 +18,7 @@
                 .WriteLine("// -----------------------------------------------------------------------")
                 .WriteLine("// State descriptor table.")
                 .WriteLine("//")
-                .WriteLine("const StateDescriptor states[] = {")
+                .WriteLine("static const StateDescriptor states[] = {")
                 .Indent();
 
             int actionNum = 0;
@@ -76,7 +76,7 @@
                 .WriteLine("// -----------------------------------------------------------------------")
                 .WriteLine("// Transition descriptor table.")
                 .WriteLine("//")
-                .WriteLine("const TransitionDescriptor transitions[] = {")
+                .WriteLine("static const TransitionDescriptor transitions[] = {")
                 .Indent();
 
             int actionNum = 0;
@@ -124,8 +124,11 @@
                 .Indent();
 
             codeBuilder
-                .WriteLine("  State_{0}", machine.Start.Name)
-                .WriteLine();
+                .WriteLine("State_{0},", machine.Start.Name)
+                .WriteLine("MAX_STATES,")
+                .WriteLine("MAX_EVENTS,")
+                .WriteLine("states,")
+                .WriteLine("events");
 
             codeBuilder
                 .UnIndent()

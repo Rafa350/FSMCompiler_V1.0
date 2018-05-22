@@ -17,7 +17,6 @@
 
         public override void Generate(Machine machine) {
 
-            GenerateMachineHeader(machine);
             GenerateStateHeader(machine);
             GenerateEventHeader(machine);
             GenerateMachineCode(machine);
@@ -103,49 +102,6 @@
             }
         }
 
-        /// <summary>
-        /// Genera el fitxer de capcelera de la maquina.
-        /// </summary>
-        /// <param name="machine">Las maquina.</param>
-        /// 
-        private void GenerateMachineHeader(Machine machine) {
-
-            string folder = options.OutputPath;
-            if (String.IsNullOrEmpty(folder))
-                folder = @".\";
-
-            // Crea el fitxer "fsm_<machine>.h"
-            //
-            string fileName = String.Format("fsm_{0}.h", machine.Name);
-            string path = Path.Combine(folder, fileName);
-            using (StreamWriter writer = File.CreateText(path)) {
-
-                string guardName = String.Format("__fsm_{0}__", machine.Name);
-
-                CodeBuilder cb = new CodeBuilder();
-                cb
-                    .WriteLine("#ifndef {0}", guardName)
-                    .WriteLine("#define {0}", guardName)
-                    .WriteLine()
-                    .WriteLine();
-
-                // Includes standards
-                //
-                cb
-                    .WriteLine("#include \"fsm.h\"")
-                    .WriteLine("#include \"fsm_{0}_states.h\"", machine.Name)
-                    .WriteLine("#include \"fsm_{0}_events.h\"", machine.Name)
-                    .WriteLine()
-                    .WriteLine();
-
-                cb
-                    .WriteLine("#endif // {0}", guardName);
-
-                writer.Write(cb.ToString());
-
-            }
-        }
-
         private void GenerateMachineCode(Machine machine) {
 
             string folder = options.OutputPath;
@@ -161,7 +117,9 @@
                 CodeBuilder codeBuilder = new CodeBuilder();
 
                 codeBuilder
-                    .WriteLine("#include \"fsm_{0}.h\"", machine.Name)
+                    .WriteLine("#include \"fsm.h\"", machine.Name)
+                    .WriteLine("#include \"fsm_{0}_states.h\"", machine.Name)
+                    .WriteLine("#include \"fsm_{0}_events.h\"", machine.Name)
                     .WriteLine("#include \"fsm_defs.h\"")
                     .WriteLine()
                     .WriteLine();
