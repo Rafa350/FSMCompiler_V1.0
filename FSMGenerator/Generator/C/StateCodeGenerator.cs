@@ -128,7 +128,7 @@
                 .WriteLine("MAX_STATES,")
                 .WriteLine("MAX_EVENTS,")
                 .WriteLine("states,")
-                .WriteLine("events");
+                .WriteLine("transitions");
 
             codeBuilder
                 .UnIndent()

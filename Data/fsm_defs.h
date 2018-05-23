@@ -13,8 +13,6 @@
 #define TIM_IH_DISABLE_ON_DELAY    8
 #define TIM_IH_DISABLE_OFF_DELAY   9
 
-#define varGet(a)             __varGet(a)
-#define varSet(a, b)          __varSet(a, b)
 
 extern uint8_t trigger;
 
@@ -22,7 +20,7 @@ extern void timStart(uint8_t id, uint16_t time);
 extern void timStop(uint8_t id);
 
 extern uint16_t varGet(uint8_t var);
-extern void varSet(uint8_t, uint16_t);
+extern void varSet(uint8_t var, uint16_t value);
 
 
 #endif // __fsm_defs__
