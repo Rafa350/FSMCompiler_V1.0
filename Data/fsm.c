@@ -1,5 +1,6 @@
 #include "fsm.h"
 #include "fsm_StartControl_events.h"
+#include "fsm_dump.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -113,12 +114,18 @@ void fsmHandleEvent(FSM *fsm, Event event) {
 
 
 typedef struct {
-    int tick;
+    int time;
     uint8_t event;
 } Tick;
 
 static Tick ticks[] = {
-    {-1, 0}
+    {  0, Event_INP_ST_ON },
+    {  5, Event_INP_ST_ON },
+    { 10, Event_INP_IH_ON },
+    { 15, Event_INP_ST_ON },
+    { 20, Event_INP_ST_ON },
+    { 25, Event_INP_ST_ON },
+    { -1, 0}
 };
 
 
@@ -146,13 +153,33 @@ int main(char *argv[], int argc) {
 
     FSM fsm;
     
-    fsmInitialize(&fsm);
+    HVCD hVcd;
     
-    for (int tick = 0; ticks[tick].tick != -1; tick++) {
-       if (ticks[0].tick == tick) {
-           fsmHandleEvent(&fsm, ticks[tick].event);
-       }
+    hVcd = vcdOpen("demoC.vcd");
+    vcdDefineSignal(hVcd, "T", "clk");
+    vcdDefineSignal(hVcd, "A", "INP_TR");
+    vcdDefineSignal(hVcd, "B", "INP_IH");
+    
+    fsmInitialize(&fsm);
+
+    int tick = 0;
+    for (int time = 0; (time < 1000) && (ticks[tick].time >= 0); time++) {
+        
+        vcdWriteTime(hVcd, time);
+        vcdWriteSignal(hVcd, "T", time & 1);
+
+        if (ticks[tick].time == time) {
+            
+           vcdWriteSignal(hVcd, "A", 1);
+           vcdWriteSignal(hVcd, "B", 0);
+           
+           //fsmHandleEvent(&fsm, ticks[tick].event);
+           
+           tick++;
+        }
     }
+    
+    vcdClose(hVcd);
         
     return 0;
 }
