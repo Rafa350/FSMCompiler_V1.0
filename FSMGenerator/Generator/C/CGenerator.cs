@@ -102,6 +102,11 @@
             }
         }
 
+        /// <summary>
+        /// \brief Genera el fitxer de codi de la maquina d'estat.
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// 
         private void GenerateMachineCode(Machine machine) {
 
             string folder = options.OutputPath;
