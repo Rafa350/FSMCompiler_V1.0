@@ -2,17 +2,52 @@
 
     using MikroPicDesigns.FSMCompiler.v1.Model;
     using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
+    using System;
+    using System.Collections.Generic;
     using System.Text;
 
-    internal static class StateCodeGenerator {
+    internal sealed class StateCodeGenerator {
+
+        private readonly Machine machine;
+        private readonly Dictionary<Model.Action, string> actionDict = new Dictionary<Model.Action, string>();
+        private readonly Dictionary<Guard, string> guardDict = new Dictionary<Guard, string>();
 
         /// <summary>
-        /// Genera la taula d'estats.
+        /// Constructor del objecte.
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// 
+        public StateCodeGenerator(Machine machine) {
+
+            this.machine = machine;
+
+            int actionCount = 0;
+            int guardCount = 0;
+            foreach (State state in machine.States) {
+
+                if (state.EnterAction != null)
+                    actionDict.Add(state.EnterAction, String.Format("Action{0}", actionCount++));
+
+                if (state.ExitAction != null)
+                    actionDict.Add(state.ExitAction, String.Format("Action{0}", actionCount++));
+
+                foreach (Transition transition in state.Transitions) {
+
+                    if (transition.Guard != null)
+                        guardDict.Add(transition.Guard, String.Format("Guard{0}", guardCount++));
+
+                    if (transition.Action != null)
+                        actionDict.Add(transition.Action, String.Format("Action{0}", actionCount++));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Genera la taula d'estats. Per implementacions basades en taules.
         /// </summary>
         /// <param name="codeBuilder">Constructor de codi font.</param>
-        /// <param name="machine">La maquina a generar.</param>
         /// 
-        public static void GenerateStateDescriptorTable(CodeBuilder codeBuilder, Machine machine) {
+        public void GenerateStateDescriptorTable(CodeBuilder codeBuilder) {
 
             codeBuilder
                 .WriteLine("// -----------------------------------------------------------------------")
@@ -21,7 +56,6 @@
                 .WriteLine("static const StateDescriptor states[] = {")
                 .Indent();
 
-            int actionNum = 0;
             int transitionOffset = 0;
             foreach (State state in machine.States) {
 
@@ -31,11 +65,11 @@
                 if (state.EnterAction == null)
                     sb.Append("NULL, ");
                 else
-                    sb.AppendFormat("Action{0}, ", actionNum++);
+                    sb.AppendFormat("{0}, ", actionDict[state.EnterAction]);
                 if (state.ExitAction == null)
                     sb.Append("NULL, ");
                 else
-                    sb.AppendFormat("Action{0}, ", actionNum++);
+                    sb.AppendFormat("{0}, ", actionDict[state.ExitAction]);
 
                 if (state.HasTransitions)
                     sb.AppendFormat("{0}, ", transitionOffset);
@@ -52,11 +86,8 @@
 
                 codeBuilder.WriteLine(sb.ToString());
 
-                foreach (Transition transition in state.Transitions) { 
+                foreach (Transition transition in state.Transitions) 
                     transitionOffset++;
-                    if (transition.Action != null)
-                        actionNum++;
-                }
             }
             codeBuilder
                 .UnIndent()
@@ -65,12 +96,11 @@
         }
 
         /// <summary>
-        /// Genera la taula de transicions.
+        /// Genera la taula de transicions. Per implementacions basades en taules.
         /// </summary>
         /// <param name="codeBuilder">Constructor de codi font.</param>
-        /// <param name="machine">La maquina.</param>
         /// 
-        public static void GenerateTransitionDescriptorTable(CodeBuilder codeBuilder, Machine machine) {
+        public void GenerateTransitionDescriptorTable(CodeBuilder codeBuilder) {
 
             codeBuilder
                 .WriteLine("// -----------------------------------------------------------------------")
@@ -79,18 +109,12 @@
                 .WriteLine("static const TransitionDescriptor transitions[] = {")
                 .Indent();
 
-            int actionNum = 0;
-            int guardNum = 0;            
             foreach (State state in machine.States) {
-                if (state.EnterAction != null)
-                    actionNum++;
-                if (state.ExitAction != null)
-                    actionNum++;
                 foreach (Transition transition in state.Transitions) {
 
                     StringBuilder sb = new StringBuilder();
                     sb.Append("{ ");
-                    sb.AppendFormat("Event_{0}, ",transition.Event.Name);
+                    sb.AppendFormat("Event_{0}, ", transition.Event.Name);
                     if (transition.NextState == null)
                         sb.AppendFormat("State_{0}, ", state.Name);
                     else
@@ -98,11 +122,11 @@
                     if (transition.Guard == null)
                         sb.Append("NULL, ");
                     else
-                        sb.AppendFormat("Guard{0}, ", guardNum++);
+                        sb.AppendFormat("Guard{0}, ", guardDict[transition.Guard]);
                     if (transition.Action == null)
                         sb.Append("NULL");
                     else
-                        sb.AppendFormat("Action{0}", actionNum++);
+                        sb.AppendFormat("{0}", actionDict[transition.Action]);
                     sb.Append(" },");
 
                     codeBuilder.WriteLine(sb.ToString());
@@ -114,7 +138,13 @@
                 .WriteLine();
         }
 
-        public static void GenerateMachineDescriptor(CodeBuilder codeBuilder, Machine machine) {
+
+        /// <summary>
+        /// Genera la taula de maquines. Per implementacio basada en taules.
+        /// </summary>
+        /// <param name="codeBuilder">Constructor de codi font.</param>
+        /// 
+        public void GenerateMachineDescriptor(CodeBuilder codeBuilder) {
 
             codeBuilder
                 .WriteLine("// -----------------------------------------------------------------------")
@@ -140,11 +170,9 @@
         /// Genera les funcions d'accio.
         /// </summary>
         /// <param name="codeBuilder">Constructor de codi font.</param>
-        /// <param name="machine">La maquina.</param>
         /// 
-        public static void GenerateActionImplementation(CodeBuilder codeBuilder, Machine machine) {
+        public void GenerateActionImplementation(CodeBuilder codeBuilder) {
 
-            int actionNum = 0;
             foreach (State state in machine.States) {
                 if (state.EnterAction != null) {
                     codeBuilder
@@ -152,7 +180,7 @@
                         .WriteLine("// Enter action")
                         .WriteLine("//     State: {0}", state.Name)
                         .WriteLine("//")
-                        .WriteLine("static void Action{0}(Context *context) {{", actionNum++)
+                        .WriteLine("static void {0}(Context *context) {{", actionDict[state.EnterAction])
                         .WriteLine();
 
                     WriteAction(codeBuilder, state.EnterAction);
@@ -167,7 +195,7 @@
                         .WriteLine("// Exit action")
                         .WriteLine("//     State: {0}", state.Name)
                         .WriteLine("//")
-                        .WriteLine("static void Action{0}(Context *context) {{", actionNum++)
+                        .WriteLine("static void {0}(Context *context) {{", actionDict[state.ExitAction])
                         .WriteLine();
 
                     WriteAction(codeBuilder, state.ExitAction);
@@ -184,7 +212,7 @@
                             .WriteLine("//     State: {0}", state.Name)
                             .WriteLine("//     Event: {0}", transition.Event.Name)
                             .WriteLine("//")
-                            .WriteLine("static void Action{0}(Context *context) {{", actionNum++)
+                            .WriteLine("static void {0}(Context *context) {{", actionDict[transition.Action])
                             .WriteLine();
 
                         WriteAction(codeBuilder, transition.Action);
@@ -195,19 +223,15 @@
                     }
                 }
             }
-            if (actionNum > 0)
-                codeBuilder.WriteLine();
         }
 
         /// <summary>
-        /// Genera les fiuncions de guarda.
+        /// Genera les funcions de guarda.
         /// </summary>
         /// <param name="codeBuilder">Constructor de codi font.</param>
-        /// <param name="machine">La maquina.</param>
         /// 
-        public static void GenerateGuardImplementation(CodeBuilder codeBuilder, Machine machine) {
+        public void GenerateGuardImplementation(CodeBuilder codeBuilder) {
 
-            int guardNum = 0;
             foreach (State state in machine.States) {
                 foreach (Transition transition in state.Transitions) {
                     if (transition.Guard != null) {
@@ -217,18 +241,107 @@
                             .WriteLine("//     State: {0}", state.Name)
                             .WriteLine("//     Event: {0}", transition.Event.Name)
                             .WriteLine("//")
-                            .WriteLine("static bool Guard{0}(Context *context) {{", guardNum++)
+                            .WriteLine("static bool {0}(Context *context) {{", guardDict[transition.Guard])
                             .WriteLine()
                             .Indent()
                             .WriteLine("return {0};", transition.Guard.Condition)
                             .UnIndent()
                             .WriteLine("}")
-                            .WriteLine(); 
+                            .WriteLine();
                     }
                 }
             }
-            if (guardNum > 0)
-                codeBuilder.WriteLine();
+        }
+
+        /// <summary>
+        /// Genera la funcio de procesament de la maquina d'estats. Versio de maquina amb "switch"
+        /// </summary>
+        /// <param name="codeBuilder">Constructor de codi font.</param>
+        /// 
+        public void GenerateProcessorImplementation(CodeBuilder codeBuilder) {
+
+            codeBuilder
+                .WriteLine("// -----------------------------------------------------------------------")
+                .WriteLine("// State machine")
+                .WriteLine("//")
+                .WriteLine("void Machine{0}(Event event, Context *context) {{", machine.Name)
+                .WriteLine()
+                .Indent()
+                .WriteLine("static State state = State_{0};", machine.Start.Name)
+                .WriteLine()
+                .WriteLine("switch (state) {")
+                .Indent();
+
+            foreach (State state in machine.States) {
+
+                codeBuilder
+                    .WriteLine("case State_{0}: ", state.Name)
+                    .Indent();
+
+                bool first = true;
+                foreach (Transition transition in state.Transitions) {
+
+                    StringBuilder sb = new StringBuilder();
+
+                    if (first) {
+                        first = false;
+                        sb.Append("if (");
+                    }
+                    else
+                        sb.Append("else if (");
+
+                    if (transition.Guard != null)
+                        sb.Append('(');
+                    sb.AppendFormat("event == Event_{0}", transition.Event.Name);
+                    if (transition.Guard != null)
+                        sb.AppendFormat(") && {0}(context)", guardDict[transition.Guard]);
+
+                    sb.Append(") {");
+
+                    codeBuilder
+                        .WriteLine(sb.ToString())
+                        .Indent();
+
+                    // Si hi ha canvi d'estat, genera la crida a la ExitAction del estat actual
+                    //
+                    if ((transition.NextState != null) && (transition.NextState != state)) {
+                        if (state.ExitAction != null)
+                            codeBuilder
+                                .WriteLine("{0}(context);", actionDict[state.ExitAction]);
+                    }
+
+                    // Genera la crida a la accio de la transicio
+                    //
+                    if (transition.Action != null)
+                        codeBuilder.WriteLine("{0}(context);", actionDict[transition.Action]);
+
+                    // Si hi ha canvi d'estat, genera la crida a la EnterAction del nou estat.
+                    //
+                    if ((transition.NextState != null) && (transition.NextState != state)) {
+                        if (transition.NextState.EnterAction != null)
+                            codeBuilder
+                                .WriteLine("{0}(context);", actionDict[transition.NextState.EnterAction]);
+                        codeBuilder
+                            .WriteLine("state = State_{0};", transition.NextState.Name);
+                    }
+
+                    codeBuilder
+                        .UnIndent()
+                        .WriteLine("}");
+                }
+
+                codeBuilder
+                    .WriteLine("break; ")
+                    .UnIndent()
+                    .WriteLine();
+            }
+
+            codeBuilder
+                .UnIndent()
+                .WriteLine("}")
+                .UnIndent()
+                .WriteLine("}")
+                .WriteLine();
         }
 
         /// <summary>
@@ -237,7 +350,7 @@
         /// <param name="codeBuilder">Constructor de codi.</param>
         /// <param name="action">L'accio.</param>
         /// 
-        private static void WriteAction(CodeBuilder codeBuilder, Action action) {
+        private static void WriteAction(CodeBuilder codeBuilder, Model.Action action) {
 
             foreach (Command command in action.Commands) {
                 InlineCommand inlineCmd = command as InlineCommand;

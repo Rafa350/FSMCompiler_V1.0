@@ -129,11 +129,19 @@
                     .WriteLine()
                     .WriteLine();
 
-                StateCodeGenerator.GenerateActionImplementation(codeBuilder, machine);
-                StateCodeGenerator.GenerateGuardImplementation(codeBuilder, machine);
-                StateCodeGenerator.GenerateTransitionDescriptorTable(codeBuilder, machine);
-                StateCodeGenerator.GenerateStateDescriptorTable(codeBuilder, machine);
-                StateCodeGenerator.GenerateMachineDescriptor(codeBuilder, machine);
+                StateCodeGenerator generator = new StateCodeGenerator(machine);
+                
+                // Genera les funcions
+                //
+                generator.GenerateActionImplementation(codeBuilder);
+                generator.GenerateGuardImplementation(codeBuilder);
+                generator.GenerateProcessorImplementation(codeBuilder);
+
+                // Genera les taules 
+                //
+                generator.GenerateTransitionDescriptorTable(codeBuilder);
+                generator.GenerateStateDescriptorTable(codeBuilder);
+                generator.GenerateMachineDescriptor(codeBuilder);
 
                 writer.Write(codeBuilder.ToString());
             }

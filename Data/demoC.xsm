@@ -6,7 +6,7 @@
     <!-- Estat inicial -->
     <state name="Reset" state="Idle">
 
-        <!-- Event d'entrada -->
+        <!-- Event de sortida -->
         <onEnter>
             <inline>
                 varSet(VAR_TEST_ACTIVE, 0);
