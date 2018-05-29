@@ -6,12 +6,13 @@
     <!-- Estat inicial -->
     <state name="Reset" state="Idle">
 
-        <!-- Event de sortida -->
+        <!-- Accio d'entrada -->
         <onEnter>
-            <inline>
-                varSet(VAR_TEST_ACTIVE, 0);
-            </inline>
+            <inline>varSet(VAR_TEST_ACTIVE, 0);</inline>
         </onEnter>
+        
+        <!-- Transicio per defecte -->
+        <onEvent state="Idle"/>
 
     </state>
 
@@ -20,33 +21,25 @@
     
         <!-- Es prem el boto Start/Reset -->
         <onEvent event="INP_ST_ON" state="Done">
-            <inline>
-                if (varGet(VAR_TEST_ACTIVE) == 1) {
-                    varSet(VAR_TEST_ACTIVE, 0);
-                    timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));
-                }    
-            </inline>
+            <inline>if (varGet(VAR_TEST_ACTIVE) == 1) {</inline>
+            <inline>    varSet(VAR_TEST_ACTIVE, 0);</inline>
+            <inline>    timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));</inline>
+            <inline>}</inline>
         </onEvent>
                
         <!-- El temporitzador d'interval de test arriva al final -->
         <onEvent event="TIM_TEST_INTERVAL" state="Done">
-            <inline>
-                timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));
-            </inline>
+            <inline>timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));</inline>
         </onEvent>
         
         <!-- L'entrada INP_TR passa a estat actiu -->
         <onEvent event="INP_TR_ON" state="Delay">
-            <inline>
-                timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));
-            </inline>
+            <inline>timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));</inline>
         </onEvent>
         
         <!-- L'entrada IN_IH passa a estat actiu -->
         <onEvent event="INP_IH_ON">
-            <inline>
-                timStart(TIM_IH_DISABLE_ON_DELAY, varGet(VAR_IH_ONDELAY));
-            </inline>
+            <inline>timStart(TIM_IH_DISABLE_ON_DELAY, varGet(VAR_IH_ONDELAY));</inline>
         </onEvent>
         
         <!-- El temporitzador de retard a la inhibicio arriva al final -->
@@ -59,9 +52,7 @@
     
         <!-- L'entrada INP_IH pasa a estat desactivat -->
         <onEvent event="INP_IH_OFF">
-            <inline>
-                timStart(TIM_IH_DISABLE_OFF_DELAY, varGet(VAR_IH_OFFDELAY));
-            </inline>
+            <inline>timStart(TIM_IH_DISABLE_OFF_DELAY, varGet(VAR_IH_OFFDELAY));</inline>
         </onEvent>
         
         <!-- El temporitzador de retart a la inhibicio arriba al final -->
@@ -83,9 +74,7 @@
         
         <!-- Es prem el boto Start/Reset -->
         <onEvent event="INP_ST_ON">
-            <inline>
-                timStop(TIM_TEST_INTERVAL);
-            </inline>
+            <inline>timStop(TIM_TEST_INTERVAL);</inline>
         </onEvent>
         
         <!-- Es reb el rearmat des d'un altre part del sistema -->

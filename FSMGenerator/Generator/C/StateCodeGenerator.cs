@@ -112,24 +112,26 @@
             foreach (State state in machine.States) {
                 foreach (Transition transition in state.Transitions) {
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append("{ ");
-                    sb.AppendFormat("Event_{0}, ", transition.Event.Name);
-                    if (transition.NextState == null)
-                        sb.AppendFormat("State_{0}, ", state.Name);
-                    else
-                        sb.AppendFormat("State_{0}, ", transition.NextState.Name);
-                    if (transition.Guard == null)
-                        sb.Append("NULL, ");
-                    else
-                        sb.AppendFormat("Guard{0}, ", guardDict[transition.Guard]);
-                    if (transition.Action == null)
-                        sb.Append("NULL");
-                    else
-                        sb.AppendFormat("{0}", actionDict[transition.Action]);
-                    sb.Append(" },");
+                    if (transition.Event != null) { // Gestionar la transicio per defecte !!!!!!
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("{ ");
+                        sb.AppendFormat("Event_{0}, ", transition.Event.Name);
+                        if (transition.NextState == null)
+                            sb.AppendFormat("State_{0}, ", state.Name);
+                        else
+                            sb.AppendFormat("State_{0}, ", transition.NextState.Name);
+                        if (transition.Guard == null)
+                            sb.Append("NULL, ");
+                        else
+                            sb.AppendFormat("{0}, ", guardDict[transition.Guard]);
+                        if (transition.Action == null)
+                            sb.Append("NULL");
+                        else
+                            sb.AppendFormat("{0}", actionDict[transition.Action]);
+                        sb.Append(" },");
 
-                    codeBuilder.WriteLine(sb.ToString());
+                        codeBuilder.WriteLine(sb.ToString());
+                    }
                 }
             }
             codeBuilder
@@ -174,36 +176,29 @@
         public void GenerateActionImplementation(CodeBuilder codeBuilder) {
 
             foreach (State state in machine.States) {
+
                 if (state.EnterAction != null) {
                     codeBuilder
                         .WriteLine("// -----------------------------------------------------------------------")
                         .WriteLine("// Enter action")
                         .WriteLine("//     State: {0}", state.Name)
-                        .WriteLine("//")
-                        .WriteLine("static void {0}(Context *context) {{", actionDict[state.EnterAction])
-                        .WriteLine();
-
-                    WriteAction(codeBuilder, state.EnterAction);
-
-                    codeBuilder
-                        .WriteLine("}")
-                        .WriteLine();
+                        .WriteLine("//");
+                    EmitActionDeclarationStart(codeBuilder, state.EnterAction);
+                    EmitActionBody(codeBuilder, state.EnterAction);
+                    EmitActionDeclarationEnd(codeBuilder, state.EnterAction);
                 }
+
                 if (state.ExitAction != null) {
                     codeBuilder
                         .WriteLine("// -----------------------------------------------------------------------")
                         .WriteLine("// Exit action")
                         .WriteLine("//     State: {0}", state.Name)
-                        .WriteLine("//")
-                        .WriteLine("static void {0}(Context *context) {{", actionDict[state.ExitAction])
-                        .WriteLine();
-
-                    WriteAction(codeBuilder, state.ExitAction);
-
-                    codeBuilder
-                        .WriteLine("}")
-                        .WriteLine();
+                        .WriteLine("//");
+                    EmitActionDeclarationStart(codeBuilder, state.ExitAction);
+                    EmitActionBody(codeBuilder, state.ExitAction);
+                    EmitActionDeclarationEnd(codeBuilder, state.ExitAction);
                 }
+
                 foreach (Transition transition in state.Transitions) {
                     if (transition.Action != null) {
                         codeBuilder
@@ -211,15 +206,10 @@
                             .WriteLine("// Transition action")
                             .WriteLine("//     State: {0}", state.Name)
                             .WriteLine("//     Event: {0}", transition.Event.Name)
-                            .WriteLine("//")
-                            .WriteLine("static void {0}(Context *context) {{", actionDict[transition.Action])
-                            .WriteLine();
-
-                        WriteAction(codeBuilder, transition.Action);
-
-                        codeBuilder
-                            .WriteLine("}")
-                            .WriteLine();
+                            .WriteLine("//");
+                        EmitActionDeclarationStart(codeBuilder, transition.Action);
+                        EmitActionBody(codeBuilder, transition.Action);
+                        EmitActionDeclarationEnd(codeBuilder, transition.Action);
                     }
                 }
             }
@@ -239,7 +229,7 @@
                             .WriteLine("// -----------------------------------------------------------------------")
                             .WriteLine("// Transition guard")
                             .WriteLine("//     State: {0}", state.Name)
-                            .WriteLine("//     Event: {0}", transition.Event.Name)
+                            .WriteLine("//     Event: {0}", transition.Event == null ? "default" : transition.Event.Name)
                             .WriteLine("//")
                             .WriteLine("static bool {0}(Context *context) {{", guardDict[transition.Guard])
                             .WriteLine()
@@ -262,13 +252,36 @@
 
             codeBuilder
                 .WriteLine("// -----------------------------------------------------------------------")
-                .WriteLine("// State machine")
+                .WriteLine("// Internal vars.")
                 .WriteLine("//")
-                .WriteLine("void Machine{0}(Event event, Context *context) {{", machine.Name)
+                .WriteLine("static State state;")
+                .WriteLine();
+
+            codeBuilder
+                .WriteLine("// -----------------------------------------------------------------------")
+                .WriteLine("// State machine setup")
+                .WriteLine("//")
+                .WriteLine("void {0}Setup(Context *context) {{", machine.Name)
                 .WriteLine()
                 .Indent()
-                .WriteLine("static State state = State_{0};", machine.Start.Name)
+                .WriteLine("state = State_{0};", machine.Start.Name);
+
+            if (machine.Start.EnterAction != null)
+                codeBuilder
+                    .WriteLine("{0}(context);", actionDict[machine.Start.EnterAction]);
+
+            codeBuilder
+                .UnIndent()
+                .WriteLine("}")
+                .WriteLine();
+
+            codeBuilder
+                .WriteLine("// -----------------------------------------------------------------------")
+                .WriteLine("// State machine event processor")
+                .WriteLine("//")
+                .WriteLine("void {0}Run(Event event, Context *context) {{", machine.Name)
                 .WriteLine()
+                .Indent()
                 .WriteLine("switch (state) {")
                 .Indent();
 
@@ -283,20 +296,33 @@
 
                     StringBuilder sb = new StringBuilder();
 
-                    if (first) {
-                        first = false;
-                        sb.Append("if (");
+                    // Transicio per defecte. cal que sigui l'ultima.
+                    //
+                    if (transition.Event == null) {
+                        if (!first) {
+                            if (transition.Guard == null)
+                                sb.Append("else");
+                            else
+                                sb.AppendFormat("else if ({0}(context))", guardDict[transition.Guard]);
+                        }
                     }
-                    else
-                        sb.Append("else if (");
 
-                    if (transition.Guard != null)
-                        sb.Append('(');
-                    sb.AppendFormat("event == Event_{0}", transition.Event.Name);
-                    if (transition.Guard != null)
-                        sb.AppendFormat(") && {0}(context)", guardDict[transition.Guard]);
-
-                    sb.Append(") {");
+                    // Transicio normal
+                    //
+                    else {
+                        if (first) {
+                            first = false;
+                            sb.Append("if (");
+                        }
+                        else
+                            sb.Append("else if (");
+                        if (transition.Guard != null)
+                            sb.Append('(');
+                        sb.AppendFormat("event == Event_{0}", transition.Event.Name);
+                        if (transition.Guard != null)
+                            sb.AppendFormat(") && {0}(context)", guardDict[transition.Guard]);
+                        sb.Append(") {");
+                    }
 
                     codeBuilder
                         .WriteLine(sb.ToString())
@@ -345,18 +371,45 @@
         }
 
         /// <summary>
+        /// Genera el inici de la declaracio de l'accio.
+        /// </summary>
+        /// <param name="codeBuilder">Constructor de codi.</param>
+        /// <param name="action">L'accio.</param>
+        /// 
+        private void EmitActionDeclarationStart(CodeBuilder codeBuilder, Model.Action action) {
+
+            codeBuilder
+                .WriteLine("static void {0}(Context *context) {{", actionDict[action])
+                .WriteLine()
+                .Indent();
+        }
+
+        /// <summary>
+        /// Finalitza la declaracio de l'accio.
+        /// </summary>
+        /// <param name="codeBuilder">Constructor de codi.</param>
+        /// <param name="action">L'accio.</param>
+        /// 
+        private void EmitActionDeclarationEnd(CodeBuilder codeBuilder, Model.Action action) {
+
+            codeBuilder
+                .UnIndent()
+                .WriteLine("}")
+                .WriteLine();
+        }
+
+        /// <summary>
         /// Genera la implementacio d'una accio.
         /// </summary>
         /// <param name="codeBuilder">Constructor de codi.</param>
         /// <param name="action">L'accio.</param>
         /// 
-        private static void WriteAction(CodeBuilder codeBuilder, Model.Action action) {
+        private void EmitActionBody(CodeBuilder codeBuilder, Model.Action action) {
 
             foreach (Command command in action.Commands) {
                 InlineCommand inlineCmd = command as InlineCommand;
-                if (inlineCmd != null) {
-                    codeBuilder.WriteLine(inlineCmd.Text.TrimStart());
-                }
+                if (inlineCmd != null)
+                    codeBuilder.WriteLine(inlineCmd.Text);
             }
         }
     }
