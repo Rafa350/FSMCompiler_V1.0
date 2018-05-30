@@ -257,7 +257,7 @@
                 .WriteLine("// -----------------------------------------------------------------------")
                 .WriteLine("// State machine setup")
                 .WriteLine("//")
-                .WriteLine("void {0}Setup(Context *context) {{", machine.Name)
+                .WriteLine("void {0}Setup(Context context) {{", machine.Name)
                 .WriteLine()
                 .Indent()
                 .WriteLine("state = State_{0};", machine.Start.Name);
@@ -274,7 +274,7 @@
                 .WriteLine("// -----------------------------------------------------------------------")
                 .WriteLine("// State machine event processor")
                 .WriteLine("//")
-                .WriteLine("void {0}Run(Event event, Context *context) {{", machine.Name)
+                .WriteLine("void {0}Run(Event event, Context context) {{", machine.Name)
                 .WriteLine()
                 .Indent()
                 .WriteLine("switch (state) {")
@@ -372,7 +372,7 @@
         private void EmitActionDeclarationStart(CodeBuilder codeBuilder, Model.Action action) {
 
             codeBuilder
-                .WriteLine("static void {0}(Context *context) {{", actionDict[action])
+                .WriteLine("static void {0}(Context context) {{", actionDict[action])
                 .WriteLine()
                 .Indent();
         }
@@ -415,7 +415,7 @@
         private void EmitActionCall(CodeBuilder codeBuilder, Model.Action action) {
 
             codeBuilder
-                .WriteLine("{0}(Context *context) {{", actionDict[action]);
+                .WriteLine("{0}(context);", actionDict[action]);
         }
 
         /// <summary>
@@ -427,7 +427,7 @@
         private void EmitGuardDeclarationStart(CodeBuilder codeBuilder, Guard guard) {
 
             codeBuilder
-                .WriteLine("static bool {0}(Context *context) {{", guardDict[guard])
+                .WriteLine("static bool {0}(Context context) {{", guardDict[guard])
                 .WriteLine()
                 .Indent();
         }
