@@ -55,15 +55,15 @@
 
             State state = GetState(machine, stateName);
 
-            XmlNode onEnterNode = stateNode.SelectSingleNode("onEnter");
+            XmlNode onEnterNode = stateNode.SelectSingleNode("enter");
             if (onEnterNode != null)
                 state.EnterAction = ProcessActionNode(onEnterNode, machine);
 
-            XmlNode onExitNode = stateNode.SelectSingleNode("onExit");
+            XmlNode onExitNode = stateNode.SelectSingleNode("exit");
             if (onExitNode != null)
                 state.ExitAction = ProcessActionNode(onExitNode, machine);
 
-            foreach (XmlNode onEventNode in stateNode.SelectNodes("onEvent")) {
+            foreach (XmlNode onEventNode in stateNode.SelectNodes("transition")) {
                 Transition transition = ProcessTransitionNode(onEventNode, machine);
                 state.AddTransition(transition);
             }
@@ -126,7 +126,7 @@
 
             // Obte la guarda
             //
-            string condition = GetAttribute(transitionNode, "condition");
+            string condition = GetAttribute(transitionNode, "guard");
             if (!String.IsNullOrEmpty(condition))
                 transition.Guard = new Guard(condition);
 

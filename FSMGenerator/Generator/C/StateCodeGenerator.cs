@@ -230,14 +230,10 @@
                             .WriteLine("// Transition guard")
                             .WriteLine("//     State: {0}", state.Name)
                             .WriteLine("//     Event: {0}", transition.Event == null ? "default" : transition.Event.Name)
-                            .WriteLine("//")
-                            .WriteLine("static bool {0}(Context *context) {{", guardDict[transition.Guard])
-                            .WriteLine()
-                            .Indent()
-                            .WriteLine("return {0};", transition.Guard.Condition)
-                            .UnIndent()
-                            .WriteLine("}")
-                            .WriteLine();
+                            .WriteLine("//");
+                        EmitGuardDeclarationStart(codeBuilder, transition.Guard);
+                        EmitGuardBody(codeBuilder, transition.Guard);
+                        EmitGuardDeclarationEnd(codeBuilder, transition.Guard);
                     }
                 }
             }
@@ -267,8 +263,7 @@
                 .WriteLine("state = State_{0};", machine.Start.Name);
 
             if (machine.Start.EnterAction != null)
-                codeBuilder
-                    .WriteLine("{0}(context);", actionDict[machine.Start.EnterAction]);
+                EmitActionCall(codeBuilder, machine.Start.EnterAction);
 
             codeBuilder
                 .UnIndent()
@@ -332,21 +327,19 @@
                     //
                     if ((transition.NextState != null) && (transition.NextState != state)) {
                         if (state.ExitAction != null)
-                            codeBuilder
-                                .WriteLine("{0}(context);", actionDict[state.ExitAction]);
+                            EmitActionCall(codeBuilder, state.ExitAction);
                     }
 
                     // Genera la crida a la accio de la transicio
                     //
                     if (transition.Action != null)
-                        codeBuilder.WriteLine("{0}(context);", actionDict[transition.Action]);
+                        EmitActionCall(codeBuilder, transition.Action);
 
                     // Si hi ha canvi d'estat, genera la crida a la EnterAction del nou estat.
                     //
                     if ((transition.NextState != null) && (transition.NextState != state)) {
                         if (transition.NextState.EnterAction != null)
-                            codeBuilder
-                                .WriteLine("{0}(context);", actionDict[transition.NextState.EnterAction]);
+                            EmitActionCall(codeBuilder, transition.NextState.EnterAction);
                         codeBuilder
                             .WriteLine("state = State_{0};", transition.NextState.Name);
                     }
@@ -411,6 +404,58 @@
                 if (inlineCmd != null)
                     codeBuilder.WriteLine(inlineCmd.Text);
             }
+        }
+
+        /// <summary>
+        /// Genera la crida a l'accio.
+        /// </summary>
+        /// <param name="codeBuilder">Constructor de codi.</param>
+        /// <param name="action">L'accio.</param>
+        /// 
+        private void EmitActionCall(CodeBuilder codeBuilder, Model.Action action) {
+
+            codeBuilder
+                .WriteLine("{0}(Context *context) {{", actionDict[action]);
+        }
+
+        /// <summary>
+        /// Genera la capcelera de la declaracio de la funcio de guarda.
+        /// </summary>
+        /// <param name="codeBuilder">Constructor de codi.</param>
+        /// <param name="guard">La guarda.</param>
+        /// 
+        private void EmitGuardDeclarationStart(CodeBuilder codeBuilder, Guard guard) {
+
+            codeBuilder
+                .WriteLine("static bool {0}(Context *context) {{", guardDict[guard])
+                .WriteLine()
+                .Indent();
+        }
+
+        /// <summary>
+        /// Genera la implementacio d'una funcio de guarda
+        /// </summary>
+        /// <param name="codeBuilder">Constructor de codi.</param>
+        /// <param name="action">La guarda.</param>
+        /// 
+        private void EmitGuardDeclarationEnd(CodeBuilder codeBuilder, Guard guard) {
+
+            codeBuilder
+                .UnIndent()
+                .WriteLine("}")
+                .WriteLine();
+        }
+
+        /// <summary>
+        /// Finalitza la declaracio de la funcio de guarda.
+        /// </summary>
+        /// <param name="codeBuilder">Constructor de codi.</param>
+        /// <param name="guard">La guarda.</param>
+        /// 
+        private void EmitGuardBody(CodeBuilder codeBuilder, Guard guard) {
+
+            codeBuilder
+                .WriteLine("return {0};", guard.Condition);
         }
     }
 }

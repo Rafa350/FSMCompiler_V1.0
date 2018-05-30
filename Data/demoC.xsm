@@ -7,12 +7,12 @@
     <state name="Reset" state="Idle">
 
         <!-- Accio d'entrada -->
-        <onEnter>
+        <enter>
             <inline>varSet(VAR_TEST_ACTIVE, 0);</inline>
-        </onEnter>
+        </enter>
         
         <!-- Transicio per defecte -->
-        <onEvent state="Idle"/>
+        <transition state="Idle"/>
 
     </state>
 
@@ -20,30 +20,30 @@
     <state name="Idle">
     
         <!-- Es prem el boto Start/Reset -->
-        <onEvent event="INP_ST_ON" state="Done">
+        <transition event="INP_ST_ON" state="Done">
             <inline>if (varGet(VAR_TEST_ACTIVE) == 1) {</inline>
             <inline>    varSet(VAR_TEST_ACTIVE, 0);</inline>
             <inline>    timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));</inline>
             <inline>}</inline>
-        </onEvent>
+        </transition>
                
         <!-- El temporitzador d'interval de test arriva al final -->
-        <onEvent event="TIM_TEST_INTERVAL" state="Done">
+        <transition event="TIM_TEST_INTERVAL" state="Done">
             <inline>timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));</inline>
-        </onEvent>
+        </transition>
         
         <!-- L'entrada INP_TR passa a estat actiu -->
-        <onEvent event="INP_TR_ON" state="Delay">
+        <transition event="INP_TR_ON" state="Delay">
             <inline>timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));</inline>
-        </onEvent>
+        </transition>
         
         <!-- L'entrada IN_IH passa a estat actiu -->
-        <onEvent event="INP_IH_ON">
+        <transition event="INP_IH_ON">
             <inline>timStart(TIM_IH_DISABLE_ON_DELAY, varGet(VAR_IH_ONDELAY));</inline>
-        </onEvent>
+        </transition>
         
         <!-- El temporitzador de retard a la inhibicio arriva al final -->
-        <onEvent event="TIM_IH_DISABLE_ON_DELAY" state="Disabled"/>
+        <transition event="TIM_IH_DISABLE_ON_DELAY" state="Disabled"/>
        
     </state>
     
@@ -51,34 +51,34 @@
     <state name="Disabled">
     
         <!-- L'entrada INP_IH pasa a estat desactivat -->
-        <onEvent event="INP_IH_OFF">
+        <transition event="INP_IH_OFF">
             <inline>timStart(TIM_IH_DISABLE_OFF_DELAY, varGet(VAR_IH_OFFDELAY));</inline>
-        </onEvent>
+        </transition>
         
         <!-- El temporitzador de retart a la inhibicio arriba al final -->
-        <onEvent event="TIM_IH_DISABLE_OFF_DELAY" state="Idle"/>
+        <transition event="TIM_IH_DISABLE_OFF_DELAY" state="Idle"/>
     </state>
 
     <!-- Retard de trigger -->
     <state name="Delay">
-        <onEvent event="TIM_TR_DELAY" state="Done"/>
+        <transition event="TIM_TR_DELAY" state="Done"/>
     </state>
     
     <!-- Dispara i espera rearmat -->
     <state name="Done">
     
         <!-- Event d'entrada -->
-        <onEnter>
+        <enter>
             <inline>trigger = true;</inline>
-        </onEnter>
+        </enter>
         
         <!-- Es prem el boto Start/Reset -->
-        <onEvent event="INP_ST_ON">
+        <transition event="INP_ST_ON">
             <inline>timStop(TIM_TEST_INTERVAL);</inline>
-        </onEvent>
+        </transition>
         
         <!-- Es reb el rearmat des d'un altre part del sistema -->
-        <onEvent event="SIG_REARM_TRIGGER" condition="trigger == false" state="Idle"/>
+        <transition event="SIG_REARM_TRIGGER" guard="trigger == false" state="Idle"/>
     </state>
 
 
