@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- Gestiona la senyal IN_TR -->
-<machine name="StartControl" start="Reset">
-
-    <!-- Estat inicial -->
-    <state name="Reset" state="Idle">
-
-        <!-- Accio d'entrada -->
-        <enter>
-            <inline>varSet(VAR_TEST_ACTIVE, 0);</inline>
-        </enter>
-        
-        <!-- Transicio per defecte -->
-        <transition state="Idle"/>
-
-    </state>
+<machine name="StartControl" start="Idle">
 
     <!-- Estat en espera de canvis -->
     <state name="Idle">

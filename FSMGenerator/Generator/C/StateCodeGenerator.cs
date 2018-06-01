@@ -112,26 +112,24 @@
             foreach (State state in machine.States) {
                 foreach (Transition transition in state.Transitions) {
 
-                    if (transition.Event != null) { // Gestionar la transicio per defecte !!!!!!
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append("{ ");
-                        sb.AppendFormat("Event_{0}, ", transition.Event.Name);
-                        if (transition.NextState == null)
-                            sb.AppendFormat("State_{0}, ", state.Name);
-                        else
-                            sb.AppendFormat("State_{0}, ", transition.NextState.Name);
-                        if (transition.Guard == null)
-                            sb.Append("NULL, ");
-                        else
-                            sb.AppendFormat("{0}, ", guardDict[transition.Guard]);
-                        if (transition.Action == null)
-                            sb.Append("NULL");
-                        else
-                            sb.AppendFormat("{0}", actionDict[transition.Action]);
-                        sb.Append(" },");
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("{ ");
+                    sb.AppendFormat("Event_{0}, ", transition.Event.Name);
+                    if (transition.NextState == null)
+                        sb.AppendFormat("State_{0}, ", state.Name);
+                    else
+                        sb.AppendFormat("State_{0}, ", transition.NextState.Name);
+                    if (transition.Guard == null)
+                        sb.Append("NULL, ");
+                    else
+                        sb.AppendFormat("{0}, ", guardDict[transition.Guard]);
+                    if (transition.Action == null)
+                        sb.Append("NULL");
+                    else
+                        sb.AppendFormat("{0}", actionDict[transition.Action]);
+                    sb.Append(" },");
 
-                        codeBuilder.WriteLine(sb.ToString());
-                    }
+                    codeBuilder.WriteLine(sb.ToString());
                 }
             }
             codeBuilder
@@ -291,33 +289,18 @@
 
                     StringBuilder sb = new StringBuilder();
 
-                    // Transicio per defecte. cal que sigui l'ultima.
-                    //
-                    if (transition.Event == null) {
-                        if (!first) {
-                            if (transition.Guard == null)
-                                sb.Append("else");
-                            else
-                                sb.AppendFormat("else if ({0}(context))", guardDict[transition.Guard]);
-                        }
+                    if (first) {
+                        first = false;
+                        sb.Append("if (");
                     }
-
-                    // Transicio normal
-                    //
-                    else {
-                        if (first) {
-                            first = false;
-                            sb.Append("if (");
-                        }
-                        else
-                            sb.Append("else if (");
-                        if (transition.Guard != null)
-                            sb.Append('(');
-                        sb.AppendFormat("event == Event_{0}", transition.Event.Name);
-                        if (transition.Guard != null)
-                            sb.AppendFormat(") && {0}(context)", guardDict[transition.Guard]);
-                        sb.Append(") {");
-                    }
+                    else
+                        sb.Append("else if (");
+                    if (transition.Guard != null)
+                        sb.Append('(');
+                    sb.AppendFormat("event == Event_{0}", transition.Event.Name);
+                    if (transition.Guard != null)
+                        sb.AppendFormat(") && {0}(context)", guardDict[transition.Guard]);
+                    sb.Append(") {");
 
                     codeBuilder
                         .WriteLine(sb.ToString())

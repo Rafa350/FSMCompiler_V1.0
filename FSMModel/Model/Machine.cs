@@ -57,20 +57,20 @@
             events.Add(ev.Name, ev);
         }
 
-        public State GetState(string fullName, bool throwError = true) {
+        public State GetState(string name, bool throwError = true) {
 
-            if (String.IsNullOrEmpty(fullName))
+            if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException("fullName");
 
-            if (!states.ContainsKey(fullName)) {
+            if (!states.ContainsKey(name)) {
                 if (throwError)
                     throw new InvalidOperationException(
-                        String.Format("No se agrego ningun estado con el nombre '{0}'.", fullName));
+                        String.Format("No se agrego ningun estado con el nombre '{0}'.", name));
                 else
                     return null;
             }
 
-            return states[fullName];
+            return states[name];
         }
 
         public Event GetEvent(string name, bool throwError = true) {
