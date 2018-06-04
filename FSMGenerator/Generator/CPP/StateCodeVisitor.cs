@@ -133,7 +133,7 @@
 
             if (transition.Guard != null) {
                 codeBuilder
-                    .WriteLine("if ({0}) {{", transition.Guard.Condition)
+                    .WriteLine("if ({0}) {{", transition.Guard.Expression)
                     .Indent();
             }
 
@@ -156,7 +156,7 @@
                     codeBuilder.WriteLine("popState();");
                     break;
             }
-            if (transition.Guard.Condition != null) {
+            if (transition.Guard.Expression != null) {
                 codeBuilder
                     .UnIndent()
                     .WriteLine("}");

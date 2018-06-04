@@ -438,7 +438,7 @@
         private void EmitGuardBody(CodeBuilder codeBuilder, Guard guard) {
 
             codeBuilder
-                .WriteLine("return {0};", guard.Condition);
+                .WriteLine("return {0};", guard.Expression);
         }
     }
 }

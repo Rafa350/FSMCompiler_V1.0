@@ -4,28 +4,28 @@
 
     public sealed class Guard {
 
-        private readonly string condition;
+        private readonly string expression;
 
         /// <summary>
         /// Constructor de l'objecte.
         /// </summary>
-        /// <param name="condition">Expresio per evaluar la condicio.</param>
+        /// <param name="expression">Expresio per evaluar la condicio.</param>
         /// 
-        public Guard(string condition) {
+        public Guard(string expression) {
 
-            if (String.IsNullOrEmpty(condition))
+            if (String.IsNullOrEmpty(expression))
                 throw new ArgumentNullException("condition");
 
-            this.condition = condition;
+            this.expression = expression;
         }
 
         /// <summary>
         /// Obte la condicio.
         /// </summary>
         /// 
-        public string Condition {
+        public string Expression {
             get {
-                return condition;
+                return expression;
             }
         }
     }
