@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+    <?include options.wxi ?>
+
+    <!-- Expecifica el producte -->
+    <Product 
+        Id="F073E410-8824-4C89-9DDE-DDC276004720" 
+        Name="$(var.ProductFullName)" 
+        Language="1033" 
+        Version="$(var.ProductVersion)" 
+        Manufacturer="$(var.ManufacturerName)" 
+        UpgradeCode="39FDBE7B-B5D2-4D0F-81FE-FC8B0E3D22DA">
+        
+        <!-- Expecifica el paquet -->
+        <Package 
+            InstallerVersion="200" 
+            Compressed="yes" 
+            InstallScope="perMachine"/>
+        
+        <!-- Especificacions del mitja -->
+        <Media
+            Id="1"
+            EmbedCab="yes"
+            Cabinet="Setup.cab"/>
+        
+        <MajorUpgrade 
+            DowngradeErrorMessage="A newer version of [ProductName] is already installed."/>
+
+        <!-- Icon -->
+        <!--<Icon Id="ICON" SourceFile="icons\lwicon32x32.ico" /> -->
+
+        <!-- Llibreries UI externes -->
+        <UIRef Id="WixUI_Mondo"/>
+        <UIRef Id="WixUI_ErrorProgressText"/>
+
+        <!-- Propietats -->
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+        <Property Id="ARPPRODUCTICON" Value="ICON"/>
+
+        <!-- Variables de configuracio dels quadres de dialeg -->
+        <!--<WixVariable Id="WixUIBannerBmp" Value="bitmaps\topbanner.bmp"/>
+        <WixVariable Id="WixUIDialogBmp" Value="bitmaps\leftbanner.bmp"/>
+        <WixVariable Id="WixUILicenseRtf" Value="eula\eula.rtf" />-->
+
+        <PropertyRef Id="NETFRAMEWORK40FULL"/>
+        <Condition Message="This application requires .NET Framework 4.6.1 Please install the .NET Framework then run this installer again.">
+            <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
+        </Condition>
+        
+        <!-- Caracteristiques -->
+        <Feature 
+            Id="ProductFeature" 
+            Title="Setup" 
+            Level="1">
+            <ComponentGroupRef 
+                Id="ProductComponents"/>
+        </Feature>
+    </Product>
+</Wix>

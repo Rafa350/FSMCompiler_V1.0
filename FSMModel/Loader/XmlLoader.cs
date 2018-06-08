@@ -28,17 +28,29 @@
                 return node.Attributes[name].Value;
         }
 
+        /// <summary
+        /// Crea un objecte Machine a partir d'un node XML
+        /// </summary>
+        /// <param name="machineNode">El node a procesar.</param>
+        /// <returns>L'objecte 'machine' creat.</returns>
+        /// 
         private Machine ProcessMachineNode(XmlNode machineNode) {
 
             string machineName = GetAttribute(machineNode, "name");
+            if (String.IsNullOrEmpty(machineName))
+                throw new Exception("No se especifico el atributo 'name'");
+
             string startStateName = GetAttribute(machineNode, "start");
+            if (String.IsNullOrEmpty(startStateName))
+                throw new Exception("No se especifico el atributo 'start'");
 
             Machine machine = new Machine(machineName);
 
             // Procesa cada estat i asigna els parametres
             //
-            foreach (XmlNode stateNode in machineNode.SelectNodes("state")) 
+            foreach (XmlNode stateNode in machineNode.SelectNodes("state")) {
                 ProcessStateNode(stateNode, machine);
+            }
 
             startStateName = startStateName.Replace(":", "");
             machine.Start = GetState(machine, startStateName);

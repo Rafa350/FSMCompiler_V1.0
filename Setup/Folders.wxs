@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+    <?include options.wxi ?>
+    
+    <!-- Estructura de carpetes -->
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="$(var.PlatformProgramFilesFolder)">
+                <Directory Id="CompanyFolder" Name="$(var.ManufacturerName)">
+                    <Directory Id="Install" Name="$(var.ProductFullName)">
+                        <Directory Id="InstallBin" Name="Bin"/>
+                        <Directory Id="InstallHelp" Name="Help"/>
+                        <Directory Id="InstallDocuments" Name="Documents"/>
+                    </Directory>
+                </Directory>
+            </Directory>
+        </Directory>
+    </Fragment>
+    
+</Wix>

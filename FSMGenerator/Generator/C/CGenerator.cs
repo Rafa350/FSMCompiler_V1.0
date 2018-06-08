@@ -51,7 +51,7 @@
                 foreach (State state in machine.States)
                     cb.WriteLine("#define State_{0} {1}", state.Name, stateNum++);
                 cb
-                    .WriteLine("#define MAX_STATES {0}", stateNum)
+                    .WriteLine("#define NUM_STATES {0}", stateNum)
                     .WriteLine();
 
                 cb
@@ -91,7 +91,7 @@
                     cb.WriteLine("#define Event_{0} {1}", ev.Name, eventNum++);
                 }
                 cb
-                    .WriteLine("#define MAX_EVENTS {0}", eventNum)
+                    .WriteLine("#define NUM_EVENTS {0}", eventNum)
                     .WriteLine();
 
                 cb
@@ -141,7 +141,7 @@
                 //
                 generator.GenerateTransitionDescriptorTable(codeBuilder);
                 generator.GenerateStateDescriptorTable(codeBuilder);
-                generator.GenerateMachineDescriptor(codeBuilder);
+                generator.GenerateMachineDescriptorTable(codeBuilder);
 
                 writer.Write(codeBuilder.ToString());
             }

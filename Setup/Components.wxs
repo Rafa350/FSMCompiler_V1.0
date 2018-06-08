@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+    <?include options.wxi ?>
+
+    <Fragment>
+        <DirectoryRef
+          Id="InstallBin">
+
+            <!-- FSMModel.Dll-->
+            <Component
+                Id="FSMModel.Dll"
+                Guid="48B81054-F2AC-42BA-8659-76F92427A439">
+                <File
+                    Source="$(var.FSMModel.TargetDir)\FSMModel.dll"
+                    KeyPath="yes"/>
+            </Component>
+
+            <!-- FSMGenerator.Dll-->
+            <Component
+                Id="FSMGenerator.Dll"
+                Guid="640D78C9-DE42-446B-82FF-97D7B3A1D7CE">
+                <File
+                    Source="$(var.FSMGenerator.TargetDir)\FSMGenerator.dll"
+                    KeyPath="yes"/>
+            </Component>
+        
+            <!-- FSMCompiler.Exe-->
+            <Component
+                Id="FSMCompiler.Exe"
+                Guid="3C4D51EA-9AE1-455E-8318-235013E2B430">
+                <File
+                    Source="$(var.FSMCompiler.TargetDir)\FSMCompiler.exe"
+                    KeyPath="yes"/>
+            </Component>
+
+        </DirectoryRef>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup
+            Id="ProductComponents">
+            <ComponentRef Id="FSMModel.Dll"/>
+            <ComponentRef Id="FSMGenerator.Dll"/>
+            <ComponentRef Id="FSMCompiler.Exe"/>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
