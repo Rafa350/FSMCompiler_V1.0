@@ -5,7 +5,7 @@
 
     <!-- Expecifica el producte -->
     <Product 
-        Id="F073E410-8824-4C89-9DDE-DDC276004720" 
+        Id="826D1AC6-8C15-4FA8-91E7-B8FDF2FB8CE8" 
         Name="$(var.ProductFullName)" 
         Language="1033" 
         Version="$(var.ProductVersion)" 
@@ -43,9 +43,9 @@
         <WixVariable Id="WixUIDialogBmp" Value="bitmaps\leftbanner.bmp"/>
         <WixVariable Id="WixUILicenseRtf" Value="eula\eula.rtf" />-->
 
-        <PropertyRef Id="NETFRAMEWORK40FULL"/>
-        <Condition Message="This application requires .NET Framework 4.6.1 Please install the .NET Framework then run this installer again.">
-            <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
+        <PropertyRef Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED"/>
+        <Condition Message="This application requires .NET Framework 4.6 or later. Please install the .NET Framework then run this installer again.">
+            <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED]]>
         </Condition>
         
         <!-- Caracteristiques -->
