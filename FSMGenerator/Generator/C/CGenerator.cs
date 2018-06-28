@@ -135,13 +135,25 @@
                 //
                 generator.GenerateActionImplementation(codeBuilder);
                 generator.GenerateGuardImplementation(codeBuilder);
+                codeBuilder
+                    .WriteLine("#ifdef FSM_IMPL_SWITCHCASE")
+                    .WriteLine();
                 generator.GenerateProcessorImplementation(codeBuilder);
+                codeBuilder
+                    .WriteLine("#endif")
+                    .WriteLine();
 
                 // Genera les taules 
                 //
+                codeBuilder
+                    .WriteLine("#ifdef FSM_IMPL_TABLEDRIVEN")
+                    .WriteLine();
                 generator.GenerateTransitionDescriptorTable(codeBuilder);
                 generator.GenerateStateDescriptorTable(codeBuilder);
                 generator.GenerateMachineDescriptorTable(codeBuilder);
+                codeBuilder
+                    .WriteLine("#endif")
+                    .WriteLine();
 
                 writer.Write(codeBuilder.ToString());
             }
