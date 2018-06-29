@@ -60,7 +60,7 @@
     <Compile Include="Generator\CPP\StateHeaderVisitor.cs" />
     <Compile Include="Generator\C\CGenerator.cs" />
     <Compile Include="Generator\C\CGeneratorOptions.cs" />
-    <Compile Include="Generator\C\StateCodeGenerator.cs" />
+    <Compile Include="Generator\C\CodeGenerator.cs" />
     <Compile Include="Generator\DOT\DOTGeneratorOptions.cs" />
     <Compile Include="Generator\DOT\DOTGenerator.cs" />
     <Compile Include="Generator\GeneratorBase.cs" />

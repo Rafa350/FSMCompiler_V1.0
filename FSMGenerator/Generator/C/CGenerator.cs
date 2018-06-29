@@ -129,7 +129,7 @@
                     .WriteLine()
                     .WriteLine();
 
-                StateCodeGenerator generator = new StateCodeGenerator(machine);
+                CodeGenerator generator = new CodeGenerator(machine);
                 
                 // Genera les funcions
                 //

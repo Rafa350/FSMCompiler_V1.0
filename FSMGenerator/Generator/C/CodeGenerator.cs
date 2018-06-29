@@ -6,7 +6,7 @@
     using System.Collections.Generic;
     using System.Text;
 
-    internal sealed class StateCodeGenerator {
+    internal sealed class CodeGenerator {
 
         private readonly Machine machine;
         private readonly Dictionary<Model.Action, string> actionDict = new Dictionary<Model.Action, string>();
@@ -17,7 +17,7 @@
         /// </summary>
         /// <param name="machine">La maquina.</param>
         /// 
-        public StateCodeGenerator(Machine machine) {
+        public CodeGenerator(Machine machine) {
 
             this.machine = machine;
 
