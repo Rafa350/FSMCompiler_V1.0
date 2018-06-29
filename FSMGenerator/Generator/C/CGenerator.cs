@@ -47,7 +47,7 @@
                     .WriteLine("#define {0}", guardName)
                     .WriteLine();
 
-                int stateNum = 0;
+                int stateNum = options.FirstStateNum;
                 foreach (State state in machine.States)
                     cb.WriteLine("#define State_{0} {1}", state.Name, stateNum++);
                 cb
@@ -86,7 +86,7 @@
                     .WriteLine("#define {0}", guardName)
                     .WriteLine();
 
-                int eventNum = 0;
+                int eventNum = options.FirstEventNum;
                 foreach (Event ev in machine.Events) {
                     cb.WriteLine("#define Event_{0} {1}", ev.Name, eventNum++);
                 }

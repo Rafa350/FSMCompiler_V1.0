@@ -2,42 +2,13 @@
 
     public sealed class CGeneratorOptions {
 
-        private string machineHeaderFileName;
-        private string machineCodeFileName;
-        private string stateHeaderFileName;
-        private string stateCodeFileName;
-        private bool useStateNames;
-
-        public CGeneratorOptions() {
-
-            useStateNames = true;
-        }
-
         public string OutputPath { get; set; }
-
-        public string MachineHeaderFileName {
-            get { return machineHeaderFileName; }
-            set { machineHeaderFileName = value; }
-        }
-
-        public string MachineCodeFileName {
-            get { return machineCodeFileName; }
-            set { machineCodeFileName = value; }
-        }
-
-        public string StateHeaderFileName {
-            get { return stateHeaderFileName; }
-            set { stateHeaderFileName = value; }
-        }
-
-        public string StateCodeFileName {
-            get { return stateCodeFileName; }
-            set { stateCodeFileName = value; }
-        }
-
-        public bool UseStateNames {
-            get { return useStateNames; }
-            set { useStateNames = value; }
-        }
+        public string MachineHeaderFileName { get; set; }
+        public string MachineCodeFileName { get; set; }
+        public string StateHeaderFileName { get; set; }
+        public string EventHeaderFileName { get; set; }
+        public int FirstStateNum { get; set; }
+        public int FirstEventNum { get; set; }
+        public bool UseStateNames { get; set; }
     }
 }

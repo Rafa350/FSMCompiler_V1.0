@@ -2,6 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <StartArguments>demoC.xsm /G:C</StartArguments>
-    <StartWorkingDirectory>C:\Users\Rafael\Documents\Projectes\VS\FSMCompiler\Data\</StartWorkingDirectory>
+    <StartWorkingDirectory>C:\Projectes\VS\FSMCompiler\Data\</StartWorkingDirectory>
   </PropertyGroup>
 </Project>

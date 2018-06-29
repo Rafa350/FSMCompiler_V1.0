@@ -46,6 +46,14 @@
 
             Machine machine = new Machine(machineName);
 
+            XmlNode initializeNode = machineNode.SelectSingleNode("initialize");
+            if (initializeNode != null)
+                machine.InitializeAction = ProcessActionNode(initializeNode, machine);
+
+            XmlNode terminateNode = machineNode.SelectSingleNode("terminate");
+            if (terminateNode != null)
+                machine.TerminateAction = ProcessActionNode(terminateNode, machine);
+
             // Procesa cada estat i asigna els parametres
             //
             foreach (XmlNode stateNode in machineNode.SelectNodes("state")) {

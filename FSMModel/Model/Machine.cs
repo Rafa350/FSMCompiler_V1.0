@@ -9,6 +9,8 @@
         private readonly List<Event> events = new List<Event>();
         private readonly string name;
         private State start;
+        private Action initializeAction;
+        private Action terminateAction;
 
         public Machine(string name) {
 
@@ -132,6 +134,24 @@
                     throw new InvalidOperationException(
                         String.Format("El estado '{0}', no esta declarado en esta maquina.", value.Name));
                 start = value;
+            }
+        }
+
+        public Action InitializeAction {
+            get {
+                return initializeAction;
+            }
+            set {
+                initializeAction = value;
+            }
+        }
+
+        public Action TerminateAction {
+            get {
+                return terminateAction;
+            }
+            set {
+                terminateAction = value;
             }
         }
 
