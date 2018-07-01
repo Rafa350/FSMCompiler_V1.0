@@ -23,6 +23,13 @@
 
             int actionCount = 0;
             int guardCount = 0;
+
+            if (machine.InitializeAction != null)
+                actionDict.Add(machine.InitializeAction, String.Format("Action{0}", actionCount++));
+
+            if (machine.TerminateAction != null) 
+                actionDict.Add(machine.TerminateAction, String.Format("Action{0}", actionCount++));
+
             foreach (State state in machine.States) {
 
                 if (state.EnterAction != null)
@@ -173,6 +180,26 @@
         /// 
         public void GenerateActionImplementation(CodeBuilder cb) {
 
+            if (machine.InitializeAction != null) {
+                cb
+                    .WriteLine("// -----------------------------------------------------------------------")
+                    .WriteLine("// Machine initialize action")
+                    .WriteLine("//");
+                EmitActionDeclarationStart(cb, machine.InitializeAction);
+                EmitActionBody(cb, machine.InitializeAction);
+                EmitActionDeclarationEnd(cb, machine.InitializeAction);
+            }
+
+            if (machine.TerminateAction != null) {
+                cb
+                    .WriteLine("// -----------------------------------------------------------------------")
+                    .WriteLine("// Machine terminate action")
+                    .WriteLine("//");
+                EmitActionDeclarationStart(cb, machine.TerminateAction);
+                EmitActionBody(cb, machine.TerminateAction);
+                EmitActionDeclarationEnd(cb, machine.TerminateAction);
+            }
+
             foreach (State state in machine.States) {
 
                 if (state.EnterAction != null) {
@@ -259,6 +286,9 @@
                 .WriteLine()
                 .Indent()
                 .WriteLine("state = State_{0};", machine.Start.Name);
+
+            if (machine.InitializeAction != null)
+                EmitActionCall(cb, machine.InitializeAction);
 
             if (machine.Start.EnterAction != null)
                 EmitActionCall(cb, machine.Start.EnterAction);

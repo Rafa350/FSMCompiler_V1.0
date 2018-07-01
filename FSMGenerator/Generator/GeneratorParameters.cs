@@ -36,7 +36,8 @@
                 if (propInfo == null)
                     throw new InvalidOperationException(
                         String.Format("No es posible asignar el parametro '{0}'.", kv.Key));
-                propInfo.SetValue(dataObject, kv.Value, null);
+                object value = Convert.ChangeType(kv.Value, propInfo.PropertyType);
+                propInfo.SetValue(dataObject, value, null);
             }
         }
 
