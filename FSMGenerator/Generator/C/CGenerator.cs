@@ -47,11 +47,11 @@
                     .WriteLine("#define {0}", guardName)
                     .WriteLine();
 
-                int stateNum = options.FirstStateNum;
+                int count = 0;
                 foreach (State state in machine.States)
-                    cb.WriteLine("#define State_{0} {1}", state.Name, stateNum++);
+                    cb.WriteLine("#define State_{0} {1}", state.Name, options.FirstStateNum + count++);
                 cb
-                    .WriteLine("#define NUM_STATES {0}", stateNum)
+                    .WriteLine("#define NUM_STATES {0}", count)
                     .WriteLine();
 
                 cb
@@ -86,12 +86,12 @@
                     .WriteLine("#define {0}", guardName)
                     .WriteLine();
 
-                int eventNum = options.FirstEventNum;
+                int count = 0;
                 foreach (Event ev in machine.Events) {
-                    cb.WriteLine("#define Event_{0} {1}", ev.Name, eventNum++);
+                    cb.WriteLine("#define Event_{0} {1}", ev.Name, options.FirstEventNum + count++);
                 }
                 cb
-                    .WriteLine("#define NUM_EVENTS {0}", eventNum)
+                    .WriteLine("#define NUM_EVENTS {0}", count)
                     .WriteLine();
 
                 cb
