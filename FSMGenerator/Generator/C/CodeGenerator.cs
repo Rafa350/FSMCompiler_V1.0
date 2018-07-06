@@ -309,7 +309,7 @@
                 .WriteLine("void {0}Setup(Context context) {{", machine.Name)
                 .WriteLine()
                 .Indent()
-                .WriteLine("state = State_{0};", machine.Start.Name);
+                .WriteLine("__fsmChangeState(State_{0});", machine.Start.Name);
 
             if (machine.InitializeAction != null)
                 EmitActionCall(cb, machine.InitializeAction);
@@ -353,7 +353,7 @@
                         sb.Append('(');
                     sb.AppendFormat("event == Event_{0}", transition.Event.Name);
                     if (transition.Guard != null)
-                        sb.AppendFormat(") && {0}(context)", guardDict[transition.Guard]);
+                        sb.AppendFormat(") && __fsmCheckGuard({0}, context)", guardDict[transition.Guard]);
                     sb.Append(") {");
 
                     cb
@@ -378,7 +378,7 @@
                         if (transition.NextState.EnterAction != null)
                             EmitActionCall(cb, transition.NextState.EnterAction);
                         cb
-                            .WriteLine("state = State_{0};", transition.NextState.Name);
+                            .WriteLine("__fsmChangeState(State_{0});", transition.NextState.Name);
                     }
 
                     cb
@@ -452,7 +452,7 @@
         private void EmitActionCall(CodeBuilder cb, Model.Action action) {
 
             cb
-                .WriteLine("{0}(context);", actionDict[action]);
+                .WriteLine("__fsmDoAction({0}, context);", actionDict[action]);
         }
 
         /// <summary>

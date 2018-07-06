@@ -17,90 +17,9 @@
 
         public override void Generate(Machine machine) {
 
-//            GenerateStateHeader(machine);
-//            GenerateEventHeader(machine);
             GenerateMachineCode(machine);
         }
 
-        /// <summary>
-        /// Genera el fitxer de capcelera amb la definicio dels estats.
-        /// </summary>
-        /// <param name="machine">La maquina.</param>
-        /// 
-        private void GenerateStateHeader(Machine machine) {
-
-            string folder = options.OutputPath;
-            if (String.IsNullOrEmpty(folder))
-                folder = @".\";
-
-            // Crea el firxer fsm_<machine>_states.h
-            //
-            string fileName = String.Format("fsm_{0}_states.h", machine.Name);
-            string path = Path.Combine(folder, fileName);
-            using (StreamWriter writer = File.CreateText(path)) {
-
-                string guardName = String.Format("__fsm_{0}_states__", machine.Name);
-
-                CodeBuilder cb = new CodeBuilder();
-                cb
-                    .WriteLine("#ifndef {0}", guardName)
-                    .WriteLine("#define {0}", guardName)
-                    .WriteLine();
-
-                int count = 0;
-                foreach (State state in machine.States)
-                    cb.WriteLine("#define State_{0} {1}", state.Name, options.FirstStateNum + count++);
-                cb
-                    .WriteLine("#define NUM_STATES {0}", count)
-                    .WriteLine();
-
-                cb
-                    .WriteLine("#endif // {0}", guardName)
-                    .WriteLine();
-
-                writer.WriteLine(cb.ToString());
-            }
-        }
-
-        /// <summary>
-        /// Genera el fitxer de capcelera amb la definicio dels events
-        /// </summary>
-        /// <param name="machine">La maquina.</param>
-        /// 
-        private void GenerateEventHeader(Machine machine) {
-
-            string folder = options.OutputPath;
-            if (String.IsNullOrEmpty(folder))
-                folder = @".\";
-
-            // Crea el fitxer fsm_<machine>_events.h
-            //
-            string fileName = String.Format("fsm_{0}_events.h", machine.Name);
-            string path = Path.Combine(folder, fileName);
-            using (StreamWriter writer = File.CreateText(path)) {
-
-                string guardName = String.Format("__fsm_{0}_events__", machine.Name);
-                CodeBuilder cb = new CodeBuilder();
-                cb
-                    .WriteLine("#ifndef {0}", guardName)
-                    .WriteLine("#define {0}", guardName)
-                    .WriteLine();
-
-                int count = 0;
-                foreach (Event ev in machine.Events) {
-                    cb.WriteLine("#define Event_{0} {1}", ev.Name, options.FirstEventNum + count++);
-                }
-                cb
-                    .WriteLine("#define NUM_EVENTS {0}", count)
-                    .WriteLine();
-
-                cb
-                    .WriteLine("#endif // {0}", guardName)
-                    .WriteLine();
-
-                writer.WriteLine(cb.ToString());
-            }
-        }
 
         /// <summary>
         /// \brief Genera el fitxer de codi de la maquina d'estat.
@@ -129,6 +48,21 @@
 
                 CodeGenerator generator = new CodeGenerator(machine);
 
+                codeBuilder
+                    .WriteLine("#ifndef __fsmChangeState")
+                    .WriteLine("#define __fsmChangeState(newState)       state = newState")
+                    .WriteLine("#endif")
+                    .WriteLine()
+                    .WriteLine("#ifndef __fsmDoAction")
+                    .WriteLine("#define __fsmDoAction(action, context)   action(context)")
+                    .WriteLine("#endif")
+                    .WriteLine()
+                    .WriteLine("#ifndef __fsmCheckGuard")
+                    .WriteLine("#define __fsmCheckGuard(guard, context)  guard(context)")
+                    .WriteLine("#endif")
+                    .WriteLine()
+                    .WriteLine();
+
                 // Genera el enumerador amb els estats de la maquina
                 //
                 generator.GenerateStateTypeDeclaration(codeBuilder);
@@ -140,25 +74,7 @@
 
                 // Genera el procesador de la maquina en moduls 'switch/case'
                 //
-                codeBuilder
-                    .WriteLine("#ifdef FSM_IMPL_SWITCHCASE")
-                    .WriteLine();
                 generator.GenerateProcessorImplementation(codeBuilder);
-                codeBuilder
-                    .WriteLine("#endif")
-                    .WriteLine();
-
-                // Genera el procesador de la maquina en modus 'table driven'
-                //
-                codeBuilder
-                    .WriteLine("#ifdef FSM_IMPL_TABLEDRIVEN")
-                    .WriteLine();
-                generator.GenerateTransitionDescriptorTable(codeBuilder);
-                generator.GenerateStateDescriptorTable(codeBuilder);
-                generator.GenerateMachineDescriptorTable(codeBuilder);
-                codeBuilder
-                    .WriteLine("#endif")
-                    .WriteLine();
 
                 writer.Write(codeBuilder.ToString());
             }
