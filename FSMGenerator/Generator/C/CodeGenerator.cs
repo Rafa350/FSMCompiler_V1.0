@@ -174,6 +174,30 @@
         }
 
         /// <summary>
+        /// Genera el tipus enumerador per l'estat de la maquina.
+        /// </summary>
+        /// <param name="cb">El constructor del codi font.</param>
+        /// 
+        public void GenerateStateTypeDeclaration(CodeBuilder cb) {
+
+            cb
+                .WriteLine("// -----------------------------------------------------------------------")
+                .WriteLine("// Internal type definitions.")
+                .WriteLine("//")
+                .WriteLine("typedef enum {")
+                .Indent();
+            foreach (State state in machine.States) {
+                cb
+                    .WriteLine("State_{0},", state.Name);
+            }
+            cb
+                .UnIndent()
+                .WriteLine("} State;")
+                .WriteLine()
+                .WriteLine();
+        }
+
+        /// <summary>
         /// Genera les funcions d'accio.
         /// </summary>
         /// <param name="cb">Constructor de codi font.</param>

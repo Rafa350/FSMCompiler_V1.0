@@ -17,8 +17,8 @@
 
         public override void Generate(Machine machine) {
 
-            GenerateStateHeader(machine);
-            GenerateEventHeader(machine);
+//            GenerateStateHeader(machine);
+//            GenerateEventHeader(machine);
             GenerateMachineCode(machine);
         }
 
@@ -122,19 +122,24 @@
                 CodeBuilder codeBuilder = new CodeBuilder();
 
                 codeBuilder
-                    .WriteLine("#include \"fsm.h\"", machine.Name)
-                    .WriteLine("#include \"fsm_{0}_states.h\"", machine.Name)
-                    .WriteLine("#include \"fsm_{0}_events.h\"", machine.Name)
+                    .WriteLine("#include \"fsm.h\"")
                     .WriteLine("#include \"fsm_defs.h\"")
                     .WriteLine()
                     .WriteLine();
 
                 CodeGenerator generator = new CodeGenerator(machine);
+
+                // Genera el enumerador amb els estats de la maquina
+                //
+                generator.GenerateStateTypeDeclaration(codeBuilder);
                 
-                // Genera les funcions
+                // Genera les Accions i les guardes
                 //
                 generator.GenerateActionImplementation(codeBuilder);
                 generator.GenerateGuardImplementation(codeBuilder);
+
+                // Genera el procesador de la maquina en moduls 'switch/case'
+                //
                 codeBuilder
                     .WriteLine("#ifdef FSM_IMPL_SWITCHCASE")
                     .WriteLine();
@@ -143,7 +148,7 @@
                     .WriteLine("#endif")
                     .WriteLine();
 
-                // Genera les taules 
+                // Genera el procesador de la maquina en modus 'table driven'
                 //
                 codeBuilder
                     .WriteLine("#ifdef FSM_IMPL_TABLEDRIVEN")
