@@ -27,7 +27,7 @@
             if (machine.InitializeAction != null)
                 actionDict.Add(machine.InitializeAction, String.Format("Action{0}", actionCount++));
 
-            if (machine.TerminateAction != null) 
+            if (machine.TerminateAction != null)
                 actionDict.Add(machine.TerminateAction, String.Format("Action{0}", actionCount++));
 
             foreach (State state in machine.States) {
@@ -93,7 +93,7 @@
 
                 codeBuilder.WriteLine(sb.ToString());
 
-                foreach (Transition transition in state.Transitions) 
+                foreach (Transition transition in state.Transitions)
                     transitionOffset++;
             }
             codeBuilder
@@ -328,23 +328,33 @@
                 .WriteLine("//")
                 .WriteLine("void {0}Run(Event event, Context context) {{", machine.Name)
                 .WriteLine()
-                .Indent()
-                .WriteLine("switch (state) {")
                 .Indent();
 
+            StringBuilder sb = new StringBuilder();
+
+            bool firstState = true;
             foreach (State state in machine.States) {
 
+                sb.Clear();
+
+                if (firstState) {
+                    firstState = false;
+                    sb.Append("if (");
+                }
+                else
+                    sb.Append("else if (");
+                sb.AppendFormat("state == State_{0}) {{", state.Name);
+
                 cb
-                    .WriteLine("case State_{0}: ", state.Name)
+                    .WriteLine(sb.ToString())
                     .Indent();
 
-                bool first = true;
+                bool firstTransition = true;
                 foreach (Transition transition in state.Transitions) {
 
-                    StringBuilder sb = new StringBuilder();
-
-                    if (first) {
-                        first = false;
+                    sb.Clear();
+                    if (firstTransition) {
+                        firstTransition = false;
                         sb.Append("if (");
                     }
                     else
@@ -387,14 +397,12 @@
                 }
 
                 cb
-                    .WriteLine("break; ")
                     .UnIndent()
+                    .WriteLine("}")
                     .WriteLine();
             }
 
             cb
-                .UnIndent()
-                .WriteLine("}")
                 .UnIndent()
                 .WriteLine("}")
                 .WriteLine();

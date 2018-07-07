@@ -18,6 +18,13 @@
         private readonly List<OptionInfo> optionInfos = new List<OptionInfo>();
         private readonly List<ArgumentInfo> argumentInfos = new List<ArgumentInfo>();
 
+        /// <summary>
+        /// Constructor del objecte.
+        /// </summary>
+        /// <param name="title">Titol</param>
+        /// <param name="description">Descripcio.</param>
+        /// <param name="caseSensitive">Indica si te en compte may/min.</param>
+        /// 
         public CmdLineParser(string title, string description = null, bool caseSensitive = false) {
 
             if (String.IsNullOrEmpty(title))
@@ -28,6 +35,11 @@
             this.caseSensitive = caseSensitive;
         }
 
+        /// <summary>
+        /// Afegeix una definicio d'argument.
+        /// </summary>
+        /// <param name="argumentDefinition">L'argument a afeigir.</param>
+        /// 
         public void Add(ArgumentDefinition argumentDefinition) {
 
             if (argumentDefinition == null)
@@ -36,6 +48,11 @@
             argumentDefinitions.Add(argumentDefinition);
         }
 
+        /// <summary>
+        /// Afegeix una definicio d'opcio.
+        /// </summary>
+        /// <param name="optionDefinition">L'opcio a afeigir.</param>
+        /// 
         public void Add(OptionDefinition optionDefinition) {
 
             if (optionDefinition == null)
@@ -44,6 +61,11 @@
             optionDefinitions.Add(optionDefinition.Name, optionDefinition);
         }
 
+        /// <summary>
+        /// Procesa una llista d'arguments.
+        /// </summary>
+        /// <param name="args">Llista d'arguments.</param>
+        /// 
         public void Parse(string[] args) {
 
             int argumentIndex = 0;
@@ -73,6 +95,12 @@
             string fileContent = reader.ReadToEnd();
         }
 
+        /// <summary>
+        /// Comprova si una string es un argument.
+        /// </summary>
+        /// <param name="arg">La string a verificar.</param>
+        /// <returns>El resultat de l'operacio.</returns>
+        /// 
         private static bool IsOption(string arg) {
 
             return arg.StartsWith(optionPrefix);
@@ -110,36 +138,60 @@
                 return arg.Substring(p + 1);
         }
 
+        /// <summary>
+        /// Obte el titol
+        /// </summary>
+        /// 
         public string Title {
             get {
                 return title;
             }
         }
 
+        /// <summary>
+        /// Obte la descripcio.
+        /// </summary>
+        /// 
         public string Description {
             get {
                 return description;
             }
         }
 
+        /// <summary>
+        /// Obte el indicador de may/min.
+        /// </summary>
+        /// 
         public bool CaseSensitive {
             get {
                 return caseSensitive;
             }
         }
 
+        /// <summary>
+        /// Enumera les opcions definides.
+        /// </summary>
+        /// 
         public IEnumerable<OptionInfo> Options {
             get {
                 return optionInfos;
             }
         }
 
+        /// <summary>
+        /// Enumera els arguments definits.
+        /// </summary>
+        /// 
         public IEnumerable<ArgumentInfo> Arguments {
             get {
                 return argumentInfos;
             }
         }
 
+        /// <summary>
+        /// Obte la cadena d'ajuda.
+        /// </summary>
+        /// 
         public string HelpText {
             get {
                 StringBuilder sb = new StringBuilder();
