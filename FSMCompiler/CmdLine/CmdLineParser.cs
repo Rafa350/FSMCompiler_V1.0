@@ -4,15 +4,32 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using System.Reflection;
+
+    public enum CmdLineStyle {
+        Windows,
+        Unix
+    }
+
+    public enum CmdLineMode {
+        Upper,
+        Lowwer,
+        Mixed,
+        Insensitive
+    }
 
     public sealed class CmdLineParser {
 
-        private const string optionPrefix = "/";
+        private const string optionWindowsPrefix = "/";
+        private const string optionUnixPrefix = "-";
         private const string optionValueSeparator = ":";
+        private const string loadFromFileOption = "@";
 
         private readonly string title;
         private readonly string description;
-        private readonly bool caseSensitive = false;
+        private readonly CmdLineMode mode = CmdLineMode.Insensitive;
+        private readonly CmdLineStyle style = CmdLineStyle.Windows;
+        private readonly string optionPrefix;
         private readonly List<ArgumentDefinition> argumentDefinitions = new List<ArgumentDefinition>();
         private readonly Dictionary<string, OptionDefinition> optionDefinitions = new Dictionary<string, OptionDefinition>();
         private readonly List<OptionInfo> optionInfos = new List<OptionInfo>();
@@ -23,16 +40,20 @@
         /// </summary>
         /// <param name="title">Titol</param>
         /// <param name="description">Descripcio.</param>
-        /// <param name="caseSensitive">Indica si te en compte may/min.</param>
+        /// <param name="mode">Modus d'interpretacio may/min.</param>
+        /// <param name="style">Estil windows o unix.</param>
         /// 
-        public CmdLineParser(string title, string description = null, bool caseSensitive = false) {
+        public CmdLineParser(string title, string description = null, CmdLineMode mode = CmdLineMode.Insensitive, CmdLineStyle style = CmdLineStyle.Windows) {
 
             if (String.IsNullOrEmpty(title))
                 throw new ArgumentNullException("title");
 
             this.title = title;
             this.description = description;
-            this.caseSensitive = caseSensitive;
+            this.mode = mode;
+            this.style = style;
+
+            optionPrefix = style == CmdLineStyle.Windows ? optionWindowsPrefix : optionUnixPrefix;
         }
 
         /// <summary>
@@ -71,17 +92,20 @@
             int argumentIndex = 0;
             foreach (string arg in args) {
 
-                if (IsOption(arg)) {
+                if (arg.StartsWith(optionPrefix)) {
                     OptionDefinition optionDefinition = FindOptionDefinition(arg);
                     OptionInfo optionInfo = new OptionInfo(
-                        optionDefinition, 
+                        optionDefinition,
                         GetOptionValue(arg));
                     optionInfos.Add(optionInfo);
+                }
+                else if (arg.StartsWith(loadFromFileOption)) {
+
                 }
                 else {
                     ArgumentDefinition argumentDefinition = FindArgumentDefinition(arg, argumentIndex);
                     ArgumentInfo argumentInfo = new ArgumentInfo(
-                        argumentDefinition, 
+                        argumentDefinition,
                         arg);
                     argumentInfos.Add(argumentInfo);
                     argumentIndex += 1;
@@ -93,17 +117,6 @@
 
             StreamReader reader = File.OpenText(fileName);
             string fileContent = reader.ReadToEnd();
-        }
-
-        /// <summary>
-        /// Comprova si una string es un argument.
-        /// </summary>
-        /// <param name="arg">La string a verificar.</param>
-        /// <returns>El resultat de l'operacio.</returns>
-        /// 
-        private static bool IsOption(string arg) {
-
-            return arg.StartsWith(optionPrefix);
         }
 
         private OptionDefinition FindOptionDefinition(string arg) {
@@ -139,6 +152,43 @@
         }
 
         /// <summary>
+        /// Obpla les dades de les opcions i els arguments.
+        /// </summary>
+        /// <param name="data">Estructuda de dades a omplir.</param>
+        /// <param name="ignoreIfNoExists">Ignora les opcions inexistens en la estructura de dades.</param>
+        /// <param name="throwOnError">Dispara una excepcio en cas d'error.</param>
+        /// <returns>True si tot es correcte.</returns>
+        /// 
+        public bool Pupulate(object data, bool ignoreIfNoExists = false, bool throwOnError = true) {
+
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            try {
+                Type dataType = data.GetType();
+
+                foreach (OptionInfo optionInfo in Options) {
+                    PropertyInfo propInfo = dataType.GetProperty(optionInfo.Name, BindingFlags.Instance | BindingFlags.Public);
+                    if (propInfo != null) {
+                        object value = Convert.ChangeType(optionInfo.Value, propInfo.PropertyType);
+                        propInfo.SetValue(data, value, null);
+                    }
+                    else if (!ignoreIfNoExists)
+                        throw new InvalidOperationException(
+                            String.Format("No se encontro la propiedad '{0}'.", optionInfo.Name));
+                }
+
+                return true;
+            }
+            catch {
+                if (throwOnError)
+                    throw;
+                else
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// Obte el titol
         /// </summary>
         /// 
@@ -159,12 +209,22 @@
         }
 
         /// <summary>
-        /// Obte el indicador de may/min.
+        /// Modus d'interpretacio de may/min.
         /// </summary>
         /// 
-        public bool CaseSensitive {
+        public CmdLineMode Case {
             get {
-                return caseSensitive;
+                return mode;
+            }
+        }
+
+        /// <summary>
+        /// Estil windows, unix, etc.
+        /// </summary>
+        /// 
+        public CmdLineStyle Style {
+            get {
+                return style;
             }
         }
 
