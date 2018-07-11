@@ -1,3 +1,0 @@
-@echo off
-"..\bin\x86\Debug\FsmCompiler.exe" demoCPP.xsm /G:CPP /P:MachineClassName=MyMachine /P:MachineBaseClassName=EosMachine /P:ContextClassName=EosContext /P:StateBaseClassName=EosState /P:EventIdHeaderFileName=..\MachineDemo\fsmEventId.h /P:StateIdHeaderFileName=..\MachineDemo\fsmStateId.h /P:MachineHeaderFileName=..\MachineDemo\fsmMachine.h /P:MachineCodeFileName=..\MachineDemo\fsmMachine.cpp /P:StateHeaderFileName=..\MachineDemo\fsmState.h /P:StateCodeFileName=..\MachineDemo\fsmState.cpp
-pause

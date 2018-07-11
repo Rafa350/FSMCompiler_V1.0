@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Logica de control de les senyals de aplicacio, 
+     inhibicio i aplicacio automatica 
+-->
+<machine name="Demo" start="IDLE">
+
+    <!--
+    <events>
+        <event name="INP_ST_OFF" value="100"/>
+    </events>
+    -->
+    
+    <initialize>
+        <inline>trigger = false;  </inline>
+        <inline>test = false;     </inline>
+    </initialize>
+    
+    <!-- Espera que pasi quelcom
+    -->
+    <state name="IDLE">
+       
+        <!-- Es prem el boto Start/Reset 
+        -->
+        <transition event="INP_ST_ON" state="DONE">
+            <inline>if (test)                                 </inline>
+            <inline>    test = false;                         </inline>
+            <inline>else if (varGet(VAR_TEST_ACTIVE) == 1) {  </inline>
+            <inline>    varSet(VAR_TEST_ACTIVE, 0);           </inline>            
+            <inline>    test = true;                          </inline>
+            <inline>}                                         </inline>
+        </transition>
+               
+        <!-- El temporitzador d'interval de test arriva al final 
+        -->
+        <transition event="TIM_TEST_INTERVAL" guard="test" state="DONE"/>
+        
+        <!-- L'entrada INP_TR passa a estat actiu 
+        -->
+        <transition event="INP_TR_ON" guard="varGet(VAR_TR_EDGE) == 0" state="TR_DELAY">
+            <inline>timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));  </inline>
+        </transition>
+        
+        <!-- L'entrada INP_TR passa a estat inactiu 
+        -->
+        <transition event="INP_TR_OFF" guard="varGet(VAR_TR_EDGE) == 1" state="TR_DELAY">
+            <inline>timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));  </inline>
+        </transition>
+
+        <!-- L'entrada IN_IH passa a estat actiu 
+        -->
+        <transition event="INP_IH_ON">
+            <inline>timStart(TIM_IH_DELAY, varGet(VAR_IH_ONDELAY));  </inline>
+        </transition>
+        
+        <!-- El temporitzador de retard a la inhibicio arriva al final 
+        -->
+        <transition event="TIM_IH_DELAY" state="DISABLED"/>
+       
+    </state>
+    
+    <!-- Entrada inhibida. Espera el final de la senyal d'inhibicio.
+    -->
+    <state name="DISABLED">
+    
+        <!-- L'entrada INP_IH pasa a estat desactivat 
+        -->
+        <transition event="INP_IH_OFF">
+            <inline>timStart(TIM_IH_DELAY, varGet(VAR_IH_OFFDELAY));  </inline>
+        </transition>
+        
+        <!-- El temporitzador de retart a la inhibicio arriba al final 
+        -->
+        <transition event="TIM_IH_DELAY" state="IDLE"/>
+    </state>
+
+    <!-- Retard de trigger 
+    -->
+    <state name="TR_DELAY">
+        <transition event="TIM_TR_DELAY" state="DONE"/>
+    </state>
+    
+    <!-- Retard de reinici
+    -->
+    <state name="REARM_DELAY">
+        <transition event="TIM_TR_INHIBIT" state="IDLE">
+            <inline>if (test)                                                    </inline>
+            <inline>    timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));  </inline>
+        </transition>
+    </state>
+
+    <!-- Dispara i espera rearmat. Es queda indefinidament en aquest estat fins
+         que es rearmi desde un altre proces 
+    -->
+    <state name="DONE">
+    
+        <!-- Event d'entrada. Activa la variable 'trigger' que serveix de
+             disparo pel un altre part del sistema.
+        -->
+        <enter>
+            <inline>trigger = true;</inline>
+        </enter>
+        
+        <!-- Es reb el rearmat des d'un altre part del sistema 
+        -->
+        <transition event="SIG_REARM_TRIGGER" state="REARM_DELAY">
+            <inline>trigger = false;                                  </inline>
+            <inline>timStart(TIM_TR_INHIBIT, varGet(VAR_TR_INHIBIT)); </inline>
+        </transition>
+        
+    </state>
+
+</machine>
