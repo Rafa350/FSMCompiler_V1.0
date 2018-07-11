@@ -97,6 +97,8 @@
                 //
                 sb.AppendLine("    START [");
                 sb.AppendLine("        label= \"\",");
+                sb.AppendLine("        width = \"0.25\",");
+                sb.AppendLine("        height = \"0.25\",");
                 sb.AppendLine("        shape = \"circle\",");
                 sb.AppendLine("        style = \"filled\",");
                 sb.AppendLine("        fillcolor =\"black\"");
