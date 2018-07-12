@@ -1,9 +1,9 @@
 # Compilador de XSM a C
-cgen = ..\bin\x86\Release\FsmCompiler.exe
+cgen = ..\bin\x86\Debug\FsmCompiler.exe
 cgen_options = /G:C
 
 # Compilador de XSM a DOT
-dotgen = ..\bin\x86\Release\FsmCompiler.exe
+dotgen = ..\bin\x86\Debug\FsmCompiler.exe
 dotgen_options = /G:DOT
 
 # Compilador de DOT a PDF: 
@@ -12,6 +12,7 @@ dot_options = -Tpdf
 
 targets = \
        fsm_Demo.c \
+	   fsm_Demo.dot \
 	   fsm_Demo.pdf
 
 .SUFFIXES: .xsm .dot .c .pdf
@@ -20,7 +21,7 @@ targets = \
 all: $(targets)
 
 clean:
-	rm *.pdf
+	rm -rf fsm_*.pdf fsm_*.dot fsm_*.c
 
 fsm_%.c: %.xsm
 	$(cgen) $(cgen_options) $*.xsm

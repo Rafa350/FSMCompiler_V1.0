@@ -9,7 +9,7 @@
     public sealed class DOTGenerator: GeneratorBase {
 
         private const string nodeFont = "arial";
-        private const int nodeFontSize = 18;
+        private const int nodeFontSize = 14;
         private const string edgeFont = "arial";
         private const int edgeFontSize = 10;
 
@@ -109,22 +109,46 @@
                 //
                 foreach (State state in machine.States) {
 
-                    string enterActionName = "--";
-                    if (state.EnterAction != null)
-                        enterActionName = actionDict[state.EnterAction];
-
-                    string exitActionName = "--";
-                    if (state.ExitAction != null)
-                        exitActionName = actionDict[state.ExitAction];
+                    bool needSeparator = true;
 
                     sb.AppendFormat("    {0} [", state.Name);
                     sb.AppendLine();
-                    sb.AppendFormat(
-                        "        label = <<table cellborder=\"0\" style=\"rounded\" bgcolor=\"aliceblue\">" +
-                        "<tr><td> {0} </td></tr>" +
-                        "<hr/>" +
-                        "<tr><td> entry / {1} <br/> exit / {2} </td></tr>" +
-                        "</table>>", state.Name, enterActionName, exitActionName);
+                    sb.Append("        label = <<table cellborder=\"0\" style=\"rounded\" bgcolor=\"lemonchiffon\">");
+                    sb.AppendFormat("<tr><td><font point-size=\"{1}\"> {0} </font></td></tr>", state.Name, nodeFontSize);
+
+                    // Transicio enter
+                    //
+                    if (state.EnterAction != null) {
+                        if (needSeparator) {
+                            needSeparator = false;
+                            sb.Append("<hr/>");
+                        }
+                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> entry/ {0} </font></td></tr>", actionDict[state.EnterAction], edgeFontSize);
+                    }
+
+                    // Transicio exit
+                    //
+                    if (state.ExitAction != null) {
+                        if (needSeparator) {
+                            needSeparator = false;
+                            sb.Append("<hr/>");
+                        }
+                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> exit/ </font>{0} </td></tr>", actionDict[state.ExitAction], edgeFontSize);
+                    }
+
+                    // Transicions internes
+                    //
+                    foreach (Transition transition in state.Transitions) {
+                        if (transition.NextState == null) {
+                            if (needSeparator) {
+                                needSeparator = false;
+                                sb.Append("<hr/>");
+                            }
+                            sb.AppendFormat("<tr><td><font point-size=\"{2}\"> {0}/ {1} </font></td></tr>", transition.Event.Name, actionDict[transition.Action], edgeFontSize);
+                        }
+                    }
+
+                    sb.Append("</table>>");
                     sb.AppendLine();
                     sb.Append("    ];");
                     sb.AppendLine();
@@ -132,20 +156,22 @@
                 }
                 sb.AppendLine();
 
-                // Declara les transicions
+                // Declara les transicions externes o auto-transicions
                 //
                 sb.AppendFormat("    START->{0}", machine.Start.Name).AppendLine();
                 sb.AppendLine();
 
                 foreach (State state in machine.States) {
                     foreach (Transition transition in state.Transitions) {
-                        sb.AppendFormat("    {0}->{1} [", state.Name, transition.NextState == null ? state.Name : transition.NextState.Name).AppendLine();
-                        sb.AppendFormat("        label=\"{0}", transition.Event.Name);
-                        if (transition.Action != null)
-                            sb.AppendFormat(" / {0}", actionDict[transition.Action]);
-                        sb.Append("\"").AppendLine();
-                        sb.Append("    ];");
-                        sb.AppendLine();
+                        if (transition.NextState != null) {
+                            sb.AppendFormat("    {0}->{1} [", state.Name, transition.NextState.Name).AppendLine();
+                            sb.AppendFormat("        label = \"{0}", transition.Event.Name);
+                            if (transition.Action != null)
+                                sb.AppendFormat(" / {0}", actionDict[transition.Action]);
+                            sb.Append("\"").AppendLine();
+                            sb.Append("    ];");
+                            sb.AppendLine();
+                        }
                     }
                     sb.AppendLine();
                 }
