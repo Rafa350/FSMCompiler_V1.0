@@ -13,10 +13,11 @@
 
         static void Main(string[] args) {
 
-        //try {
+        try {
                 CmdLineParser cmdLineParser = new CmdLineParser("FSMCompiler v1.0");
                 cmdLineParser.Add(new ArgumentDefinition("source", 1, "Archivo de entrada.", true));
                 cmdLineParser.Add(new OptionDefinition("G", "Generador."));
+                cmdLineParser.Add(new OptionDefinition("H", "Ayuda."));
                 cmdLineParser.Add(new OptionDefinition("P", "Parametro especifico del generador."));
 
                 if (args.Length == 0) {
@@ -60,26 +61,25 @@
                             break;
 
                         case "C":
+                        default:
                             generator = new CGenerator(generatorParameters);
                             break;
 
                         case "CPP":
-                        default:
                             generator = new CPPGenerator(generatorParameters);
                             break;
                     }
 
                     generator.Generate(machine);
                 }
-          /*  }
+           }
 
             catch (Exception e) {
                 while (e != null) {
                     Console.WriteLine(e.Message);
                     e = e.InnerException;
                 }
-                Console.ReadKey(true);
-            }*/
+            }
         }
     }
 }

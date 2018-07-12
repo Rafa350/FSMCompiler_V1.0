@@ -48,21 +48,6 @@
 
                 CodeGenerator generator = new CodeGenerator(machine);
 
-                codeBuilder
-                    .WriteLine("#ifndef __fsmChangeState")
-                    .WriteLine("#define __fsmChangeState(newState)       state = newState")
-                    .WriteLine("#endif")
-                    .WriteLine()
-                    .WriteLine("#ifndef __fsmDoAction")
-                    .WriteLine("#define __fsmDoAction(action, context)   action(context)")
-                    .WriteLine("#endif")
-                    .WriteLine()
-                    .WriteLine("#ifndef __fsmCheckGuard")
-                    .WriteLine("#define __fsmCheckGuard(guard, context)  guard(context)")
-                    .WriteLine("#endif")
-                    .WriteLine()
-                    .WriteLine();
-
                 // Genera el enumerador amb els estats de la maquina
                 //
                 generator.GenerateStateTypeDeclaration(codeBuilder);
