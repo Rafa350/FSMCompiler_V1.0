@@ -11,6 +11,8 @@
         private readonly Machine machine;
         private readonly Dictionary<Model.Action, string> actionDict = new Dictionary<Model.Action, string>();
         private readonly Dictionary<Guard, string> guardDict = new Dictionary<Guard, string>();
+        private readonly bool inlineActions = true;
+        private readonly bool inlineGuards = true;
 
         /// <summary>
         /// Constructor del objecte.
@@ -80,61 +82,64 @@
         /// 
         public void GenerateActionImplementation(CodeBuilder codeBuilder) {
 
-            if (machine.InitializeAction != null) {
-                codeBuilder
-                    .WriteLine("// -----------------------------------------------------------------------")
-                    .WriteLine("// Machine initialize action")
-                    .WriteLine("//");
-                EmitActionDeclarationStart(codeBuilder, machine.InitializeAction);
-                EmitActionBody(codeBuilder, machine.InitializeAction);
-                EmitActionDeclarationEnd(codeBuilder, machine.InitializeAction);
-            }
+            if (!inlineActions) {
 
-            if (machine.TerminateAction != null) {
-                codeBuilder
-                    .WriteLine("// -----------------------------------------------------------------------")
-                    .WriteLine("// Machine terminate action")
-                    .WriteLine("//");
-                EmitActionDeclarationStart(codeBuilder, machine.TerminateAction);
-                EmitActionBody(codeBuilder, machine.TerminateAction);
-                EmitActionDeclarationEnd(codeBuilder, machine.TerminateAction);
-            }
-
-            foreach (State state in machine.States) {
-
-                if (state.EnterAction != null) {
+                if (machine.InitializeAction != null) {
                     codeBuilder
                         .WriteLine("// -----------------------------------------------------------------------")
-                        .WriteLine("// Enter action")
-                        .WriteLine("//     State: {0}", state.Name)
+                        .WriteLine("// Machine initialize action")
                         .WriteLine("//");
-                    EmitActionDeclarationStart(codeBuilder, state.EnterAction);
-                    EmitActionBody(codeBuilder, state.EnterAction);
-                    EmitActionDeclarationEnd(codeBuilder, state.EnterAction);
+                    EmitActionDeclarationStart(codeBuilder, machine.InitializeAction);
+                    EmitActionBody(codeBuilder, machine.InitializeAction);
+                    EmitActionDeclarationEnd(codeBuilder, machine.InitializeAction);
                 }
 
-                if (state.ExitAction != null) {
+                if (machine.TerminateAction != null) {
                     codeBuilder
                         .WriteLine("// -----------------------------------------------------------------------")
-                        .WriteLine("// Exit action")
-                        .WriteLine("//     State: {0}", state.Name)
+                        .WriteLine("// Machine terminate action")
                         .WriteLine("//");
-                    EmitActionDeclarationStart(codeBuilder, state.ExitAction);
-                    EmitActionBody(codeBuilder, state.ExitAction);
-                    EmitActionDeclarationEnd(codeBuilder, state.ExitAction);
+                    EmitActionDeclarationStart(codeBuilder, machine.TerminateAction);
+                    EmitActionBody(codeBuilder, machine.TerminateAction);
+                    EmitActionDeclarationEnd(codeBuilder, machine.TerminateAction);
                 }
 
-                foreach (Transition transition in state.Transitions) {
-                    if (transition.Action != null) {
+                foreach (State state in machine.States) {
+
+                    if (state.EnterAction != null) {
                         codeBuilder
                             .WriteLine("// -----------------------------------------------------------------------")
-                            .WriteLine("// Transition action")
+                            .WriteLine("// Enter action")
                             .WriteLine("//     State: {0}", state.Name)
-                            .WriteLine("//     Event: {0}", transition.Event.Name)
                             .WriteLine("//");
-                        EmitActionDeclarationStart(codeBuilder, transition.Action);
-                        EmitActionBody(codeBuilder, transition.Action);
-                        EmitActionDeclarationEnd(codeBuilder, transition.Action);
+                        EmitActionDeclarationStart(codeBuilder, state.EnterAction);
+                        EmitActionBody(codeBuilder, state.EnterAction);
+                        EmitActionDeclarationEnd(codeBuilder, state.EnterAction);
+                    }
+
+                    if (state.ExitAction != null) {
+                        codeBuilder
+                            .WriteLine("// -----------------------------------------------------------------------")
+                            .WriteLine("// Exit action")
+                            .WriteLine("//     State: {0}", state.Name)
+                            .WriteLine("//");
+                        EmitActionDeclarationStart(codeBuilder, state.ExitAction);
+                        EmitActionBody(codeBuilder, state.ExitAction);
+                        EmitActionDeclarationEnd(codeBuilder, state.ExitAction);
+                    }
+
+                    foreach (Transition transition in state.Transitions) {
+                        if (transition.Action != null) {
+                            codeBuilder
+                                .WriteLine("// -----------------------------------------------------------------------")
+                                .WriteLine("// Transition action")
+                                .WriteLine("//     State: {0}", state.Name)
+                                .WriteLine("//     Event: {0}", transition.Event.Name)
+                                .WriteLine("//");
+                            EmitActionDeclarationStart(codeBuilder, transition.Action);
+                            EmitActionBody(codeBuilder, transition.Action);
+                            EmitActionDeclarationEnd(codeBuilder, transition.Action);
+                        }
                     }
                 }
             }
@@ -147,25 +152,27 @@
         /// 
         public void GenerateGuardImplementation(CodeBuilder codeBuilder) {
 
-            foreach (State state in machine.States) {
-                foreach (Transition transition in state.Transitions) {
-                    if (transition.Guard != null) {
-                        codeBuilder
-                            .WriteLine("// -----------------------------------------------------------------------")
-                            .WriteLine("// Transition guard")
-                            .WriteLine("//     State: {0}", state.Name)
-                            .WriteLine("//     Event: {0}", transition.Event == null ? "default" : transition.Event.Name)
-                            .WriteLine("//");
-                        EmitGuardDeclarationStart(codeBuilder, transition.Guard);
-                        EmitGuardBody(codeBuilder, transition.Guard);
-                        EmitGuardDeclarationEnd(codeBuilder, transition.Guard);
+            if (!inlineGuards) {
+                foreach (State state in machine.States) {
+                    foreach (Transition transition in state.Transitions) {
+                        if (transition.Guard != null) {
+                            codeBuilder
+                                .WriteLine("// -----------------------------------------------------------------------")
+                                .WriteLine("// Transition guard")
+                                .WriteLine("//     State: {0}", state.Name)
+                                .WriteLine("//     Event: {0}", transition.Event == null ? "default" : transition.Event.Name)
+                                .WriteLine("//");
+                            EmitGuardDeclarationStart(codeBuilder, transition.Guard);
+                            EmitGuardBody(codeBuilder, transition.Guard);
+                            EmitGuardDeclarationEnd(codeBuilder, transition.Guard);
+                        }
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Genera la funcio de procesament de la maquina d'estats. Versio de maquina amb "switch"
+        /// Genera la funcio de procesament de la maquina d'estats.
         /// </summary>
         /// <param name="codeBuilder">Constructor de codi font.</param>
         /// 
@@ -241,20 +248,32 @@
                     // Si hi ha canvi d'estat, genera la crida a la ExitAction del estat actual
                     //
                     if ((transition.NextState != null) && (transition.NextState != state)) {
-                        if (state.ExitAction != null)
-                            EmitActionCall(codeBuilder, state.ExitAction);
+                        if (state.ExitAction != null) {
+                            if (inlineActions)
+                                EmitActionBody(codeBuilder, state.ExitAction);
+                            else
+                                EmitActionCall(codeBuilder, state.ExitAction);
+                        }
                     }
 
                     // Genera la crida a la accio de la transicio
                     //
-                    if (transition.Action != null)
-                        EmitActionCall(codeBuilder, transition.Action);
+                    if (transition.Action != null) {
+                        if (inlineActions)
+                            EmitActionBody(codeBuilder, transition.Action);
+                        else
+                            EmitActionCall(codeBuilder, transition.Action);
+                    }
 
                     // Si hi ha canvi d'estat, genera la crida a la EnterAction del nou estat.
                     //
-                    if ((transition.NextState != null) && (transition.NextState != state)) {
-                        if (transition.NextState.EnterAction != null)
-                            EmitActionCall(codeBuilder, transition.NextState.EnterAction);
+                    if ((transition.NextState != null) /*OJO auto-transicio*/ && (transition.NextState != state)) {
+                        if (transition.NextState.EnterAction != null) {
+                            if (inlineActions)
+                                EmitActionBody(codeBuilder, transition.NextState.EnterAction);
+                            else
+                                EmitActionCall(codeBuilder, transition.NextState.EnterAction);
+                        }
                         codeBuilder
                             .WriteLine("state = State_{0};", transition.NextState.Name);
                     }
