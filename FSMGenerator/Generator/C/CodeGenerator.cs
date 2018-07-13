@@ -245,8 +245,12 @@
                     if (transition.Guard != null)
                         sb.Append('(');
                     sb.AppendFormat("event == Event_{0}", transition.Event.Name);
-                    if (transition.Guard != null)
-                        sb.AppendFormat(") && {0}(context)", guardDict[transition.Guard]);
+                    if (transition.Guard != null) {
+                        if (inlineGuards)
+                            sb.AppendFormat(") && ({0})", transition.Guard.Expression);
+                        else 
+                            sb.AppendFormat(") && {0}(context)", guardDict[transition.Guard]);
+                    }
                     sb.Append(") {");
 
                     codeBuilder

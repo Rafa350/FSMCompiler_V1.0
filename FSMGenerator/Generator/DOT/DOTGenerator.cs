@@ -123,7 +123,7 @@
                             needSeparator = false;
                             sb.Append("<hr/>");
                         }
-                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> entry/ {0} </font></td></tr>", actionDict[state.EnterAction], edgeFontSize);
+                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> ENTRY/ {0} </font></td></tr>", actionDict[state.EnterAction], edgeFontSize);
                     }
 
                     // Transicio exit
@@ -133,7 +133,7 @@
                             needSeparator = false;
                             sb.Append("<hr/>");
                         }
-                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> exit/ </font>{0} </td></tr>", actionDict[state.ExitAction], edgeFontSize);
+                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> EXIT/ </font>{0} </td></tr>", actionDict[state.ExitAction], edgeFontSize);
                     }
 
                     // Transicions internes
