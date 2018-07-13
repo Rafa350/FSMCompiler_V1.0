@@ -4,12 +4,6 @@
      inhibicio i aplicacio automatica 
 -->
 <machine name="Demo" start="IDLE">
-
-    <!--
-    <events>
-        <event name="INP_ST_OFF" value="100"/>
-    </events>
-    -->
     
     <initialize>
         <inline>trigger = false;  </inline>
@@ -20,39 +14,37 @@
     -->
     <state name="IDLE">
        
-        <!-- Es prem el boto Start/Reset 
+        <!-- Es prem el boto Start/Reset en modus normal
         -->
-        <transition event="INP_ST_ON" state="DONE">
-            <inline>if (test)                                 </inline>
-            <inline>    test = false;                         </inline>
-            <inline>else if (varGet(VAR_TEST_ACTIVE) == 1) {  </inline>
-            <inline>    varSet(VAR_TEST_ACTIVE, 0);           </inline>            
-            <inline>    test = true;                          </inline>
-            <inline>}                                         </inline>
+        <transition event="INP_ST_ON" guard="!test" state="DONE">
+            <inline>if (varGet(VAR_TEST_ACTIVE) == 1) {  </inline>
+            <inline>    varSet(VAR_TEST_ACTIVE, 0);      </inline>            
+            <inline>    test = true;                     </inline>
+            <inline>}                                    </inline>
         </transition>
                
-        <!-- El temporitzador d'interval de test arriva al final 
+        <!-- Es prem el boto Start/Reset en modus test
         -->
-        <transition event="TIM_TEST_INTERVAL" guard="test" state="DONE"/>
-        
-        <!-- L'entrada INP_TR passa a estat actiu 
+        <transition event="INP_ST_ON" guard="test">
+            <inline>test = false; </inline>
+        </transition>
+       
+        <!-- Flanc positiu en l'entrada INP_TR 
         -->
-        <transition event="INP_TR_ON" guard="varGet(VAR_TR_EDGE) == 0" state="TR_DELAY">
+        <transition event="INP_TR_ON" guard="!test" state="DELAY_BEFORE_DONE">
             <inline>timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));  </inline>
         </transition>
-        
-        <!-- L'entrada INP_TR passa a estat inactiu 
+                
+        <!-- Flanc positiu en l'entrada IN_IH 
         -->
-        <transition event="INP_TR_OFF" guard="varGet(VAR_TR_EDGE) == 1" state="TR_DELAY">
-            <inline>timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));  </inline>
-        </transition>
-
-        <!-- L'entrada IN_IH passa a estat actiu 
-        -->
-        <transition event="INP_IH_ON">
+        <transition event="INP_IH_ON" guard="!test">
             <inline>timStart(TIM_IH_DELAY, varGet(VAR_IH_ONDELAY));  </inline>
         </transition>
         
+        <!-- El temporitzador d'interval de test arriva al final 
+        -->
+        <transition event="TIM_TEST_INTERVAL" guard="test" state="DONE"/>
+
         <!-- El temporitzador de retard a la inhibicio arriva al final 
         -->
         <transition event="TIM_IH_DELAY" state="DISABLED"/>
@@ -63,26 +55,44 @@
     -->
     <state name="DISABLED">
     
-        <!-- L'entrada INP_IH pasa a estat desactivat 
+        <!-- Flanc negatiu en l'entrada INP_IH 
         -->
         <transition event="INP_IH_OFF">
             <inline>timStart(TIM_IH_DELAY, varGet(VAR_IH_OFFDELAY));  </inline>
         </transition>
-        
+
         <!-- El temporitzador de retart a la inhibicio arriba al final 
         -->
         <transition event="TIM_IH_DELAY" state="IDLE"/>
     </state>
 
-    <!-- Retard de trigger 
+    <!-- Retard abans de imprimir
     -->
-    <state name="TR_DELAY">
+    <state name="DELAY_BEFORE_DONE">
+    
+        <!-- Si es prem Start/Reset es desactiva el test
+        -->
+        <transition event="INP_ST_ON">
+            <inline>test = false;  </inline>
+        </transition>
+
+        <!-- Final del retard
+        -->
         <transition event="TIM_TR_DELAY" state="DONE"/>
     </state>
     
-    <!-- Retard de reinici
+    <!-- Retard abans del reinici
     -->
-    <state name="REARM_DELAY">
+    <state name="DELAY_BEFORE_IDLE">
+        
+        <!-- Si es prem Start/Reset es desactiva el test
+        -->
+        <transition event="INP_ST_ON">
+            <inline>test = false;  </inline>
+        </transition>
+
+        <!-- Final del retart de reinici 
+        -->
         <transition event="TIM_TR_INHIBIT" state="IDLE">
             <inline>if (test)                                                    </inline>
             <inline>    timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));  </inline>
@@ -98,12 +108,18 @@
              disparo pel un altre part del sistema.
         -->
         <enter>
-            <inline>trigger = true;</inline>
+            <inline>trigger = true;  </inline>
         </enter>
+
+        <!-- Si es prem Start/Reset es desactiva el test
+        -->
+        <transition event="INP_ST_ON">
+            <inline>test = false;  </inline>
+        </transition>
         
         <!-- Es reb el rearmat des d'un altre part del sistema 
         -->
-        <transition event="SIG_REARM_TRIGGER" state="REARM_DELAY">
+        <transition event="SIG_REARM_TRIGGER" state="DELAY_BEFORE_IDLE">
             <inline>trigger = false;                                  </inline>
             <inline>timStart(TIM_TR_INHIBIT, varGet(VAR_TR_INHIBIT)); </inline>
         </transition>

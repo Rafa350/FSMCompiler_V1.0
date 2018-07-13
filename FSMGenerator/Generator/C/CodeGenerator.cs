@@ -194,11 +194,19 @@
                 .Indent()
                 .WriteLine("state = State_{0};", machine.Start.Name);
 
-            if (machine.InitializeAction != null)
-                EmitActionCall(codeBuilder, machine.InitializeAction);
+            if (machine.InitializeAction != null) {
+                if (inlineActions)
+                    EmitActionBody(codeBuilder, machine.InitializeAction);
+                else
+                    EmitActionCall(codeBuilder, machine.InitializeAction);
+            }
 
-            if (machine.Start.EnterAction != null)
-                EmitActionCall(codeBuilder, machine.Start.EnterAction);
+            if (machine.Start.EnterAction != null) {
+                if (inlineActions)
+                    EmitActionBody(codeBuilder, machine.Start.EnterAction);
+                else
+                    EmitActionCall(codeBuilder, machine.Start.EnterAction);
+            }
 
             codeBuilder
                 .UnIndent()
