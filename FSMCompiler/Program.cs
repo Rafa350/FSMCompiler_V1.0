@@ -51,6 +51,13 @@
                         }
                     }
 
+                    Console.WriteLine();
+                    Console.WriteLine("FsmCompiler v1.1");
+                    Console.WriteLine("-------------------------------------------------------------");
+                    Console.WriteLine("  Finite state machine compiler tool.");
+                    Console.WriteLine("  Copyright 2015-2018 Rafael Serrano (rsr.openware@gmail.com)");
+                    Console.WriteLine();
+
                     XmlLoader loader = new XmlLoader();
                     Machine machine = loader.Load(sourceFileName);
 
