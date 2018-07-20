@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Include>
     
-    <?define ProductVersion = "1.0.0.0"?>
-    <?define ProductDisplayVersion = "1.0"?>
+    <?define ProductVersion = "1.1.0.0"?>
+    <?define ProductDisplayVersion = "1.1"?>
     <?define ProductName = "FSMCompiler"?>
     <?define ProductFullName = "$(var.ProductName) v$(var.ProductDisplayVersion)"?>
     <?define ManufacturerName = "MP Designs"?>
