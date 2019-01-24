@@ -2,3 +2,5 @@ Out
 obj
 bin
 .vs/
+*.pfx
+
