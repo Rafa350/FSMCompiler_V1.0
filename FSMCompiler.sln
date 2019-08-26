@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2000
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSMCompiler", "FSMCompiler\FSMCompiler.csproj", "{4FD0F136-D599-458B-A51B-83977C568381}"
 EndProject
@@ -9,33 +9,29 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSMModel", "FSMModel\FSMMod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSMGenerator", "FSMGenerator\FSMGenerator.csproj", "{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MachineDemo", "MachineDemo\MachineDemo.vcxproj", "{E15F6DF7-8AE6-4D41-B1B5-8049E9313C27}"
-EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Setup", "Setup\Setup.wixproj", "{C86E8FB8-E9FF-463E-B41F-E40037A60462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x86 = Debug|x86
-		Release|x86 = Release|x86
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4FD0F136-D599-458B-A51B-83977C568381}.Debug|x86.ActiveCfg = Debug|x86
-		{4FD0F136-D599-458B-A51B-83977C568381}.Debug|x86.Build.0 = Debug|x86
-		{4FD0F136-D599-458B-A51B-83977C568381}.Release|x86.ActiveCfg = Release|x86
-		{4FD0F136-D599-458B-A51B-83977C568381}.Release|x86.Build.0 = Release|x86
-		{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}.Debug|x86.ActiveCfg = Debug|x86
-		{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}.Debug|x86.Build.0 = Debug|x86
-		{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}.Release|x86.ActiveCfg = Release|x86
-		{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}.Release|x86.Build.0 = Release|x86
-		{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}.Debug|x86.ActiveCfg = Debug|x86
-		{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}.Debug|x86.Build.0 = Debug|x86
-		{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}.Release|x86.ActiveCfg = Release|x86
-		{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}.Release|x86.Build.0 = Release|x86
-		{E15F6DF7-8AE6-4D41-B1B5-8049E9313C27}.Debug|x86.ActiveCfg = Debug|Win32
-		{E15F6DF7-8AE6-4D41-B1B5-8049E9313C27}.Release|x86.ActiveCfg = Release|Win32
-		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Debug|x86.ActiveCfg = Debug|x86
-		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Release|x86.ActiveCfg = Release|x86
-		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Release|x86.Build.0 = Release|x86
+		{4FD0F136-D599-458B-A51B-83977C568381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FD0F136-D599-458B-A51B-83977C568381}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FD0F136-D599-458B-A51B-83977C568381}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FD0F136-D599-458B-A51B-83977C568381}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E6B3A29-B3E2-4F45-BD31-4EBD84C68669}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Release|Any CPU.ActiveCfg = Release|x86
+		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Release|Any CPU.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
