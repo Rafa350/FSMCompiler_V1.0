@@ -1,9 +1,9 @@
 # Compilador de XSM a C
-cgen = ..\bin\x86\Debug\FsmCompiler.exe
+cgen = ..\bin\Debug\FsmCompiler.exe
 cgen_options = /G:C
 
 # Compilador de XSM a DOT
-dotgen = ..\bin\x86\Debug\FsmCompiler.exe
+dotgen = ..\bin\Debug\FsmCompiler.exe
 dotgen_options = /G:DOT
 
 # Compilador de DOT a PDF: 
