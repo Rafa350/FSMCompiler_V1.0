@@ -156,7 +156,7 @@
                     codeBuilder.WriteLine("popState();");
                     break;
             }
-            if (transition.Guard.Expression != null) {
+            if (transition.Guard != null) {
                 codeBuilder
                     .UnIndent()
                     .WriteLine("}");

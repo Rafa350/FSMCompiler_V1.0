@@ -1,4 +1,4 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.C {
+﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP {
 
     using System;
     using System.Collections.Generic;
@@ -86,9 +86,9 @@
 
                 if (machine.InitializeAction != null) {
                     codeBuilder
-                        .WriteLine("// -----------------------------------------------------------------------")
-                        .WriteLine("// Machine initialize action")
-                        .WriteLine("//");
+                        .WriteLine("/// ----------------------------------------------------------------------")
+                        .WriteLine("/// \\brief    Machine initialize action.")
+                        .WriteLine("///");
                     EmitActionDeclarationStart(codeBuilder, machine.InitializeAction);
                     EmitActionBody(codeBuilder, machine.InitializeAction);
                     EmitActionDeclarationEnd(codeBuilder, machine.InitializeAction);
@@ -96,9 +96,9 @@
 
                 if (machine.TerminateAction != null) {
                     codeBuilder
-                        .WriteLine("// -----------------------------------------------------------------------")
-                        .WriteLine("// Machine terminate action")
-                        .WriteLine("//");
+                        .WriteLine("/// ----------------------------------------------------------------------")
+                        .WriteLine("/// \\brief    Machine terminate action.")
+                        .WriteLine("///");
                     EmitActionDeclarationStart(codeBuilder, machine.TerminateAction);
                     EmitActionBody(codeBuilder, machine.TerminateAction);
                     EmitActionDeclarationEnd(codeBuilder, machine.TerminateAction);
@@ -108,10 +108,10 @@
 
                     if (state.EnterAction != null) {
                         codeBuilder
-                            .WriteLine("// -----------------------------------------------------------------------")
-                            .WriteLine("// Enter action")
-                            .WriteLine("//     State: {0}", state.Name)
-                            .WriteLine("//");
+                            .WriteLine("/// ----------------------------------------------------------------------")
+                            .WriteLine("/// \\brief   Enter action.")
+                            .WriteLine("///          -State: '{0}'", state.Name)
+                            .WriteLine("///");
                         EmitActionDeclarationStart(codeBuilder, state.EnterAction);
                         EmitActionBody(codeBuilder, state.EnterAction);
                         EmitActionDeclarationEnd(codeBuilder, state.EnterAction);
@@ -119,10 +119,10 @@
 
                     if (state.ExitAction != null) {
                         codeBuilder
-                            .WriteLine("// -----------------------------------------------------------------------")
-                            .WriteLine("// Exit action")
-                            .WriteLine("//     State: {0}", state.Name)
-                            .WriteLine("//");
+                            .WriteLine("/// ----------------------------------------------------------------------")
+                            .WriteLine("/// \\brief    Exit action.")
+                            .WriteLine("///           -State: {0}", state.Name)
+                            .WriteLine("///");
                         EmitActionDeclarationStart(codeBuilder, state.ExitAction);
                         EmitActionBody(codeBuilder, state.ExitAction);
                         EmitActionDeclarationEnd(codeBuilder, state.ExitAction);
@@ -131,11 +131,11 @@
                     foreach (Transition transition in state.Transitions) {
                         if (transition.Action != null) {
                             codeBuilder
-                                .WriteLine("// -----------------------------------------------------------------------")
-                                .WriteLine("// Transition action")
-                                .WriteLine("//     State: {0}", state.Name)
-                                .WriteLine("//     Event: {0}", transition.Event.Name)
-                                .WriteLine("//");
+                                .WriteLine("/// ----------------------------------------------------------------------")
+                                .WriteLine("/// \\brief    Transition action.")
+                                .WriteLine("///           -State: '{0}'", state.Name)
+                                .WriteLine("///           -Event: '{0}'", transition.Event.Name)
+                                .WriteLine("///");
                             EmitActionDeclarationStart(codeBuilder, transition.Action);
                             EmitActionBody(codeBuilder, transition.Action);
                             EmitActionDeclarationEnd(codeBuilder, transition.Action);
@@ -179,20 +179,13 @@
         public void GenerateProcessorImplementation(CodeBuilder codeBuilder) {
 
             codeBuilder
-                .WriteLine("// -----------------------------------------------------------------------")
-                .WriteLine("// Internal vars.")
-                .WriteLine("//")
-                .WriteLine("static State state;")
-                .WriteLine();
-
-            codeBuilder
-                .WriteLine("// -----------------------------------------------------------------------")
-                .WriteLine("// State machine setup")
-                .WriteLine("//")
-                .WriteLine("void {0}Setup(Context context) {{", machine.Name)
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    State machine setup")
+                .WriteLine("///")
+                .WriteLine("void Machine::start() {")
                 .WriteLine()
                 .Indent()
-                .WriteLine("state = State_{0};", machine.Start.Name);
+                .WriteLine("state = State::{0};", machine.Start.Name);
 
             if (machine.InitializeAction != null) {
                 if (inlineActions)
@@ -214,10 +207,11 @@
                 .WriteLine();
 
             codeBuilder
-                .WriteLine("// -----------------------------------------------------------------------")
-                .WriteLine("// State machine event processor")
-                .WriteLine("//")
-                .WriteLine("void {0}Run(Event event, Context context) {{", machine.Name)
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    Process event.")
+                .WriteLine("/// \\param    event: Event to process.")
+                .WriteLine("///")
+                .WriteLine("void Machine::acceptEvent(Event event) {")
                 .WriteLine()
                 .Indent();
 
@@ -228,7 +222,7 @@
             foreach (State state in machine.States) {
 
                 codeBuilder
-                    .WriteLine("case State_{0}:", state.Name)
+                    .WriteLine("case State::{0}:", state.Name)
                     .Indent();
 
                 bool firstTransition = true;
@@ -244,12 +238,12 @@
                         sb.Append("else if (");
                     if (transition.Guard != null)
                         sb.Append('(');
-                    sb.AppendFormat("event == Event_{0}", transition.Event.Name);
+                    sb.AppendFormat("event == Machine::Event::{0}", transition.Event.Name);
                     if (transition.Guard != null) {
                         if (inlineGuards)
                             sb.AppendFormat(") && ({0})", transition.Guard.Expression);
                         else 
-                            sb.AppendFormat(") && {0}(context)", guardName[transition.Guard]);
+                            sb.AppendFormat(") && {0}()", guardName[transition.Guard]);
                     }
                     sb.Append(") {");
 
@@ -287,7 +281,7 @@
                                 EmitActionCall(codeBuilder, transition.NextState.EnterAction);
                         }
                         codeBuilder
-                            .WriteLine("state = State_{0};", transition.NextState.Name);
+                            .WriteLine("state = State::{0};", transition.NextState.Name);
                     }
 
                     codeBuilder
@@ -318,7 +312,7 @@
         private void EmitActionDeclarationStart(CodeBuilder codeBuilder, Model.Action action) {
 
             codeBuilder
-                .WriteLine("static void {0}(Context context) {{", actionName[action])
+                .WriteLine("void Machine::{0}() {{", actionName[action])
                 .WriteLine()
                 .Indent();
         }
@@ -361,7 +355,7 @@
         private void EmitActionCall(CodeBuilder codeBuilder, Model.Action action) {
 
             codeBuilder
-                .WriteLine("{0}(context);", actionName[action]);
+                .WriteLine("{0}();", actionName[action]);
         }
 
         /// <summary>
@@ -373,7 +367,7 @@
         private void EmitGuardDeclarationStart(CodeBuilder codeBuilder, Guard guard) {
 
             codeBuilder
-                .WriteLine("static bool {0}(Context context) {{", guardName[guard])
+                .WriteLine("bool Machine::{0}() {{", guardName[guard])
                 .WriteLine()
                 .Indent();
         }
@@ -406,12 +400,12 @@
 
         private static string MakeActionName(int count) {
 
-            return String.Format("Action{0}", count);
+            return String.Format("action{0}", count);
         }
 
         private static string MakeGuardName(int count) {
 
-            return String.Format("Guard{0}", count);
+            return String.Format("guard{0}", count);
         }
     }
 }

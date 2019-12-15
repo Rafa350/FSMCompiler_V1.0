@@ -37,30 +37,30 @@
             //
             int actionCount = 0;
             int guardCount = 0;
-            Dictionary<Model.Action, string> actionDict = new Dictionary<Model.Action, string>();
-            Dictionary<Guard, string> guardDict = new Dictionary<Guard, string>();
+            Dictionary<Model.Action, string> actionName = new Dictionary<Model.Action, string>();
+            Dictionary<Guard, string> guardName = new Dictionary<Guard, string>();
 
             if (machine.InitializeAction != null)
-                actionDict.Add(machine.InitializeAction, String.Format("Action{0}", actionCount++));
+                actionName.Add(machine.InitializeAction, MakeActionName(actionCount++));
 
             if (machine.TerminateAction != null)
-                actionDict.Add(machine.TerminateAction, String.Format("Action{0}", actionCount++));
+                actionName.Add(machine.TerminateAction, MakeActionName(actionCount++));
 
             foreach (State state in machine.States) {
 
                 if (state.EnterAction != null)
-                    actionDict.Add(state.EnterAction, String.Format("Action{0}", actionCount++));
+                    actionName.Add(state.EnterAction, MakeActionName(actionCount++));
 
                 if (state.ExitAction != null)
-                    actionDict.Add(state.ExitAction, String.Format("Action{0}", actionCount++));
+                    actionName.Add(state.ExitAction, MakeActionName(actionCount++));
 
                 foreach (Transition transition in state.Transitions) {
 
                     if (transition.Guard != null)
-                        guardDict.Add(transition.Guard, String.Format("Guard{0}", guardCount++));
+                        guardName.Add(transition.Guard, MakeGuardName(guardCount++));
 
                     if (transition.Action != null)
-                        actionDict.Add(transition.Action, String.Format("Action{0}", actionCount++));
+                        actionName.Add(transition.Action, MakeActionName(actionCount++));
                 }
             }
 
@@ -123,7 +123,7 @@
                             needSeparator = false;
                             sb.Append("<hr/>");
                         }
-                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> ENTRY/ {0} </font></td></tr>", actionDict[state.EnterAction], edgeFontSize);
+                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> ENTRY/ {0} </font></td></tr>", actionName[state.EnterAction], edgeFontSize);
                     }
 
                     // Transicio exit
@@ -133,7 +133,7 @@
                             needSeparator = false;
                             sb.Append("<hr/>");
                         }
-                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> EXIT/ </font>{0} </td></tr>", actionDict[state.ExitAction], edgeFontSize);
+                        sb.AppendFormat("<tr><td><font point-size=\"{1}\"> EXIT/ {0} </font></td></tr>", actionName[state.ExitAction], edgeFontSize);
                     }
 
                     // Transicions internes
@@ -144,7 +144,7 @@
                                 needSeparator = false;
                                 sb.Append("<hr/>");
                             }
-                            sb.AppendFormat("<tr><td><font point-size=\"{2}\"> {0}/ {1} </font></td></tr>", transition.Event.Name, actionDict[transition.Action], edgeFontSize);
+                            sb.AppendFormat("<tr><td><font point-size=\"{2}\"> {0}/ {1} </font></td></tr>", transition.Event.Name, actionName[transition.Action], edgeFontSize);
                         }
                     }
 
@@ -167,7 +167,7 @@
                             sb.AppendFormat("    {0}->{1} [", state.Name, transition.NextState.Name).AppendLine();
                             sb.AppendFormat("        label = \"{0}", transition.Event.Name);
                             if (transition.Action != null)
-                                sb.AppendFormat(" / {0}", actionDict[transition.Action]);
+                                sb.AppendFormat(" / {0}", actionName[transition.Action]);
                             sb.Append("\"").AppendLine();
                             sb.Append("    ];");
                             sb.AppendLine();
@@ -179,6 +179,16 @@
 
                 writer.WriteLine(sb.ToString());
             }
+        }
+
+        private static string MakeActionName(int count) {
+
+            return String.Format("Action{0}", count);
+        }
+
+        private static string MakeGuardName(int count) {
+
+            return String.Format("Guard{0}", count);
         }
     }
 }

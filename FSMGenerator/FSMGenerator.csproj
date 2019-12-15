@@ -46,14 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generator\CodeBuilder.cs" />
-    <Compile Include="Generator\CPP\StateIdHeaderVisitor.cs" />
-    <Compile Include="Generator\CPP\EventIdHeaderVisitor.cs" />
-    <Compile Include="Generator\CPP\CPPGeneratorOptions.cs" />
-    <Compile Include="Generator\CPP\StateCodeVisitor.cs" />
     <Compile Include="Generator\CPP\CPPGenerator.cs" />
-    <Compile Include="Generator\CPP\MachineCodeVisitor.cs" />
-    <Compile Include="Generator\CPP\MachineHeaderVisitor.cs" />
-    <Compile Include="Generator\CPP\StateHeaderVisitor.cs" />
+    <Compile Include="Generator\CPP\CPPGeneratorOptions.cs" />
+    <Compile Include="Generator\CPP\CodeGenerator.cs" />
     <Compile Include="Generator\C\CGenerator.cs" />
     <Compile Include="Generator\C\CGeneratorOptions.cs" />
     <Compile Include="Generator\C\CodeGenerator.cs" />
