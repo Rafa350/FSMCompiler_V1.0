@@ -1,4 +1,4 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP {
+﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
 
     using System;
     using System.IO;
@@ -60,7 +60,7 @@
                 if (s.EnterAction != null) {
                     if (!hasActions) {
                         codeBuilder
-                            .WriteLine("void {0}State::onEnter() {{", state.FullName)
+                            .WriteLine("void {0}State::enter() {{", state.FullName)
                             .WriteLine()
                             .Indent();
                         hasActions = true;
@@ -83,7 +83,7 @@
                 if (s.ExitAction != null) {
                     if (!hasActions) {
                         codeBuilder
-                            .WriteLine("void {0}State::onExit() {{", state.FullName)
+                            .WriteLine("void {0}State::exit() {{", state.FullName)
                             .WriteLine()
                             .Indent();
                         hasActions = true;
@@ -101,7 +101,7 @@
 
             if (state.HasTransitions || state.Parent != null) {
                 codeBuilder
-                    .WriteLine("void {0}State::onEvent(unsigned eventId) {{", state.FullName)
+                    .WriteLine("void {0}State::transition(unsigned eventId) {{", state.FullName)
                     .WriteLine()
                     .Indent();
 

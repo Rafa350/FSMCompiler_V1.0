@@ -5,6 +5,7 @@
     using MikroPicDesigns.FSMCompiler.v1.Generator;
     using MikroPicDesigns.FSMCompiler.v1.Generator.C;
     using MikroPicDesigns.FSMCompiler.v1.Generator.CPP;
+    using MikroPicDesigns.FSMCompiler.v1.Generator.CPP2;
     using MikroPicDesigns.FSMCompiler.v1.Generator.DOT;
     using MikroPicDesigns.FSMCompiler.v1.Loader;
     using MikroPicDesigns.FSMCompiler.v1.Model;
@@ -73,7 +74,11 @@
                             break;
 
                         case "CPP":
-                            generator = new CPPGenerator(generatorParameters);
+                            generator = new v1.Generator.CPP.CPPGenerator(generatorParameters);
+                            break;
+
+                        case "CPP2":
+                            generator = new v1.Generator.CPP2.CPPGenerator(generatorParameters);
                             break;
                     }
 

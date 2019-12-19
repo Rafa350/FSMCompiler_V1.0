@@ -1,4 +1,4 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP {
+﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
 
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
@@ -27,11 +27,27 @@
                 .WriteLine()
                 .WriteLine();
 
+            codeBuilder
+                .WriteLine("class {0} {{", options.StateBaseClassName)
+                .Indent()
+                .WriteLine("public:")
+                .Indent()
+                .WriteLine("{0}({1} *machine);", options.StateBaseClassName, options.MachineBaseClassName)
+                .WriteLine("virtual void enter();")
+                .WriteLine("virtual void exit();")
+                .WriteLine("virtual void transition(unsigned eventId);");
+
+            codeBuilder
+                .UnIndent()
+                .UnIndent()
+                .UnIndent()
+                .WriteLine("};")
+                .WriteLine();
+
             foreach (State state in machine.States)
                 state.AcceptVisitor(this);
 
             codeBuilder
-                .WriteLine()
                 .WriteLine()
                 .WriteLine("#endif");
 
@@ -45,18 +61,15 @@
                 .Indent()
                 .WriteLine("public:")
                 .Indent()
-                .WriteLine("{0}State({1} *machine);", state.FullName, options.MachineBaseClassName)
-                .UnIndent()
-                .WriteLine("protected:")
-                .Indent();
+                .WriteLine("{0}State({1} *machine);", state.FullName, options.MachineBaseClassName);
             
             if (state.EnterAction != null) 
-                codeBuilder.WriteLine("void onEnter();");
+                codeBuilder.WriteLine("void enter() override;");
             if (state.ExitAction != null)
-                codeBuilder.WriteLine("void onExit();");
+                codeBuilder.WriteLine("void exit() override;");
 
             codeBuilder
-                .WriteLine("void onEvent(unsigned eventId);")
+                .WriteLine("void transition(unsigned eventId) override;")
                 .UnIndent()
                 .UnIndent()
                 .WriteLine("};")

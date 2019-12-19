@@ -1,4 +1,4 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP {
+﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
 
     using System;
     using System.IO;
