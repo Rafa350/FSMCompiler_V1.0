@@ -22,15 +22,14 @@
             string stateIdHeaderFileName = Path.GetFileName(options.StateIdHeaderFileName);
 
             codeBuilder
-                .WriteLine("#include \"fsmDefines.h\"")
-                .WriteLine("#include \"{0}\"", stateIdHeaderFileName)
+                //.WriteLine("#include \"fsmDefines.h\"")
+                //.WriteLine("#include \"{0}\"", stateIdHeaderFileName)
                 .WriteLine("#include \"{0}\"", machineHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateHeaderFileName)
                 .WriteLine()
                 .WriteLine()
-                .WriteLine("{0}::{0}({1} *context):", options.MachineClassName, options.ContextClassName)
+                .WriteLine("{0}::{0}({1}* context) {{", options.MachineClassName, options.ContextClassName)
                 .Indent()
-                .WriteLine("{0}(context) {{", options.MachineBaseClassName)
                 .WriteLine();
 
             foreach (State state in machine.States)

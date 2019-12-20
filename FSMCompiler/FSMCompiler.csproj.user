@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartWorkingDirectory>C:\Users\Rafael\Documents\Projectes\NET\FSMCompiler\Data\</StartWorkingDirectory>
-    <StartArguments>Demo.xsm /G:CPP</StartArguments>
+    <StartArguments>Demo.xsm /G:CPP2</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <StartArguments>..\..\data\demo.xsm /G:CPP</StartArguments>

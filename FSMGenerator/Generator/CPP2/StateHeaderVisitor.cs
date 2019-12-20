@@ -23,16 +23,26 @@
                 .WriteLine("#define __{0}", guardString)
                 .WriteLine()
                 .WriteLine()
-                .WriteLine("#include \"fsmDefines.h\"")
+                .WriteLine("class {0};", options.MachineClassName)
+                .WriteLine("class {0};", options.ContextClassName)
                 .WriteLine()
                 .WriteLine();
 
             codeBuilder
-                .WriteLine("class {0} {{", options.StateBaseClassName)
+                .WriteLine("class {0} {{", options.StateClassName)
                 .Indent()
+                .WriteLine("private:")
+                .Indent()
+                .WriteLine("{0}* machine;", options.MachineClassName)
+                .UnIndent()
+                .WriteLine("protected:")
+                .Indent()
+                .WriteLine("inline {0}* getMachine() const {{ return machine; }}", options.MachineClassName)
+                .WriteLine("{0}* getContext() const;", options.ContextClassName)
+                .UnIndent()
                 .WriteLine("public:")
                 .Indent()
-                .WriteLine("{0}({1} *machine);", options.StateBaseClassName, options.MachineBaseClassName)
+                .WriteLine("{0}({1}* machine);", options.StateClassName, options.MachineClassName)
                 .WriteLine("virtual void enter();")
                 .WriteLine("virtual void exit();")
                 .WriteLine("virtual void transition(unsigned eventId);");
@@ -57,11 +67,11 @@
         public override void Visit(State state) {
 
             codeBuilder
-                .WriteLine("class {0}State: public {1} {{", state.FullName, options.StateBaseClassName)
+                .WriteLine("class {0}State: public {1} {{", state.FullName, options.StateClassName)
                 .Indent()
                 .WriteLine("public:")
                 .Indent()
-                .WriteLine("{0}State({1} *machine);", state.FullName, options.MachineBaseClassName);
+                .WriteLine("{0}State({1}* machine);", state.FullName, options.MachineClassName);
             
             if (state.EnterAction != null) 
                 codeBuilder.WriteLine("void enter() override;");

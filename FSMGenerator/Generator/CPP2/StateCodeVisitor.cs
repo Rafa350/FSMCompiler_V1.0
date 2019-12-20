@@ -25,12 +25,20 @@
             string stateIdHeaderFileName = Path.GetFileName(options.StateIdHeaderFileName);
 
             codeBuilder
-                .WriteLine("#include \"fsmDefines.h\"")
-                .WriteLine("#include \"{0}\"", eventIdHeaderFileName)
-                .WriteLine("#include \"{0}\"", stateIdHeaderFileName)
+                //.WriteLine("#include \"fsmDefines.h\"")
+                //.WriteLine("#include \"{0}\"", eventIdHeaderFileName)
+                //.WriteLine("#include \"{0}\"", stateIdHeaderFileName)
                 .WriteLine("#include \"{0}\"", machineHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateHeaderFileName)
                 .WriteLine()
+                .WriteLine();
+
+            codeBuilder
+                .WriteLine("{0}::{0}({1}* machine):", options.StateClassName, options.MachineClassName)
+                .Indent()
+                .WriteLine("machine(machine) {")
+                .UnIndent()
+                .WriteLine("}")
                 .WriteLine();
 
             foreach (State state in machine.States)
@@ -42,9 +50,9 @@
         public override void Visit(State state) {
 
             codeBuilder
-                .WriteLine("{0}State::{0}State({1} *machine):", state.FullName, options.MachineBaseClassName)
+                .WriteLine("{0}State::{0}State({1}* machine):", state.FullName, options.MachineClassName)
                 .Indent()
-                .WriteLine("{0}(machine) {{", options.StateBaseClassName)
+                .WriteLine("{0}(machine) {{", options.StateClassName)
                 .UnIndent()
                 .WriteLine("}")
                 .WriteLine();
@@ -52,7 +60,7 @@
             State s;
             bool hasActions;
 
-            // Combina les accions 'onEnter' del pares
+            // Combina les accions 'Enter' del pares
             //
             hasActions = false;
             s = state;
@@ -75,7 +83,7 @@
                     .WriteLine("}")
                     .WriteLine();
 
-            // Combina les accions 'onExit' del pares
+            // Combina les accions 'Exit' del pares
             //
             hasActions = false;
             s = state;

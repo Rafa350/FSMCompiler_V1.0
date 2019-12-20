@@ -3,24 +3,21 @@
     public sealed class CPPGeneratorOptions {
 
         private string machineClassName;
-        private string machineBaseClassName;
         private string contextClassName;
         private string eventIdHeaderFileName;
         private string stateIdHeaderFileName;
         private string machineHeaderFileName;
         private string machineCodeFileName;
-        private string stateBaseClassName;
+        private string stateClassName;
         private string stateHeaderFileName;
         private string stateCodeFileName;
         private bool useStateNames;
 
         public CPPGeneratorOptions() {
 
-            machineClassName = "FsmMachine";
-            machineBaseClassName = "FsmMachineBase";
-            stateBaseClassName = "FsmStateBase";
-
-            contextClassName = "IFsmContext";
+            machineClassName = "Machine";
+            stateClassName = "State";
+            contextClassName = "IContext";
             
             machineHeaderFileName = "fsmMachine.h";
             machineCodeFileName = "fsmMachine.cpp";
@@ -35,9 +32,9 @@
             set { machineClassName = value; }
         }
 
-        public string MachineBaseClassName {
-            get { return machineBaseClassName; }
-            set { machineBaseClassName = value; }
+        public string StateClassName {
+            get { return stateClassName; }
+            set { stateClassName = value; }
         }
 
         public string ContextClassName {
@@ -65,12 +62,7 @@
             set { machineCodeFileName = value; }
         }
 
-        public string StateBaseClassName {
-            get { return stateBaseClassName; }
-            set { stateBaseClassName = value; }
-        }
-
-        public string StateHeaderFileName {
+         public string StateHeaderFileName {
             get { return stateHeaderFileName; }
             set { stateHeaderFileName = value; }
         }

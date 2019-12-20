@@ -66,7 +66,7 @@
 
             // Crea el firxer fsm_<machine>.dot
             //
-            string fileName = String.Format("fsm_{0}.dot", machine.Name);
+            string fileName = String.Format("fsm{0}.dot", machine.Name);
             string path = Path.Combine(folder, fileName);
             using (StreamWriter writer = File.CreateText(path)) {
 
