@@ -24,30 +24,10 @@
 
         public override void Generate(Machine machine) {
 
-            GenerateStateIdHeader(machine);
-            GenerateEventIdHeader(machine);
             GenerateMachineHeader(machine);
             GenerateMachineCode(machine);
             GenerateStateHeader(machine);
             GenerateStateCode(machine);
-        }
-
-        private void GenerateStateIdHeader(Machine machine) {
-
-            if (!String.IsNullOrEmpty(options.StateIdHeaderFileName))
-                using (StreamWriter writer = File.CreateText(options.StateIdHeaderFileName)) {
-                    StateIdHeaderVisitor visitor = new StateIdHeaderVisitor(writer, options);
-                    machine.AcceptVisitor(visitor);
-                }
-        }
-
-        private void GenerateEventIdHeader(Machine machine) {
-
-            if (!String.IsNullOrEmpty(options.EventIdHeaderFileName))
-                using (StreamWriter writer = File.CreateText(options.EventIdHeaderFileName)) {
-                    EventIdHeaderVisitor visitor = new EventIdHeaderVisitor(writer, options);
-                    machine.AcceptVisitor(visitor);
-                }
         }
 
         private void GenerateMachineHeader(Machine machine) {

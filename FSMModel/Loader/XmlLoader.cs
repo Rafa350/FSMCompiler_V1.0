@@ -136,7 +136,11 @@
 
         private Transition ProcessTransitionNode(XmlNode transitionNode, Machine machine) {
 
-            Transition transition = new Transition();
+            string transitionName = GetAttribute(transitionNode, "name");
+            if (String.IsNullOrEmpty(transitionName))
+                throw new Exception("No se especifico el atributo 'name'");
+
+            Transition transition = new Transition(transitionName);
 
             // Obte l'event
             //

@@ -22,31 +22,61 @@
             string stateIdHeaderFileName = Path.GetFileName(options.StateIdHeaderFileName);
 
             codeBuilder
-                //.WriteLine("#include \"fsmDefines.h\"")
-                //.WriteLine("#include \"{0}\"", stateIdHeaderFileName)
                 .WriteLine("#include \"{0}\"", machineHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateHeaderFileName)
                 .WriteLine()
                 .WriteLine()
-                .WriteLine("{0}::{0}({1}* context) {{", options.MachineClassName, options.ContextClassName)
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    Constructor.")
+                .WriteLine("/// \\param    context: Pointer to context data.")
+                .WriteLine("///")
+                .WriteLine("{0}::{0}(", options.MachineClassName)
                 .Indent()
-                .WriteLine();
+                .WriteLine("{0}* context):", options.ContextClassName)
+                .WriteLine()
+                .WriteLine("state(nullptr),");
 
             foreach (State state in machine.States)
-                state.AcceptVisitor(this);
-            
+                codeBuilder
+                    .WriteLine("state{0}(new {0}(this)),", state.Name);
+
             codeBuilder
+                .WriteLine("context(context) {")
                 .WriteLine()
-                .WriteLine("start(states[ST_{0}]);", machine.Start.FullName)
                 .UnIndent()
-                .WriteLine("}");
+                .WriteLine("}")
+                .WriteLine()
+                .WriteLine();
+
+            codeBuilder
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    Set to initial state.")
+                .WriteLine("///")
+                .WriteLine("void {0}::start() {{", options.MachineClassName)
+                .Indent()
+                .WriteLine()
+                .WriteLine("state = state{0};", machine.Start.Name)
+                .UnIndent()
+                .WriteLine("}")
+                .WriteLine()
+                .WriteLine();
+
+            foreach (string transitionName in machine.GetTransitionNames()) {
+                codeBuilder
+                    .WriteLine("/// ----------------------------------------------------------------------")
+                    .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
+                    .WriteLine("///")
+                    .WriteLine("void {0}::{1}() {{", options.MachineClassName, transitionName)
+                    .Indent()
+                    .WriteLine()
+                    .WriteLine("state->{0}();", transitionName)
+                    .UnIndent()
+                    .WriteLine("}")
+                    .WriteLine()
+                    .WriteLine();
+            }
 
             writer.Write(codeBuilder.ToString());
-        }
-
-        public override void Visit(State state) {
-
-            codeBuilder.WriteLine("states[ST_{0}] = new {0}State(this);", state.FullName);
         }
     }
 }

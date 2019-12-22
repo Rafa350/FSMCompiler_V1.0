@@ -16,7 +16,7 @@
        
         <!-- Es prem el boto Start/Reset en modus normal
         -->
-        <transition event="INP_ST_ON" guard="!test" state="DONE">
+        <transition name="inp_st_on" event="INP_ST_ON" guard="!test" state="DONE">
             <inline>if (varGet(VAR_TEST_ACTIVE) == 1) {  </inline>
             <inline>    varSet(VAR_TEST_ACTIVE, 0);      </inline>            
             <inline>    test = true;                     </inline>
@@ -25,29 +25,29 @@
                
         <!-- Es prem el boto Start/Reset en modus test
         -->
-        <transition event="INP_ST_ON" guard="test">
+        <transition name="inp_st_om" event="INP_ST_ON" guard="test">
             <inline>test = false; </inline>
         </transition>
        
         <!-- Flanc positiu en l'entrada INP_TR 
         -->
-        <transition event="INP_TR_ON" guard="!test" state="DELAY_BEFORE_DONE">
+        <transition name="input_tr_on" event="INP_TR_ON" guard="!test" state="DELAY_BEFORE_DONE">
             <inline>timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));  </inline>
         </transition>
                 
         <!-- Flanc positiu en l'entrada IN_IH 
         -->
-        <transition event="INP_IH_ON" guard="!test">
+        <transition name="input_ih_on" event="INP_IH_ON" guard="!test">
             <inline>timStart(TIM_IH_DELAY, varGet(VAR_IH_ONDELAY));  </inline>
         </transition>
         
         <!-- El temporitzador d'interval de test arriva al final 
         -->
-        <transition event="TIM_TEST_INTERVAL" guard="test" state="DONE"/>
+        <transition name="tim_test_interval" event="TIM_TEST_INTERVAL" guard="test" state="DONE"/>
 
         <!-- El temporitzador de retard a la inhibicio arriva al final 
         -->
-        <transition event="TIM_IH_DELAY" state="DISABLED"/>
+        <transition name="tim_ih_delay" event="TIM_IH_DELAY" state="DISABLED"/>
        
     </state>
     

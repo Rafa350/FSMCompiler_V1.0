@@ -25,21 +25,36 @@
             string stateIdHeaderFileName = Path.GetFileName(options.StateIdHeaderFileName);
 
             codeBuilder
-                //.WriteLine("#include \"fsmDefines.h\"")
-                //.WriteLine("#include \"{0}\"", eventIdHeaderFileName)
-                //.WriteLine("#include \"{0}\"", stateIdHeaderFileName)
                 .WriteLine("#include \"{0}\"", machineHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateHeaderFileName)
                 .WriteLine()
                 .WriteLine();
 
             codeBuilder
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    Constructor.")
+                .WriteLine("/// \\param    machine: Pointer the machine.")
+                .WriteLine("///")
                 .WriteLine("{0}::{0}({1}* machine):", options.StateClassName, options.MachineClassName)
                 .Indent()
                 .WriteLine("machine(machine) {")
+                .WriteLine()
                 .UnIndent()
                 .WriteLine("}")
+                .WriteLine()
                 .WriteLine();
+
+            foreach (string transitionName in machine.GetTransitionNames()) { 
+                codeBuilder
+                    .WriteLine("/// ----------------------------------------------------------------------")
+                    .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
+                    .WriteLine("///")
+                    .WriteLine("void {0}::{1}() {{", options.StateClassName, transitionName)
+                    .WriteLine()
+                    .WriteLine("}")
+                    .WriteLine()
+                    .WriteLine();
+            }
 
             foreach (State state in machine.States)
                 state.AcceptVisitor(this);
@@ -50,17 +65,25 @@
         public override void Visit(State state) {
 
             codeBuilder
-                .WriteLine("{0}State::{0}State({1}* machine):", state.FullName, options.MachineClassName)
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    Constructor.")
+                .WriteLine("/// \\param    machine: Pointer the machine.")
+                .WriteLine("///")
+                .WriteLine("{0}::{0}(", state.FullName)
                 .Indent()
+                .WriteLine("{0}* machine):", options.MachineClassName)
+                .WriteLine()
                 .WriteLine("{0}(machine) {{", options.StateClassName)
+                .WriteLine()
                 .UnIndent()
                 .WriteLine("}")
+                .WriteLine()
                 .WriteLine();
 
             State s;
             bool hasActions;
 
-            // Combina les accions 'Enter' del pares
+            // Combina les accions 'onEnter' del pares
             //
             hasActions = false;
             s = state;
@@ -68,7 +91,10 @@
                 if (s.EnterAction != null) {
                     if (!hasActions) {
                         codeBuilder
-                            .WriteLine("void {0}State::enter() {{", state.FullName)
+                            .WriteLine("/// ----------------------------------------------------------------------")
+                            .WriteLine("/// \\brief    Perform 'enter' action.")
+                            .WriteLine("///")
+                            .WriteLine("void {0}::enter() {{", state.FullName)
                             .WriteLine()
                             .Indent();
                         hasActions = true;
@@ -81,9 +107,10 @@
                 codeBuilder
                     .UnIndent()
                     .WriteLine("}")
+                    .WriteLine()
                     .WriteLine();
 
-            // Combina les accions 'Exit' del pares
+            // Combina les accions 'onExit' del pares
             //
             hasActions = false;
             s = state;
@@ -91,7 +118,10 @@
                 if (s.ExitAction != null) {
                     if (!hasActions) {
                         codeBuilder
-                            .WriteLine("void {0}State::exit() {{", state.FullName)
+                            .WriteLine("/// ----------------------------------------------------------------------")
+                            .WriteLine("/// \\brief    Perform 'exit' action.")
+                            .WriteLine("///")
+                            .WriteLine("void {0}::exit() {{", state.FullName)
                             .WriteLine()
                             .Indent();
                         hasActions = true;
@@ -105,11 +135,12 @@
                 codeBuilder
                     .UnIndent()
                     .WriteLine("}")
+                    .WriteLine()
                     .WriteLine();
 
             if (state.HasTransitions || state.Parent != null) {
                 codeBuilder
-                    .WriteLine("void {0}State::transition(unsigned eventId) {{", state.FullName)
+                    .WriteLine("void {0}::transition(unsigned eventId) {{", state.FullName)
                     .WriteLine()
                     .Indent();
 

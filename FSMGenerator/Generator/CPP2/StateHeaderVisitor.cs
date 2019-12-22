@@ -44,8 +44,12 @@
                 .Indent()
                 .WriteLine("{0}({1}* machine);", options.StateClassName, options.MachineClassName)
                 .WriteLine("virtual void enter();")
-                .WriteLine("virtual void exit();")
-                .WriteLine("virtual void transition(unsigned eventId);");
+                .WriteLine("virtual void exit();");
+
+            foreach(string transitionName in machine.GetTransitionNames()) {
+                codeBuilder
+                    .WriteLine("virtual void {0}();", transitionName);
+            }
 
             codeBuilder
                 .UnIndent()
@@ -67,19 +71,23 @@
         public override void Visit(State state) {
 
             codeBuilder
-                .WriteLine("class {0}State: public {1} {{", state.FullName, options.StateClassName)
+                .WriteLine("class {0}: public {1} {{", state.FullName, options.StateClassName)
                 .Indent()
                 .WriteLine("public:")
                 .Indent()
-                .WriteLine("{0}State({1}* machine);", state.FullName, options.MachineClassName);
+                .WriteLine("{0}({1}* machine);", state.FullName, options.MachineClassName);
             
             if (state.EnterAction != null) 
                 codeBuilder.WriteLine("void enter() override;");
             if (state.ExitAction != null)
                 codeBuilder.WriteLine("void exit() override;");
 
+            foreach (string transitionName in state.GetTransitionNames()) {
+                codeBuilder
+                    .WriteLine("void {0}() override;", transitionName);
+            }
+
             codeBuilder
-                .WriteLine("void transition(unsigned eventId) override;")
                 .UnIndent()
                 .UnIndent()
                 .WriteLine("};")

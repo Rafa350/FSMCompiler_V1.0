@@ -48,12 +48,12 @@
     <Compile Include="Generator\CodeBuilder.cs" />
     <Compile Include="Generator\CPP2\CPPGenerator.cs" />
     <Compile Include="Generator\CPP2\CPPGeneratorOptions.cs" />
-    <Compile Include="Generator\CPP2\EventIdHeaderVisitor.cs" />
     <Compile Include="Generator\CPP2\MachineCodeVisitor.cs" />
     <Compile Include="Generator\CPP2\MachineHeaderVisitor.cs" />
+    <Compile Include="Generator\CPP2\MachineHelper.cs" />
     <Compile Include="Generator\CPP2\StateCodeVisitor.cs" />
     <Compile Include="Generator\CPP2\StateHeaderVisitor.cs" />
-    <Compile Include="Generator\CPP2\StateIdHeaderVisitor.cs" />
+    <Compile Include="Generator\CPP2\StateHelper.cs" />
     <Compile Include="Generator\CPP\CPPGenerator.cs" />
     <Compile Include="Generator\CPP\CPPGeneratorOptions.cs" />
     <Compile Include="Generator\CPP\CodeGenerator.cs" />
