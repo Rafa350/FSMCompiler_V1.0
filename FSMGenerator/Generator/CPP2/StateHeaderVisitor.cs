@@ -1,5 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
 
+    using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
 
@@ -14,6 +15,7 @@
             this.writer = writer;
             this.options = options;
         }
+
         public override void Visit(Machine machine) {
 
             string guardString = Path.GetFileName(options.StateHeaderFileName).ToUpper().Replace(".", "_");
@@ -22,10 +24,17 @@
                 .WriteLine("#ifndef __{0}", guardString)
                 .WriteLine("#define __{0}", guardString)
                 .WriteLine()
-                .WriteLine()
+                .WriteLine();
+
+            if (!String.IsNullOrEmpty(options.NsName))
+                codeBuilder
+                    .WriteLine("namespace {0} {{", options.NsName)
+                    .Indent()
+                    .WriteLine();
+
+            codeBuilder
                 .WriteLine("class {0};", options.MachineClassName)
                 .WriteLine("class {0};", options.ContextClassName)
-                .WriteLine()
                 .WriteLine();
 
             codeBuilder
@@ -39,6 +48,7 @@
                 .Indent()
                 .WriteLine("inline {0}* getMachine() const {{ return machine; }}", options.MachineClassName)
                 .WriteLine("{0}* getContext() const;", options.ContextClassName)
+                .WriteLine("inline void setState({0}* state) const {{ machine->setState(state); }}", options.StateClassName)
                 .UnIndent()
                 .WriteLine("public:")
                 .Indent()
@@ -46,13 +56,11 @@
                 .WriteLine("virtual void enter();")
                 .WriteLine("virtual void exit();");
 
-            foreach(string transitionName in machine.GetTransitionNames()) {
+            foreach(string transitionName in machine.GetTransitionNames())
                 codeBuilder
                     .WriteLine("virtual void {0}();", transitionName);
-            }
 
             codeBuilder
-                .UnIndent()
                 .UnIndent()
                 .UnIndent()
                 .WriteLine("};")
@@ -61,9 +69,15 @@
             foreach (State state in machine.States)
                 state.AcceptVisitor(this);
 
+            if (!String.IsNullOrEmpty(options.NsName))
+                codeBuilder
+                    .UnIndent()
+                    .WriteLine("}");
+
             codeBuilder
                 .WriteLine()
-                .WriteLine("#endif");
+                .WriteLine()
+                .WriteLine("#endif // __{0}", guardString);
 
             writer.Write(codeBuilder.ToString());
         }
@@ -91,8 +105,7 @@
                 .UnIndent()
                 .UnIndent()
                 .WriteLine("};")
-                .WriteLine()
-                .UnIndent();
+                .WriteLine();
         }
     }
 }

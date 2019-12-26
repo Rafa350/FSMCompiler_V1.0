@@ -103,6 +103,16 @@
         }
 
         /// <summary>
+        /// Obte el nombre de transicions.
+        /// </summary>
+        /// 
+        public int NumberOfTransitions {
+            get {
+                return transitions.Count;
+            }
+        }
+
+        /// <summary>
         /// Indica si hi han transisions.
         /// </summary>
         /// 

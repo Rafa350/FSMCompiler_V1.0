@@ -7,17 +7,6 @@
     [Obsolete]
     public static class StateHelper {
 
-        public static IEnumerable<Event> GetTransitionEvents(this State state) {
-
-            List<Event> events = new List<Event>();
-
-            foreach (Transition transition in state.Transitions) 
-                if (!events.Contains(transition.Event))
-                    events.Add(transition.Event);
-            
-            return events;
-        }
-
         public static IEnumerable<string> GetTransitionNames(this State state) {
 
             List<string> names = new List<string>();

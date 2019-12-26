@@ -134,7 +134,6 @@
                                 .WriteLine("/// ----------------------------------------------------------------------")
                                 .WriteLine("/// \\brief    Transition action.")
                                 .WriteLine("///           -State: '{0}'", state.Name)
-                                .WriteLine("///           -Event: '{0}'", transition.Event.Name)
                                 .WriteLine("///");
                             EmitActionDeclarationStart(codeBuilder, transition.Action);
                             EmitActionBody(codeBuilder, transition.Action);
@@ -160,7 +159,6 @@
                                 .WriteLine("// -----------------------------------------------------------------------")
                                 .WriteLine("// Transition guard")
                                 .WriteLine("//     State: {0}", state.Name)
-                                .WriteLine("//     Event: {0}", transition.Event == null ? "default" : transition.Event.Name)
                                 .WriteLine("//");
                             EmitGuardDeclarationStart(codeBuilder, transition.Guard);
                             EmitGuardBody(codeBuilder, transition.Guard);
@@ -238,7 +236,7 @@
                         sb.Append("else if (");
                     if (transition.Guard != null)
                         sb.Append('(');
-                    sb.AppendFormat("event == Machine::Event::{0}", transition.Event.Name);
+                    sb.AppendFormat("event == Machine::Event::{0}", transition.Name);
                     if (transition.Guard != null) {
                         if (inlineGuards)
                             sb.AppendFormat(") && ({0})", transition.Guard.Expression);

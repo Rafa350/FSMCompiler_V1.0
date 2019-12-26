@@ -13,7 +13,6 @@
     public sealed class Transition: IVisitable {
 
         private readonly string name;
-        private Event ev;
         private Guard guard;
         private Action action;
         private State nextState;
@@ -49,19 +48,6 @@
         public string Name {
             get {
                 return name;
-            }
-        }
-
-        /// <summary>
-        /// Obte o asigna l'event associat a aquesta transicio.
-        /// </summary>
-        /// 
-        public Event Event {
-            get {
-                return ev;
-            }
-            set {
-                ev = value;
             }
         }
 

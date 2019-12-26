@@ -1,5 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
 
+    using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
 
@@ -19,13 +20,20 @@
 
             string machineHeaderFileName = Path.GetFileName(options.MachineHeaderFileName);
             string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
-            string stateIdHeaderFileName = Path.GetFileName(options.StateIdHeaderFileName);
 
             codeBuilder
                 .WriteLine("#include \"{0}\"", machineHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateHeaderFileName)
                 .WriteLine()
-                .WriteLine()
+                .WriteLine();
+
+            if (!String.IsNullOrEmpty(options.NsName))
+                codeBuilder
+                    .WriteLine("using namespace {0};", options.NsName)
+                    .WriteLine()
+                    .WriteLine();
+
+            codeBuilder
                 .WriteLine("/// ----------------------------------------------------------------------")
                 .WriteLine("/// \\brief    Constructor.")
                 .WriteLine("/// \\param    context: Pointer to context data.")
@@ -36,13 +44,13 @@
                 .WriteLine()
                 .WriteLine("state(nullptr),");
 
-            foreach (State state in machine.States)
+            foreach (State state in machine.States) {
                 codeBuilder
-                    .WriteLine("state{0}(new {0}(this)),", state.Name);
+                    .WriteLine("state{0}(new {0}(this)),", state.FullName);
+            }
 
             codeBuilder
                 .WriteLine("context(context) {")
-                .WriteLine()
                 .UnIndent()
                 .WriteLine("}")
                 .WriteLine()
@@ -55,7 +63,7 @@
                 .WriteLine("void {0}::start() {{", options.MachineClassName)
                 .Indent()
                 .WriteLine()
-                .WriteLine("state = state{0};", machine.Start.Name)
+                .WriteLine("state = state{0};", machine.Start.FullName)
                 .UnIndent()
                 .WriteLine("}")
                 .WriteLine()

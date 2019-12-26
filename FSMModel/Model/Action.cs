@@ -53,7 +53,7 @@
         /// 
         public bool HasCommands {
             get {
-                return commands.Count > 0;
+                return (commands != null) && (commands.Count > 0);
             }
         }
     }

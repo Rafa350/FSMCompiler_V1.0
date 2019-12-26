@@ -6,7 +6,6 @@
     public sealed class Machine: IVisitable {
 
         private readonly List<State> states = new List<State>();
-        private readonly List<Event> events = new List<Event>();
         private readonly string name;
         private State start;
         private Action initializeAction;
@@ -48,23 +47,6 @@
         }
 
         /// <summary>
-        /// Afegeix un event a la maquina.
-        /// </summary>
-        /// <param name="ev">L'estat a afeigir.</param>
-        /// 
-        public void AddEvent(Event ev) {
-
-            if (ev == null)
-                throw new ArgumentNullException("ev");
-
-            if (events.Contains(ev))
-                throw new InvalidOperationException(
-                    String.Format("El evento '{0}' ya ha sido agregado.", ev.Name));
-
-            events.Add(ev);
-        }
-
-        /// <summary>
         /// Obte un estat afeigit previament a la maquina.
         /// </summary>
         /// <param name="name">El nom del estat.</param>
@@ -84,29 +66,6 @@
             if (throwError)
                 throw new InvalidOperationException(
                     String.Format("No se agrego ningun estado con el nombre '{0}'.", name));
-
-            return null;
-        }
-
-        /// <summary>
-        /// Obte un event afeigit previament a la maquina.
-        /// </summary>
-        /// <param name="name">Nom de l'event.</param>
-        /// <param name="throwError">True si cal generar una excepcio en cas d'error.</param>
-        /// <returns>L'event.</returns>
-        /// 
-        public Event GetEvent(string name, bool throwError = true) {
-
-            if (String.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
-
-            foreach (Event ev in events)
-                if (ev.Name == name)
-                    return ev;
-
-            if (throwError)
-                throw new InvalidOperationException(
-                    String.Format("No se agrego ningun evento con el nombre '{0}'.", name));
 
             return null;
         }
@@ -167,17 +126,6 @@
         }
 
         /// <summary>
-        /// Enumera els noms dels events de la maquina.
-        /// </summary>
-        /// 
-        public IEnumerable<string> EventNames {
-            get {
-                foreach (Event ev in events)
-                    yield return ev.Name;
-            }
-        }
-
-        /// <summary>
         /// Enumera els estats de la maquina.
         /// </summary>
         /// 
@@ -187,21 +135,21 @@
             }
         }
 
+        /// <summary>
+        /// Obte el nombre d'estats.
+        /// </summary>
+        /// 
+        public int NumberOfStates {
+            get {
+                return states.Count;
+            }
+        }
+
         public IEnumerable<State> FinalStates {
             get {
                 foreach (State state in states)
                     if (!state.HasChilds)
                         yield return state;
-            }
-        }
-
-        /// <summary>
-        /// Enumera els events de la maquina.
-        /// </summary>
-        /// 
-        public IEnumerable<Event> Events {
-            get {
-                return events;
             }
         }
     }

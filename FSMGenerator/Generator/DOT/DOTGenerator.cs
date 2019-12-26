@@ -144,7 +144,7 @@
                                 needSeparator = false;
                                 sb.Append("<hr/>");
                             }
-                            sb.AppendFormat("<tr><td><font point-size=\"{2}\"> {0}/ {1} </font></td></tr>", transition.Event.Name, actionName[transition.Action], edgeFontSize);
+                            sb.AppendFormat("<tr><td><font point-size=\"{2}\"> {0}/ {1} </font></td></tr>", transition.Name, actionName[transition.Action], edgeFontSize);
                         }
                     }
 
@@ -165,7 +165,7 @@
                     foreach (Transition transition in state.Transitions) {
                         if (transition.NextState != null) {
                             sb.AppendFormat("    {0}->{1} [", state.Name, transition.NextState.Name).AppendLine();
-                            sb.AppendFormat("        label = \"{0}", transition.Event.Name);
+                            sb.AppendFormat("        label = \"{0}", transition.Name);
                             if (transition.Action != null)
                                 sb.AppendFormat(" / {0}", actionName[transition.Action]);
                             sb.Append("\"").AppendLine();

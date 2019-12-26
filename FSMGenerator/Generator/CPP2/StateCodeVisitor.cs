@@ -5,7 +5,7 @@
     using MikroPicDesigns.FSMCompiler.v1.Model;
     using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
 
-    internal sealed class StateCodeVisitor: DefaultVisitor {
+    internal sealed class StateCodeVisitor : DefaultVisitor {
 
         private readonly TextWriter writer;
         private readonly CPPGeneratorOptions options;
@@ -21,14 +21,20 @@
 
             string machineHeaderFileName = Path.GetFileName(options.MachineHeaderFileName);
             string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
-            string eventIdHeaderFileName = Path.GetFileName(options.EventIdHeaderFileName);
-            string stateIdHeaderFileName = Path.GetFileName(options.StateIdHeaderFileName);
+            string contextHeaderFileName = Path.GetFileName(options.ContextHeaderFileName);
 
             codeBuilder
                 .WriteLine("#include \"{0}\"", machineHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateHeaderFileName)
+                .WriteLine("#include \"{0}\"", contextHeaderFileName)
                 .WriteLine()
                 .WriteLine();
+
+            if (!String.IsNullOrEmpty(options.NsName))
+                codeBuilder
+                    .WriteLine("using namespace {0};", options.NsName)
+                    .WriteLine()
+                    .WriteLine();
 
             codeBuilder
                 .WriteLine("/// ----------------------------------------------------------------------")
@@ -44,7 +50,7 @@
                 .WriteLine()
                 .WriteLine();
 
-            foreach (string transitionName in machine.GetTransitionNames()) { 
+            foreach (string transitionName in machine.GetTransitionNames()) {
                 codeBuilder
                     .WriteLine("/// ----------------------------------------------------------------------")
                     .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
@@ -64,6 +70,8 @@
 
         public override void Visit(State state) {
 
+            // Genera el constructor.
+            //
             codeBuilder
                 .WriteLine("/// ----------------------------------------------------------------------")
                 .WriteLine("/// \\brief    Constructor.")
@@ -83,7 +91,7 @@
             State s;
             bool hasActions;
 
-            // Combina les accions 'onEnter' del pares
+            // Genera l'accio 'enter'.
             //
             hasActions = false;
             s = state;
@@ -95,8 +103,8 @@
                             .WriteLine("/// \\brief    Perform 'enter' action.")
                             .WriteLine("///")
                             .WriteLine("void {0}::enter() {{", state.FullName)
-                            .WriteLine()
-                            .Indent();
+                            .Indent()
+                            .WriteLine();
                         hasActions = true;
                     }
                     s.EnterAction.AcceptVisitor(this);
@@ -110,7 +118,7 @@
                     .WriteLine()
                     .WriteLine();
 
-            // Combina les accions 'onExit' del pares
+            // Genera l'accio 'exit'.
             //
             hasActions = false;
             s = state;
@@ -122,8 +130,8 @@
                             .WriteLine("/// \\brief    Perform 'exit' action.")
                             .WriteLine("///")
                             .WriteLine("void {0}::exit() {{", state.FullName)
-                            .WriteLine()
-                            .Indent();
+                            .Indent()
+                            .WriteLine();
                         hasActions = true;
                     }
                     s.ExitAction.AcceptVisitor(this);
@@ -138,37 +146,31 @@
                     .WriteLine()
                     .WriteLine();
 
-            if (state.HasTransitions || state.Parent != null) {
+            // Genera les transicions.
+            //
+            foreach (string transitionName in state.GetTransitionNames()) {
                 codeBuilder
-                    .WriteLine("void {0}::transition(unsigned eventId) {{", state.FullName)
-                    .WriteLine()
-                    .Indent();
+                    .WriteLine("/// ----------------------------------------------------------------------")
+                    .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
+                    .WriteLine("///")
+                    .WriteLine("void {0}::{1}() {{", state.FullName, transitionName)
+                    .Indent()
+                    .WriteLine();
 
-                codeBuilder
-                    .WriteLine("switch (eventId) {")
-                    .Indent();
-
-                if (state.HasTransitions)
-                    foreach (Transition transition in state.Transitions)
+                foreach (Transition transition in state.Transitions) {
+                    if (transition.Name == transitionName)
                         transition.AcceptVisitor(this);
-
-                codeBuilder
-                    .UnIndent()
-                    .WriteLine("}");
+                }
 
                 codeBuilder
                     .UnIndent()
                     .WriteLine("}")
+                    .WriteLine()
                     .WriteLine();
             }
         }
 
         public override void Visit(Transition transition) {
-
-            codeBuilder
-                .WriteLine()
-                .WriteLine("case EV_{0}:", transition.Event.Name)
-                .Indent();
 
             if (transition.Guard != null) {
                 codeBuilder
@@ -184,44 +186,43 @@
                     break;
 
                 case TransitionMode.JumpToState:
-                    codeBuilder.WriteLine("setState(ST_{0});", transition.NextState.FullName);
+                    codeBuilder
+                        .WriteLine()
+                        .WriteLine("setState(getMachine()->state{0});", transition.NextState.FullName);
                     break;
 
                 case TransitionMode.CallToState:
-                    codeBuilder.WriteLine("pushState(ST_{0});", transition.NextState.FullName);
+                    codeBuilder
+                        .WriteLine()
+                        .WriteLine("pushState(getMachine()->state{0});", transition.NextState.FullName);
                     break;
 
                 case TransitionMode.ReturnFromState:
-                    codeBuilder.WriteLine("popState();");
+                    codeBuilder
+                        .WriteLine()
+                        .WriteLine("popState();");
                     break;
             }
+
             if (transition.Guard != null) {
                 codeBuilder
                     .UnIndent()
                     .WriteLine("}");
             }
-
-            codeBuilder
-                .WriteLine("break;")
-                .UnIndent();
         }
 
         public override void Visit(InlineCommand action) {
 
             if (!System.String.IsNullOrEmpty(action.Text)) {
-                string[] lines = action.Text.Split(new char[] { '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = action.Text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string line in lines)
                     if (!System.String.IsNullOrEmpty(line))
                         codeBuilder.WriteLine(line.Trim());
             }
         }
-
-        public override void Visit(RaiseCommand action) {
-
-            codeBuilder.WriteLine("raiseEvent(Event_{0}, {1});", action.Event.Name, action.DelayText);
-        }
     }
 }
+
 
 

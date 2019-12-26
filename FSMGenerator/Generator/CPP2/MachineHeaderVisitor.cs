@@ -1,5 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
 
+    using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
 
@@ -19,32 +20,46 @@
 
             string guardString = Path.GetFileName(options.MachineHeaderFileName).ToUpper().Replace(".", "_");
 
+            // Escriu la capcelera del fitxer.
+            //
             codeBuilder
                 .WriteLine("#ifndef __{0}", guardString)
                 .WriteLine("#define __{0}", guardString)
                 .WriteLine()
-                .WriteLine()
+                .WriteLine();
+
+            if (!String.IsNullOrEmpty(options.NsName))
+                codeBuilder
+                    .WriteLine("namespace {0} {{", options.NsName)
+                    .Indent()
+                    .WriteLine();
+
+            // Escriu la definicial de la clase
+            //
+            codeBuilder
                 .WriteLine("class {0};", options.StateClassName)
                 .WriteLine("class {0};", options.ContextClassName)
-                .WriteLine()
                 .WriteLine()
                 .WriteLine("class {0} {{", options.MachineClassName)
                 .Indent()
                 .WriteLine("private:")
                 .Indent()
-                .WriteLine("{0}* state;", options.StateClassName);
+                .WriteLine("{0}* state;", options.StateClassName)
+                .WriteLine("{0}* context;", options.ContextClassName)
+                .UnIndent()
+                .WriteLine("public:")
+                .Indent();
 
             foreach (State state in machine.States)
                 codeBuilder
-                    .WriteLine("{0}* state{1};", options.StateClassName, state.Name);
+                    .WriteLine("{0}* state{1};", options.StateClassName, state.FullName);
 
             codeBuilder
-                .WriteLine("{0}* context;", options.ContextClassName)
                 .UnIndent()
                 .WriteLine("private:")
                 .Indent()
-                .WriteLine("void setState(State* state);")
-                .WriteLine("void pushState(State* state);")
+                .WriteLine("void setState({0}* state);", options.StateClassName)
+                .WriteLine("void pushState({0}* state);", options.StateClassName)
                 .WriteLine("void popState();")
                 .UnIndent()
                 .WriteLine("public:")
@@ -64,10 +79,17 @@
                 .WriteLine("friend {0};", options.StateClassName)
                 .UnIndent()
                 .WriteLine("};")
-                .UnIndent()
+                .UnIndent();
+
+            if (!String.IsNullOrEmpty(options.NsName))
+                codeBuilder
+                    .UnIndent()
+                    .WriteLine("}");
+
+            codeBuilder
                 .WriteLine()
                 .WriteLine()
-                .WriteLine("#endif");
+                .WriteLine("#endif // __{0}", guardString);
 
             writer.Write(codeBuilder.ToString());
         }

@@ -83,8 +83,8 @@
             if (onExitNode != null)
                 state.ExitAction = ProcessActionNode(onExitNode, machine);
 
-            foreach (XmlNode onEventNode in stateNode.SelectNodes("transition")) {
-                Transition transition = ProcessTransitionNode(onEventNode, machine);
+            foreach (XmlNode transitionNode in stateNode.SelectNodes("transition")) {
+                Transition transition = ProcessTransitionNode(transitionNode, machine);
                 state.AddTransition(transition);
             }
 
@@ -101,10 +101,6 @@
                     case "inline": 
                         action.AddCommand(ProcessInlineActionNode(node, machine));
                         break;
-
-                    case "raise":
-                        action.AddCommand(ProcessRaiseActionNode(node, machine));
-                        break;
                 }
             }
 
@@ -119,34 +115,15 @@
             return command;
         }
 
-        private Command ProcessRaiseActionNode(XmlNode raiseActionNode, Machine machine) {
-
-            string eventName = GetAttribute(raiseActionNode, "event");
-            string delayText = GetAttribute(raiseActionNode, "delay");
-
-            if (String.IsNullOrEmpty(eventName))
-                throw new InvalidOperationException(String.Format("No se declaro el evento '{0}'.", eventName));
-
-            RaiseCommand command = new RaiseCommand();
-            command.Event = GetEvent(machine, eventName);
-            command.DelayText = delayText;
-
-            return command;
-        }
-
         private Transition ProcessTransitionNode(XmlNode transitionNode, Machine machine) {
 
+            // Obte el nom
+            //
             string transitionName = GetAttribute(transitionNode, "name");
             if (String.IsNullOrEmpty(transitionName))
                 throw new Exception("No se especifico el atributo 'name'");
 
             Transition transition = new Transition(transitionName);
-
-            // Obte l'event
-            //
-            string eventName = GetAttribute(transitionNode, "event");
-            if (!String.IsNullOrEmpty(eventName))
-                transition.Event = GetEvent(machine, eventName);
 
             // Obte la guarda
             //
@@ -154,6 +131,8 @@
             if (!String.IsNullOrEmpty(condition))
                 transition.Guard = new Guard(condition);
 
+            // Obte el nou estat
+            //
             string name = GetAttribute(transitionNode, "state");
             if (System.String.IsNullOrEmpty(name))
                 transition.Mode = TransitionMode.Null;
@@ -201,21 +180,5 @@
             return ev;
         }
 
-        /// <summary>
-        /// Obte l'event especificat. Si no existeix, el crea.
-        /// </summary>
-        /// <param name="machine">La maquina.</param>
-        /// <param name="name">Nom de l'event.</param>
-        /// <returns>L'event.</returns>
-        /// 
-        private static Event GetEvent(Machine machine, string name) {
-
-            Event ev = machine.GetEvent(name, false);
-            if (ev == null) {
-                ev = new Event(name);
-                machine.AddEvent(ev);
-            }
-            return ev;
-        }
     }
 }

@@ -28,19 +28,17 @@
                 transition.Action.AcceptVisitor(this);
         }
 
-        public virtual void Visit(Event ev) {
-        }
-
         public virtual void Visit(Guard guard) {
         }
 
         public virtual void Visit(Action action) {
+
+            if (action.HasCommands)
+                foreach (Command command in action.Commands)
+                    command.AcceptVisitor(this);
         }
 
         public virtual void Visit(InlineCommand command) {
-        }
-
-        public virtual void Visit(RaiseCommand command) {
         }
     }
 }
