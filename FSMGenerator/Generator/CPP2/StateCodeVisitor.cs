@@ -10,6 +10,7 @@
         private readonly TextWriter writer;
         private readonly CPPGeneratorOptions options;
         private readonly CodeBuilder codeBuilder = new CodeBuilder();
+        public State currentState;
 
         public StateCodeVisitor(TextWriter writer, CPPGeneratorOptions options) {
 
@@ -39,23 +40,21 @@
             codeBuilder
                 .WriteLine("/// ----------------------------------------------------------------------")
                 .WriteLine("/// \\brief    Constructor.")
-                .WriteLine("/// \\param    machine: Pointer the machine.")
                 .WriteLine("///")
-                .WriteLine("{0}::{0}({1}* machine):", options.StateClassName, options.MachineClassName)
-                .Indent()
-                .WriteLine("machine(machine) {")
-                .WriteLine()
-                .UnIndent()
+                .WriteLine("{0}::{0}() {{", options.StateClassName)
                 .WriteLine("}")
                 .WriteLine()
                 .WriteLine();
+
 
             foreach (string transitionName in machine.GetTransitionNames()) {
                 codeBuilder
                     .WriteLine("/// ----------------------------------------------------------------------")
                     .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
+                    .WriteLine("/// \\param    machine: The state machine.")
+                    .WriteLine("/// \\return   The next state.")
                     .WriteLine("///")
-                    .WriteLine("void {0}::{1}() {{", options.StateClassName, transitionName)
+                    .WriteLine("{0}* {0}::on{1}({2}* machine) {{", options.StateClassName, transitionName, options.MachineClassName)
                     .WriteLine()
                     .WriteLine("}")
                     .WriteLine()
@@ -70,145 +69,144 @@
 
         public override void Visit(State state) {
 
+            currentState = state;
+
             // Genera el constructor.
             //
             codeBuilder
                 .WriteLine("/// ----------------------------------------------------------------------")
                 .WriteLine("/// \\brief    Constructor.")
-                .WriteLine("/// \\param    machine: Pointer the machine.")
                 .WriteLine("///")
-                .WriteLine("{0}::{0}(", state.FullName)
-                .Indent()
-                .WriteLine("{0}* machine):", options.MachineClassName)
-                .WriteLine()
-                .WriteLine("{0}(machine) {{", options.StateClassName)
-                .WriteLine()
-                .UnIndent()
+                .WriteLine("{0}::{0}() {{", state.FullName)
                 .WriteLine("}")
                 .WriteLine()
                 .WriteLine();
+    
+            codeBuilder
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    Get a instance of class.")
+                .WriteLine("///")
+                .WriteLine("{0}* {0}::getInstance() {{", state.FullName)
+                .WriteLine()
+                .Indent()
+                .WriteLine("if (instance == nullptr)")
+                .Indent()
+                .WriteLine("instance = new {0}();", state.FullName)
+                .UnIndent()
+                .WriteLine("")
+                .WriteLine("return instance;")
+                .UnIndent()
+                .WriteLine("}")
+                .WriteLine()
+                .WriteLine("{0}* {0}::instance = nullptr;", state.FullName)
+                .WriteLine()
+                .WriteLine();
 
-            State s;
-            bool hasActions;
-
-            // Genera l'accio 'enter'.
-            //
-            hasActions = false;
-            s = state;
-            while (s != null) {
-                if (s.EnterAction != null) {
-                    if (!hasActions) {
-                        codeBuilder
-                            .WriteLine("/// ----------------------------------------------------------------------")
-                            .WriteLine("/// \\brief    Perform 'enter' action.")
-                            .WriteLine("///")
-                            .WriteLine("void {0}::enter() {{", state.FullName)
-                            .Indent()
-                            .WriteLine();
-                        hasActions = true;
-                    }
-                    s.EnterAction.AcceptVisitor(this);
-                }
-                s = s.Parent;
-            }
-            if (hasActions)
-                codeBuilder
-                    .UnIndent()
-                    .WriteLine("}")
-                    .WriteLine()
-                    .WriteLine();
-
-            // Genera l'accio 'exit'.
-            //
-            hasActions = false;
-            s = state;
-            while (s != null) {
-                if (s.ExitAction != null) {
-                    if (!hasActions) {
-                        codeBuilder
-                            .WriteLine("/// ----------------------------------------------------------------------")
-                            .WriteLine("/// \\brief    Perform 'exit' action.")
-                            .WriteLine("///")
-                            .WriteLine("void {0}::exit() {{", state.FullName)
-                            .Indent()
-                            .WriteLine();
-                        hasActions = true;
-                    }
-                    s.ExitAction.AcceptVisitor(this);
-                }
-                s = s.Parent;
-            }
-
-            if (hasActions)
-                codeBuilder
-                    .UnIndent()
-                    .WriteLine("}")
-                    .WriteLine()
-                    .WriteLine();
-
-            // Genera les transicions.
+            // Genera les transicions. 
             //
             foreach (string transitionName in state.GetTransitionNames()) {
-                codeBuilder
-                    .WriteLine("/// ----------------------------------------------------------------------")
-                    .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
-                    .WriteLine("///")
-                    .WriteLine("void {0}::{1}() {{", state.FullName, transitionName)
-                    .Indent()
-                    .WriteLine();
 
+                WriteTransitionMethodHeader(options.MachineClassName, state.FullName, transitionName);
                 foreach (Transition transition in state.Transitions) {
                     if (transition.Name == transitionName)
                         transition.AcceptVisitor(this);
                 }
-
-                codeBuilder
-                    .UnIndent()
-                    .WriteLine("}")
-                    .WriteLine()
-                    .WriteLine();
+                WriteMethodTail();
             }
+
+            currentState = null;
         }
 
         public override void Visit(Transition transition) {
 
-            if (transition.Guard != null) {
+            // Genera el codi de les guardes.
+            //
+            codeBuilder
+                .WriteLine("// Check transition guard.")
+                .WriteLine("//");
+            if (transition.Guard != null)
                 codeBuilder
-                    .WriteLine("if ({0}) {{", transition.Guard.Expression)
-                    .Indent();
+                    .WriteLine("if ({0}) {{", transition.Guard.Expression);
+            else
+                codeBuilder
+                    .WriteLine("if (true) {");
+            codeBuilder
+                .Indent()
+                .WriteLine();
+
+            // Genera el codi de l'accio de sortida del estat actual.
+            //
+            if (transition.NextState != null) {
+                if (currentState.ExitAction != null) {
+                    codeBuilder
+                        .WriteLine("// Exit state actions.")
+                        .WriteLine("//");
+                    currentState.ExitAction.AcceptVisitor(this);
+                    codeBuilder
+                        .WriteLine();
+                }
             }
 
-            if (transition.Action != null)
+            // Genera el code de l'accio de la transicio.
+            //
+            if (transition.Action != null) {
+                codeBuilder
+                    .WriteLine("// Transition actions.")
+                    .WriteLine("//");
                 transition.Action.AcceptVisitor(this);
+                codeBuilder
+                    .WriteLine();
+            }
+
+            // Genera el codi de l'accio d'entrada del nou estat.
+            //
+            if (transition.NextState != null) {
+                if (transition.NextState.EnterAction != null) {
+                    codeBuilder
+                        .WriteLine("// Enter state actions.")
+                        .WriteLine("//");
+                    transition.NextState.EnterAction.AcceptVisitor(this);
+                    codeBuilder
+                        .WriteLine();
+                }
+            }
 
             switch (transition.Mode) {
                 case TransitionMode.Null:
+                    codeBuilder
+                        .WriteLine("// Return the same state.")
+                        .WriteLine("//")
+                        .WriteLine("return this;")
+                        .WriteLine();
                     break;
 
                 case TransitionMode.JumpToState:
                     codeBuilder
-                        .WriteLine()
-                        .WriteLine("setState(getMachine()->state{0});", transition.NextState.FullName);
+                        .WriteLine("// Return the next state.")
+                        .WriteLine("//")
+                        .WriteLine("return {0}::getInstance();", transition.NextState.FullName)
+                        .WriteLine();
                     break;
 
-                case TransitionMode.CallToState:
-                    codeBuilder
-                        .WriteLine()
-                        .WriteLine("pushState(getMachine()->state{0});", transition.NextState.FullName);
-                    break;
+                    /*case TransitionMode.CallToState:
+                        codeBuilder
+                            .WriteLine()
+                            .WriteLine("pushState(machine, {0}::getInstance());", transition.NextState.FullName);
+                        break;
 
-                case TransitionMode.ReturnFromState:
-                    codeBuilder
-                        .WriteLine()
-                        .WriteLine("popState();");
-                    break;
+                    case TransitionMode.ReturnFromState:
+                        codeBuilder
+                            .WriteLine()
+                            .WriteLine("popState();");
+                        break;*/
             }
 
-            if (transition.Guard != null) {
-                codeBuilder
-                    .UnIndent()
-                    .WriteLine("}");
-            }
+            // Final del bloc de la guarda.
+            //
+            codeBuilder
+                .UnIndent()
+                .WriteLine("}")
+                .WriteLine();
         }
 
         public override void Visit(InlineCommand action) {
@@ -220,6 +218,35 @@
                     if (!System.String.IsNullOrEmpty(line))
                         codeBuilder.WriteLine(line.Trim());
             }
+        }
+
+        public override void Visit(MachineCommand action) {
+
+            if (!System.String.IsNullOrEmpty(action.Text)) {
+                codeBuilder.WriteLine("machine->do{0}();", action.Text.Trim());
+            }
+        }
+
+        private void WriteTransitionMethodHeader(string machineClassName, string stateClassName, string transitionName) {
+
+            codeBuilder
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    Perform '{0}' transition to other state.", transitionName)
+                .WriteLine("/// \\param    machine: The state machine.")
+                .WriteLine("/// \\return   The next state.")
+                .WriteLine("///")
+                .WriteLine("{0}* {1}::on{2}({3}* machine) {{", options.StateClassName, stateClassName, transitionName, machineClassName)
+                .Indent()
+                .WriteLine();
+        }
+
+        private void WriteMethodTail() {
+
+            codeBuilder
+                .UnIndent()
+                .WriteLine("}")
+                .WriteLine()
+                .WriteLine();
         }
     }
 }

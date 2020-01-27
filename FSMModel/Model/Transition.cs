@@ -1,7 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
     using System;
-    using System.Collections.Generic;
 
     public enum TransitionMode {
         Null,

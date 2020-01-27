@@ -47,16 +47,7 @@
                 .WriteLine("{0}* state;", options.StateClassName)
                 .WriteLine("{0}* context;", options.ContextClassName)
                 .UnIndent()
-                .WriteLine("public:")
-                .Indent();
-
-            foreach (State state in machine.States)
-                codeBuilder
-                    .WriteLine("{0}* state{1};", options.StateClassName, state.FullName);
-
-            codeBuilder
-                .UnIndent()
-                .WriteLine("private:")
+                .WriteLine("protected:")
                 .Indent()
                 .WriteLine("void setState({0}* state);", options.StateClassName)
                 .WriteLine("void pushState({0}* state);", options.StateClassName)
@@ -71,7 +62,11 @@
 
             foreach (string transitionName in machine.GetTransitionNames())
                 codeBuilder
-                    .WriteLine("void {0}();", transitionName);
+                    .WriteLine("void on{0}();", transitionName);
+
+            foreach (string commandName in machine.GetCommandNames())
+                codeBuilder
+                    .WriteLine("void do{0}();", commandName);
 
             codeBuilder
                 .WriteLine()

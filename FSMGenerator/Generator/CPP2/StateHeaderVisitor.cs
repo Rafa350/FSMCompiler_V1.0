@@ -40,25 +40,16 @@
             codeBuilder
                 .WriteLine("class {0} {{", options.StateClassName)
                 .Indent()
-                .WriteLine("private:")
-                .Indent()
-                .WriteLine("{0}* machine;", options.MachineClassName)
-                .UnIndent()
                 .WriteLine("protected:")
                 .Indent()
-                .WriteLine("inline {0}* getMachine() const {{ return machine; }}", options.MachineClassName)
-                .WriteLine("{0}* getContext() const;", options.ContextClassName)
-                .WriteLine("inline void setState({0}* state) const {{ machine->setState(state); }}", options.StateClassName)
+                .WriteLine("{0}();", options.StateClassName)
                 .UnIndent()
                 .WriteLine("public:")
-                .Indent()
-                .WriteLine("{0}({1}* machine);", options.StateClassName, options.MachineClassName)
-                .WriteLine("virtual void enter();")
-                .WriteLine("virtual void exit();");
+                .Indent();
 
             foreach(string transitionName in machine.GetTransitionNames())
                 codeBuilder
-                    .WriteLine("virtual void {0}();", transitionName);
+                    .WriteLine("virtual {0}* on{1}({2}* machine);", options.StateClassName, transitionName, options.MachineClassName);
 
             codeBuilder
                 .UnIndent()
@@ -87,18 +78,21 @@
             codeBuilder
                 .WriteLine("class {0}: public {1} {{", state.FullName, options.StateClassName)
                 .Indent()
+                .WriteLine("private:")
+                .Indent()
+                .WriteLine("static {0}* instance;", state.FullName)
+                .UnIndent()
+                .WriteLine("private:")
+                .Indent()
+                .WriteLine("{0}();", state.FullName)
+                .UnIndent()
                 .WriteLine("public:")
                 .Indent()
-                .WriteLine("{0}({1}* machine);", state.FullName, options.MachineClassName);
+                .WriteLine("static {0}* getInstance();", state.FullName);
             
-            if (state.EnterAction != null) 
-                codeBuilder.WriteLine("void enter() override;");
-            if (state.ExitAction != null)
-                codeBuilder.WriteLine("void exit() override;");
-
             foreach (string transitionName in state.GetTransitionNames()) {
                 codeBuilder
-                    .WriteLine("void {0}() override;", transitionName);
+                    .WriteLine("{0}* on{1}({2}* machine) override;", options.StateClassName, transitionName, options.MachineClassName);
             }
 
             codeBuilder

@@ -11,5 +11,6 @@
         void Visit(Action action);
 
         void Visit(InlineCommand action);
+        void Visit(MachineCommand action);
     }
 }

@@ -99,7 +99,10 @@
             foreach (XmlNode node in actionNode.ChildNodes) {
                 switch (node.Name) {
                     case "inline": 
-                        action.AddCommand(ProcessInlineActionNode(node, machine));
+                        action.AddCommand(ProcessInlineCommandNode(node, machine));
+                        break;
+                    case "command":
+                        action.AddCommand(ProcessMachineCommandNode(node, machine));
                         break;
                 }
             }
@@ -107,10 +110,18 @@
             return action;
         }
 
-        private Command ProcessInlineActionNode(XmlNode inlineActionNode, Machine machine) {
+        private Command ProcessInlineCommandNode(XmlNode inlineActionNode, Machine machine) {
 
             InlineCommand command = new InlineCommand();
             command.Text = inlineActionNode.InnerText;
+
+            return command;
+        }
+
+        private Command ProcessMachineCommandNode(XmlNode commandActionNode, Machine machine) {
+
+            MachineCommand command = new MachineCommand();
+            command.Text = GetAttribute(commandActionNode, "name");
 
             return command;
         }

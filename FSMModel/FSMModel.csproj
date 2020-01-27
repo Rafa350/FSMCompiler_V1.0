@@ -48,6 +48,7 @@
     <Compile Include="Loader\XmlLoader.cs" />
     <Compile Include="Model\Action.cs" />
     <Compile Include="Model\Command.cs" />
+    <Compile Include="Model\Commands\MachineCommand.cs" />
     <Compile Include="Model\Commands\InlineCommand.cs" />
     <Compile Include="Model\DefaultVisitor.cs" />
     <Compile Include="Model\Guard.cs" />

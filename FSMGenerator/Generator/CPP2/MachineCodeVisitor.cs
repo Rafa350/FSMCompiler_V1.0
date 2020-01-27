@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
 
     internal class MachineCodeVisitor: DefaultVisitor {
 
@@ -42,14 +43,7 @@
                 .Indent()
                 .WriteLine("{0}* context):", options.ContextClassName)
                 .WriteLine()
-                .WriteLine("state(nullptr),");
-
-            foreach (State state in machine.States) {
-                codeBuilder
-                    .WriteLine("state{0}(new {0}(this)),", state.FullName);
-            }
-
-            codeBuilder
+                .WriteLine("state(nullptr),")
                 .WriteLine("context(context) {")
                 .UnIndent()
                 .WriteLine("}")
@@ -62,8 +56,21 @@
                 .WriteLine("///")
                 .WriteLine("void {0}::start() {{", options.MachineClassName)
                 .Indent()
-                .WriteLine()
-                .WriteLine("state = state{0};", machine.Start.FullName)
+                .WriteLine();
+
+            if (machine.Start.EnterAction != null) {
+                codeBuilder
+                    .WriteLine("// Enter state actions.")
+                    .WriteLine("//");
+                machine.Start.EnterAction.AcceptVisitor(this);
+                codeBuilder
+                    .WriteLine();
+            }
+
+            codeBuilder
+                .WriteLine("// Select initial state.")
+                .WriteLine("//")
+                .WriteLine("state = {0}::getInstance();", machine.Start.FullName)
                 .UnIndent()
                 .WriteLine("}")
                 .WriteLine()
@@ -74,10 +81,10 @@
                     .WriteLine("/// ----------------------------------------------------------------------")
                     .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
                     .WriteLine("///")
-                    .WriteLine("void {0}::{1}() {{", options.MachineClassName, transitionName)
+                    .WriteLine("void {0}::on{1}() {{", options.MachineClassName, transitionName)
                     .Indent()
                     .WriteLine()
-                    .WriteLine("state->{0}();", transitionName)
+                    .WriteLine("state = state->on{0}(this);", transitionName)
                     .UnIndent()
                     .WriteLine("}")
                     .WriteLine()
@@ -85,6 +92,24 @@
             }
 
             writer.Write(codeBuilder.ToString());
+        }
+
+        public override void Visit(InlineCommand action) {
+
+            if (!System.String.IsNullOrEmpty(action.Text)) {
+                string[] lines = action.Text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string line in lines)
+                    if (!System.String.IsNullOrEmpty(line))
+                        codeBuilder.WriteLine(line.Trim());
+            }
+        }
+
+        public override void Visit(MachineCommand action) {
+
+            if (!System.String.IsNullOrEmpty(action.Text)) {
+                codeBuilder.WriteLine("machine->do{0}();", action.Text.Trim());
+            }
         }
     }
 }

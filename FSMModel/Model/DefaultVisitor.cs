@@ -40,5 +40,8 @@
 
         public virtual void Visit(InlineCommand command) {
         }
+
+        public virtual void Visit(MachineCommand command) {
+        }
     }
 }
