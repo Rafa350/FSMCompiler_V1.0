@@ -8,7 +8,7 @@
 
         private readonly TextWriter writer;
         private readonly CPPGeneratorOptions options;
-        private CodeBuilder codeBuilder = new CodeBuilder();
+        private readonly CppCodeBuilder codeBuilder = new CppCodeBuilder();
 
         public StateHeaderVisitor(TextWriter writer, CPPGeneratorOptions options) {
 
@@ -18,43 +18,47 @@
 
         public override void Visit(Machine machine) {
 
-            string guardString = Path.GetFileName(options.StateHeaderFileName).ToUpper().Replace(".", "_");
+            string guard = Path.GetFileName(options.StateHeaderFileName).ToUpper().Replace(".", "_");
 
             codeBuilder
-                .WriteLine("#ifndef __{0}", guardString)
-                .WriteLine("#define __{0}", guardString)
+                .WriteIncludeStartGuard(guard)
+                .WriteLine()
+                .WriteLine();
+
+            codeBuilder
+                .WriteInclude("eos.h")
+                .WriteInclude("Services/Fsm/eosFsmStateBase.h")
                 .WriteLine()
                 .WriteLine();
 
             if (!String.IsNullOrEmpty(options.NsName))
                 codeBuilder
-                    .WriteLine("namespace {0} {{", options.NsName)
-                    .Indent()
+                    .WriteBeginNamespace(options.NsName)
                     .WriteLine();
 
             codeBuilder
-                .WriteLine("class {0};", options.MachineClassName)
-                .WriteLine("class {0};", options.ContextClassName)
+                .WriteForwardClassDeclaration(options.ContextClassName)
                 .WriteLine();
 
             codeBuilder
-                .WriteLine("class {0} {{", options.StateClassName)
-                .Indent()
-                .WriteLine("protected:")
-                .Indent()
-                .WriteLine("{0}();", options.StateClassName)
-                .UnIndent()
-                .WriteLine("public:")
-                .Indent();
+                .WriteBeginClassDeclaration(options.StateClassName, options.StateBaseClassName);
+
+            codeBuilder
+                .WriteBeginClassSection(CppCodeBuilder.ProtectionLevel.Protected)
+                .WriteLine("{0}();", options.StateClassName);
+            codeBuilder
+                .WriteEndClassSection();
+
+            codeBuilder
+                .WriteBeginClassSection(CppCodeBuilder.ProtectionLevel.Public);
 
             foreach(string transitionName in machine.GetTransitionNames())
                 codeBuilder
-                    .WriteLine("virtual {0}* on{1}({2}* machine);", options.StateClassName, transitionName, options.MachineClassName);
+                    .WriteLine("virtual void on{0}({1}* context);", transitionName, options.ContextClassName);
 
             codeBuilder
-                .UnIndent()
-                .UnIndent()
-                .WriteLine("};")
+                .WriteEndClassSection()
+                .WriteEndClassDeclaration()
                 .WriteLine();
 
             foreach (State state in machine.States)
@@ -62,13 +66,13 @@
 
             if (!String.IsNullOrEmpty(options.NsName))
                 codeBuilder
-                    .UnIndent()
-                    .WriteLine("}");
+                    .WriteEndNamespace();
 
             codeBuilder
                 .WriteLine()
-                .WriteLine()
-                .WriteLine("#endif // __{0}", guardString);
+                .WriteLine();
+            codeBuilder
+                .WriteIncludeEndGuard();
 
             writer.Write(codeBuilder.ToString());
         }
@@ -76,29 +80,28 @@
         public override void Visit(State state) {
 
             codeBuilder
-                .WriteLine("class {0}: public {1} {{", state.FullName, options.StateClassName)
-                .Indent()
-                .WriteLine("private:")
-                .Indent()
-                .WriteLine("static {0}* instance;", state.FullName)
-                .UnIndent()
-                .WriteLine("private:")
-                .Indent()
-                .WriteLine("{0}();", state.FullName)
-                .UnIndent()
-                .WriteLine("public:")
-                .Indent()
+                .WriteBeginClassDeclaration(state.FullName, options.StateBaseClassName)
+                .WriteBeginClassSection(CppCodeBuilder.ProtectionLevel.Private)
+                .WriteLine("static {0}* instance;", state.FullName);
+
+            codeBuilder
+                .WriteEndClassSection()
+                .WriteBeginClassSection(CppCodeBuilder.ProtectionLevel.Private)
+                .WriteLine("{0}();", state.FullName);
+
+            codeBuilder
+                .WriteEndClassSection()
+                .WriteBeginClassSection(CppCodeBuilder.ProtectionLevel.Public)
                 .WriteLine("static {0}* getInstance();", state.FullName);
             
             foreach (string transitionName in state.GetTransitionNames()) {
                 codeBuilder
-                    .WriteLine("{0}* on{1}({2}* machine) override;", options.StateClassName, transitionName, options.MachineClassName);
+                    .WriteLine("void on{0}({1}* context) override;", transitionName, options.ContextClassName);
             }
 
             codeBuilder
-                .UnIndent()
-                .UnIndent()
-                .WriteLine("};")
+                .WriteEndClassSection()
+                .WriteEndClassDeclaration()
                 .WriteLine();
         }
     }

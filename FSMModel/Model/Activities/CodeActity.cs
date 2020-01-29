@@ -1,6 +1,6 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model.Commands {
+﻿namespace MikroPicDesigns.FSMCompiler.v1.Model.Activities {
     
-    public sealed class InlineCommand: Command {
+    public sealed class CodeActity: Activity {
 
         private string text;
 

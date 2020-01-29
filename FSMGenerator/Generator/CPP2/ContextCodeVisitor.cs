@@ -3,15 +3,15 @@
     using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
-    internal class MachineCodeVisitor: DefaultVisitor {
+    internal class ContextCodeVisitor: DefaultVisitor {
 
         private readonly TextWriter writer;
         private readonly CPPGeneratorOptions options;
         private CodeBuilder codeBuilder = new CodeBuilder();
 
-        public MachineCodeVisitor(TextWriter writer, CPPGeneratorOptions options) {
+        public ContextCodeVisitor(TextWriter writer, CPPGeneratorOptions options) {
 
             this.writer = writer;
             this.options = options;
@@ -19,11 +19,11 @@
 
         public override void Visit(Machine machine) {
 
-            string machineHeaderFileName = Path.GetFileName(options.MachineHeaderFileName);
+            string contextHeaderFileName = Path.GetFileName(options.ContextHeaderFileName);
             string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
 
             codeBuilder
-                .WriteLine("#include \"{0}\"", machineHeaderFileName)
+                .WriteLine("#include \"{0}\"", contextHeaderFileName)
                 .WriteLine("#include \"{0}\"", stateHeaderFileName)
                 .WriteLine()
                 .WriteLine();
@@ -37,15 +37,9 @@
             codeBuilder
                 .WriteLine("/// ----------------------------------------------------------------------")
                 .WriteLine("/// \\brief    Constructor.")
-                .WriteLine("/// \\param    context: Pointer to context data.")
                 .WriteLine("///")
-                .WriteLine("{0}::{0}(", options.MachineClassName)
-                .Indent()
-                .WriteLine("{0}* context):", options.ContextClassName)
+                .WriteLine("{0}::{0}() {{", options.ContextClassName)
                 .WriteLine()
-                .WriteLine("state(nullptr),")
-                .WriteLine("context(context) {")
-                .UnIndent()
                 .WriteLine("}")
                 .WriteLine()
                 .WriteLine();
@@ -54,9 +48,18 @@
                 .WriteLine("/// ----------------------------------------------------------------------")
                 .WriteLine("/// \\brief    Set to initial state.")
                 .WriteLine("///")
-                .WriteLine("void {0}::start() {{", options.MachineClassName)
+                .WriteLine("void {0}::start() {{", options.ContextClassName)
                 .Indent()
                 .WriteLine();
+
+            if (machine.InitializeAction != null) {
+                codeBuilder
+                    .WriteLine("// Machine initialization actions.")
+                    .WriteLine("//");
+                machine.InitializeAction.AcceptVisitor(this);
+                codeBuilder
+                    .WriteLine();
+            }
 
             if (machine.Start.EnterAction != null) {
                 codeBuilder
@@ -70,7 +73,7 @@
             codeBuilder
                 .WriteLine("// Select initial state.")
                 .WriteLine("//")
-                .WriteLine("state = {0}::getInstance();", machine.Start.FullName)
+                .WriteLine("setState({0}::getInstance());", machine.Start.FullName)
                 .UnIndent()
                 .WriteLine("}")
                 .WriteLine()
@@ -81,10 +84,10 @@
                     .WriteLine("/// ----------------------------------------------------------------------")
                     .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
                     .WriteLine("///")
-                    .WriteLine("void {0}::on{1}() {{", options.MachineClassName, transitionName)
+                    .WriteLine("void {0}::on{1}() {{", options.ContextClassName, transitionName)
                     .Indent()
                     .WriteLine()
-                    .WriteLine("state = state->on{0}(this);", transitionName)
+                    .WriteLine("static_cast<{1}*>(getState())->on{0}(this);", transitionName, options.StateClassName)
                     .UnIndent()
                     .WriteLine("}")
                     .WriteLine()
@@ -94,7 +97,7 @@
             writer.Write(codeBuilder.ToString());
         }
 
-        public override void Visit(InlineCommand action) {
+        public override void Visit(CodeActity action) {
 
             if (!System.String.IsNullOrEmpty(action.Text)) {
                 string[] lines = action.Text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -105,10 +108,10 @@
             }
         }
 
-        public override void Visit(MachineCommand action) {
+        public override void Visit(CallActivity action) {
 
-            if (!System.String.IsNullOrEmpty(action.Text)) {
-                codeBuilder.WriteLine("machine->do{0}();", action.Text.Trim());
+            if (!System.String.IsNullOrEmpty(action.MethodName)) {
+                codeBuilder.WriteLine("do{0}();", action.MethodName);
             }
         }
     }

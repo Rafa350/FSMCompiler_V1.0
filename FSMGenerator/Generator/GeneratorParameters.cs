@@ -35,7 +35,7 @@
                 PropertyInfo propInfo = dataObjectType.GetProperty(kv.Key, BindingFlags.Instance | BindingFlags.Public);
                 if (propInfo == null)
                     throw new InvalidOperationException(
-                        String.Format("No es posible asignar el parametro '{0}'.", kv.Key));
+                        String.Format("No es posible asignar el valor '{1}', al parametro '{0}'.", kv.Key, kv.Value));
                 object value = Convert.ChangeType(kv.Value, propInfo.PropertyType);
                 propInfo.SetValue(dataObject, value, null);
             }

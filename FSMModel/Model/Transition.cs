@@ -3,10 +3,11 @@
     using System;
 
     public enum TransitionMode {
-        Null,
-        JumpToState,
-        CallToState,
-        ReturnFromState
+        InternalLoop,
+        ExternalLoop,
+        Jump,
+        Push,
+        Pop
     }
 
     public sealed class Transition: IVisitable {
@@ -15,7 +16,7 @@
         private Guard guard;
         private Action action;
         private State nextState;
-        private TransitionMode mode = TransitionMode.Null;
+        private TransitionMode mode = TransitionMode.InternalLoop;
 
         /// <summary>
         /// Constructor.

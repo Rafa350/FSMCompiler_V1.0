@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
-    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
     public interface IVisitor {
 
@@ -10,7 +10,7 @@
         void Visit(Guard guard);
         void Visit(Action action);
 
-        void Visit(InlineCommand action);
-        void Visit(MachineCommand action);
+        void Visit(CodeActity action);
+        void Visit(CallActivity action);
     }
 }

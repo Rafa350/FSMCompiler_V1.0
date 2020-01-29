@@ -2,33 +2,30 @@
 
     public sealed class CPPGeneratorOptions {
 
-        public string NsName;
-        public string ContextClassName;
-        public string ContextHeaderFileName;
-        public string MachineClassName;
-        public string MachineHeaderFileName;
-        public string MachineCodeFileName;
-        public string StateClassName;
-        public string StateHeaderFileName;
-        public string StateCodeFileName;
-        public bool UseStateNames;
+        public string NsName { get; set; }
+        public string ContextBaseClassName { get; set; }
+        public string ContextClassName { get; set; }
+        public string ContextHeaderFileName { get; set; }
+        public string ContextCodeFileName { get; set; }
+        public string StateBaseClassName { get; set; }
+        public string StateClassName { get; set; }
+        public string StateHeaderFileName { get; set; }
+        public string StateCodeFileName { get; set; }
 
         public CPPGeneratorOptions() {
 
             NsName = "app";
 
-            MachineClassName = "Machine";
-            StateClassName = "State";
+            ContextBaseClassName = null;
             ContextClassName = "Context";
 
+            StateBaseClassName = null;
+            StateClassName = "State";
+
             ContextHeaderFileName = "fsmContext.h";
-            MachineHeaderFileName = "fsmMachine.h";
-            MachineCodeFileName = "fsmMachine.cpp";
+            ContextCodeFileName = "fsmContext.cpp";
             StateHeaderFileName = "fsmState.h";
             StateCodeFileName = "fsmState.cpp";
-            
-            UseStateNames = true;
         }
-   }
-    
+    }
 }

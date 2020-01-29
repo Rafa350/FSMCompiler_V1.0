@@ -46,14 +46,32 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generator\CodeBuilder.cs" />
+    <Compile Include="Generator\CPP2\CppCodeGenerator\Generator.cs" />
+    <Compile Include="Generator\CPP2\CppCodeGenerator\StringBuilderExtensions.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\ArgumentDefinition.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\ClassDeclaration.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\AccessSpecifier.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\DestructorDeclaration.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\DefaultVisitor.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\IClassMember.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\INamespaceMember.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\IUnitMember.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\IVisitable.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\IVisitor.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\ConstructorDeclaration.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\MethodDeclaration.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\FieldDeclaration.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\NamespaceDeclaration.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\UnitDeclaration.cs" />
     <Compile Include="Generator\CPP2\CPPGenerator.cs" />
     <Compile Include="Generator\CPP2\CPPGeneratorOptions.cs" />
-    <Compile Include="Generator\CPP2\MachineCodeVisitor.cs" />
-    <Compile Include="Generator\CPP2\MachineHeaderVisitor.cs" />
+    <Compile Include="Generator\CPP2\ContextCodeVisitor.cs" />
+    <Compile Include="Generator\CPP2\ContextHeaderVisitor.cs" />
     <Compile Include="Generator\CPP2\MachineHelper.cs" />
     <Compile Include="Generator\CPP2\StateCodeVisitor.cs" />
     <Compile Include="Generator\CPP2\StateHeaderVisitor.cs" />
     <Compile Include="Generator\CPP2\StateHelper.cs" />
+    <Compile Include="Generator\CppCodeBuilder.cs" />
     <Compile Include="Generator\CPP\CPPGenerator.cs" />
     <Compile Include="Generator\CPP\CPPGeneratorOptions.cs" />
     <Compile Include="Generator\CPP\CodeGenerator.cs" />

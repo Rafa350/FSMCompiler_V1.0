@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
-    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
     public abstract class DefaultVisitor: IVisitor {
 
@@ -33,15 +33,15 @@
 
         public virtual void Visit(Action action) {
 
-            if (action.HasCommands)
-                foreach (Command command in action.Commands)
+            if (action.HasActivities)
+                foreach (Activity command in action.Activities)
                     command.AcceptVisitor(this);
         }
 
-        public virtual void Visit(InlineCommand command) {
+        public virtual void Visit(CodeActity command) {
         }
 
-        public virtual void Visit(MachineCommand command) {
+        public virtual void Visit(CallActivity command) {
         }
     }
 }

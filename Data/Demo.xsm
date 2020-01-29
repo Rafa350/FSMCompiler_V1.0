@@ -1,129 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- Logica de control de les senyals de aplicacio, 
-     inhibicio i aplicacio automatica 
--->
-<machine name="Demo" start="IDLE">
+<machine name="Demo" start="WaitingSW1">
+
+	<!-- Inicialitzacio de la maquina
+	-->
+	<initialize>
+		<call name="LED1_OFF"/>
+		<call name="LED2_OFF"/>
+		<call name="LED3_OFF"/>
+	</initialize>
     
-    <initialize>
-        <inline>trigger = false;  </inline>
-        <inline>test = false;     </inline>
-    </initialize>
-    
-    <!-- Espera que pasi quelcom
+    <!-- Espera al boto SW1
     -->
-    <state name="IDLE">
-       
-        <!-- Es prem el boto Start/Reset en modus normal
+    <state name="WaitingSW1">
+	
+		<enter>
+			<call name="LED1_OFF"/>
+		</enter>
+
+		<exit>
+			<call name="LED1_ON"/>
+		</exit>
+		
+        <!-- Es prem el boto SW1
         -->
-        <transition name="inp_st_on" event="INP_ST_ON" guard="!test" state="DONE">
-            <inline>if (varGet(VAR_TEST_ACTIVE) == 1) {  </inline>
-            <inline>    varSet(VAR_TEST_ACTIVE, 0);      </inline>            
-            <inline>    test = true;                     </inline>
-            <inline>}                                    </inline>
+        <transition name="SW1_ON" state="WaitingSW2">
+			<command name="LED1_ON" />
         </transition>
+
+	</state>
                
-        <!-- Es prem el boto Start/Reset en modus test
-        -->
-        <transition name="inp_st_om" event="INP_ST_ON" guard="test">
-            <inline>test = false; </inline>
-        </transition>
-       
-        <!-- Flanc positiu en l'entrada INP_TR 
-        -->
-        <transition name="input_tr_on" event="INP_TR_ON" guard="!test" state="DELAY_BEFORE_DONE">
-            <inline>timStart(TIM_TR_DELAY, varGet(VAR_TR_DELAY));  </inline>
-        </transition>
-                
-        <!-- Flanc positiu en l'entrada IN_IH 
-        -->
-        <transition name="input_ih_on" event="INP_IH_ON" guard="!test">
-            <inline>timStart(TIM_IH_DELAY, varGet(VAR_IH_ONDELAY));  </inline>
-        </transition>
-        
-        <!-- El temporitzador d'interval de test arriva al final 
-        -->
-        <transition name="tim_test_interval" event="TIM_TEST_INTERVAL" guard="test" state="DONE"/>
-
-        <!-- El temporitzador de retard a la inhibicio arriva al final 
-        -->
-        <transition name="tim_ih_delay" event="TIM_IH_DELAY" state="DISABLED"/>
-       
-    </state>
-    
-    <!-- Entrada inhibida. Espera el final de la senyal d'inhibicio.
+    <!-- Espera al boto SW2.
     -->
-    <state name="DISABLED">
-    
-        <!-- Flanc negatiu en l'entrada INP_IH 
+    <state name="WaitingSW2">
+	
+		<enter>
+			<command name="LED3_ON"/>
+		</enter>
+
+        <!-- Es prem el boto SW2
         -->
-        <transition event="INP_IH_OFF">
-            <inline>timStart(TIM_IH_DELAY, varGet(VAR_IH_OFFDELAY));  </inline>
+        <transition name="SW2_ON" state="WaitingSW3">
+			<command name="LED1_OFF" />
+			<command name="LED2_ON" />
         </transition>
 
-        <!-- El temporitzador de retart a la inhibicio arriba al final 
-        -->
-        <transition event="TIM_IH_DELAY" state="IDLE"/>
     </state>
 
-    <!-- Retard abans de imprimir
+    <!-- Espera al boto SW3.
     -->
-    <state name="DELAY_BEFORE_DONE">
-    
-        <!-- Si es prem Start/Reset es desactiva el test
+    <state name="WaitingSW3">
+	
+        <!-- Es prem el boto SW3
         -->
-        <transition event="INP_ST_ON">
-            <inline>test = false;  </inline>
+        <transition name="SW3_ON" state="WaitingTMR1">
+			<command name="LED2_OFF" />
+			<command name="LED3_ON" />
+			<command name="TMR1_START" />
         </transition>
-
-        <!-- Final del retard
-        -->
-        <transition event="TIM_TR_DELAY" state="DONE"/>
+		
     </state>
     
-    <!-- Retard abans del reinici
+    <!-- Espera el timeout de TMR1
     -->
-    <state name="DELAY_BEFORE_IDLE">
+    <state name="WaitingTMR1">
         
-        <!-- Si es prem Start/Reset es desactiva el test
+        <!-- Timeout del temporitzador TIMER1
         -->
-        <transition event="INP_ST_ON">
-            <inline>test = false;  </inline>
-        </transition>
+        <transition name="TMR1_TIMEOUT" state="WaitingSW1">
+			<command name="LED3_OFF" />
+		</transition>
 
-        <!-- Final del retart de reinici 
-        -->
-        <transition event="TIM_TR_INHIBIT" state="IDLE">
-            <inline>if (test)                                                    </inline>
-            <inline>    timStart(TIM_TEST_INTERVAL, varGet(VAR_TEST_INTERVAL));  </inline>
-        </transition>
-    </state>
-
-    <!-- Dispara i espera rearmat. Es queda indefinidament en aquest estat fins
-         que es rearmi desde un altre proces 
-    -->
-    <state name="DONE">
-    
-        <!-- Event d'entrada. Activa la variable 'trigger' que serveix de
-             disparo pel un altre part del sistema.
-        -->
-        <enter>
-            <inline>trigger = true;  </inline>
-        </enter>
-
-        <!-- Si es prem Start/Reset es desactiva el test
-        -->
-        <transition event="INP_ST_ON">
-            <inline>test = false;  </inline>
-        </transition>
-        
-        <!-- Es reb el rearmat des d'un altre part del sistema 
-        -->
-        <transition event="SIG_REARM_TRIGGER" state="DELAY_BEFORE_IDLE">
-            <inline>trigger = false;                                  </inline>
-            <inline>timStart(TIM_TR_INHIBIT, varGet(VAR_TR_INHIBIT)); </inline>
-        </transition>
-        
     </state>
 
 </machine>

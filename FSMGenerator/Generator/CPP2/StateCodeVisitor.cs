@@ -3,13 +3,13 @@
     using System;
     using System.IO;
     using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
     internal sealed class StateCodeVisitor : DefaultVisitor {
 
         private readonly TextWriter writer;
         private readonly CPPGeneratorOptions options;
-        private readonly CodeBuilder codeBuilder = new CodeBuilder();
+        private readonly CppCodeBuilder codeBuilder = new CppCodeBuilder();
         public State currentState;
 
         public StateCodeVisitor(TextWriter writer, CPPGeneratorOptions options) {
@@ -20,41 +20,17 @@
 
         public override void Visit(Machine machine) {
 
-            string machineHeaderFileName = Path.GetFileName(options.MachineHeaderFileName);
-            string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
-            string contextHeaderFileName = Path.GetFileName(options.ContextHeaderFileName);
-
-            codeBuilder
-                .WriteLine("#include \"{0}\"", machineHeaderFileName)
-                .WriteLine("#include \"{0}\"", stateHeaderFileName)
-                .WriteLine("#include \"{0}\"", contextHeaderFileName)
-                .WriteLine()
-                .WriteLine();
-
-            if (!String.IsNullOrEmpty(options.NsName))
-                codeBuilder
-                    .WriteLine("using namespace {0};", options.NsName)
-                    .WriteLine()
-                    .WriteLine();
-
-            codeBuilder
-                .WriteLine("/// ----------------------------------------------------------------------")
-                .WriteLine("/// \\brief    Constructor.")
-                .WriteLine("///")
-                .WriteLine("{0}::{0}() {{", options.StateClassName)
-                .WriteLine("}")
-                .WriteLine()
-                .WriteLine();
-
+            WriteIncludes();
+            WriteUsing();
+            WriteConstructor(options.StateClassName);
 
             foreach (string transitionName in machine.GetTransitionNames()) {
                 codeBuilder
                     .WriteLine("/// ----------------------------------------------------------------------")
                     .WriteLine("/// \\brief    Perform '{0}' transition.", transitionName)
-                    .WriteLine("/// \\param    machine: The state machine.")
-                    .WriteLine("/// \\return   The next state.")
+                    .WriteLine("/// \\param    context: The context.")
                     .WriteLine("///")
-                    .WriteLine("{0}* {0}::on{1}({2}* machine) {{", options.StateClassName, transitionName, options.MachineClassName)
+                    .WriteLine("void {0}::on{1}({2}* context) {{", options.StateClassName, transitionName, options.ContextClassName)
                     .WriteLine()
                     .WriteLine("}")
                     .WriteLine()
@@ -72,7 +48,7 @@
             currentState = state;
 
             // Genera el constructor.
-            //
+            //            
             codeBuilder
                 .WriteLine("/// ----------------------------------------------------------------------")
                 .WriteLine("/// \\brief    Constructor.")
@@ -106,7 +82,7 @@
             //
             foreach (string transitionName in state.GetTransitionNames()) {
 
-                WriteTransitionMethodHeader(options.MachineClassName, state.FullName, transitionName);
+                WriteTransitionMethodHeader(options.ContextClassName, state.FullName, transitionName);
                 foreach (Transition transition in state.Transitions) {
                     if (transition.Name == transitionName)
                         transition.AcceptVisitor(this);
@@ -139,7 +115,7 @@
             if (transition.NextState != null) {
                 if (currentState.ExitAction != null) {
                     codeBuilder
-                        .WriteLine("// Exit state actions.")
+                        .WriteLine("// Exit state action.")
                         .WriteLine("//");
                     currentState.ExitAction.AcceptVisitor(this);
                     codeBuilder
@@ -151,7 +127,7 @@
             //
             if (transition.Action != null) {
                 codeBuilder
-                    .WriteLine("// Transition actions.")
+                    .WriteLine("// Transition action.")
                     .WriteLine("//");
                 transition.Action.AcceptVisitor(this);
                 codeBuilder
@@ -163,7 +139,7 @@
             if (transition.NextState != null) {
                 if (transition.NextState.EnterAction != null) {
                     codeBuilder
-                        .WriteLine("// Enter state actions.")
+                        .WriteLine("// Enter state action.")
                         .WriteLine("//");
                     transition.NextState.EnterAction.AcceptVisitor(this);
                     codeBuilder
@@ -172,20 +148,20 @@
             }
 
             switch (transition.Mode) {
-                case TransitionMode.Null:
+                case TransitionMode.ExternalLoop:
+                case TransitionMode.InternalLoop:
                     codeBuilder
-                        .WriteLine("// Return the same state.")
-                        .WriteLine("//")
-                        .WriteLine("return this;")
-                        .WriteLine();
+                        .WriteLine()
+                        .WriteLine("return;");
                     break;
 
-                case TransitionMode.JumpToState:
+                case TransitionMode.Jump:
                     codeBuilder
-                        .WriteLine("// Return the next state.")
+                        .WriteLine("// Set the next state.")
                         .WriteLine("//")
-                        .WriteLine("return {0}::getInstance();", transition.NextState.FullName)
-                        .WriteLine();
+                        .WriteLine("context->setState({0}::getInstance());", transition.NextState.FullName)
+                        .WriteLine()
+                        .WriteLine("return;");
                     break;
 
                     /*case TransitionMode.CallToState:
@@ -209,7 +185,7 @@
                 .WriteLine();
         }
 
-        public override void Visit(InlineCommand action) {
+        public override void Visit(CodeActity action) {
 
             if (!System.String.IsNullOrEmpty(action.Text)) {
                 string[] lines = action.Text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -220,11 +196,44 @@
             }
         }
 
-        public override void Visit(MachineCommand action) {
+        public override void Visit(CallActivity action) {
 
-            if (!System.String.IsNullOrEmpty(action.Text)) {
-                codeBuilder.WriteLine("machine->do{0}();", action.Text.Trim());
+            if (!System.String.IsNullOrEmpty(action.MethodName)) {
+                codeBuilder.WriteLine("context->do{0}();", action.MethodName);
             }
+        }
+
+        private void WriteIncludes() {
+
+            string contextHeaderFileName = Path.GetFileName(options.ContextHeaderFileName);
+            string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
+
+            codeBuilder
+                .WriteInclude(contextHeaderFileName)
+                .WriteInclude(stateHeaderFileName)
+                .WriteLine()
+                .WriteLine();
+        }
+
+        private void WriteUsing() {
+
+            if (!String.IsNullOrEmpty(options.NsName))
+                codeBuilder
+                    .WriteUsingNamespace(options.NsName)
+                    .WriteLine()
+                    .WriteLine();
+        }
+
+        private void WriteConstructor(string className) {
+
+            codeBuilder
+                .WriteLine("/// ----------------------------------------------------------------------")
+                .WriteLine("/// \\brief    Constructor.")
+                .WriteLine("///")
+                .WriteLine("{0}::{0}() {{", className)
+                .WriteLine("}")
+                .WriteLine()
+                .WriteLine();
         }
 
         private void WriteTransitionMethodHeader(string machineClassName, string stateClassName, string transitionName) {
@@ -232,10 +241,9 @@
             codeBuilder
                 .WriteLine("/// ----------------------------------------------------------------------")
                 .WriteLine("/// \\brief    Perform '{0}' transition to other state.", transitionName)
-                .WriteLine("/// \\param    machine: The state machine.")
-                .WriteLine("/// \\return   The next state.")
+                .WriteLine("/// \\param    context: The context.")
                 .WriteLine("///")
-                .WriteLine("{0}* {1}::on{2}({3}* machine) {{", options.StateClassName, stateClassName, transitionName, machineClassName)
+                .WriteLine("void {0}::on{1}({2}* context) {{", stateClassName, transitionName, machineClassName)
                 .Indent()
                 .WriteLine();
         }

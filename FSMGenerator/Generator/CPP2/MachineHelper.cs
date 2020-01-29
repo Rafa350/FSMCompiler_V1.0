@@ -2,7 +2,7 @@
 
     using System.Collections.Generic;
     using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
     public static class MachineHelper {
 
@@ -26,9 +26,9 @@
 
             void PopulateList(Action action) {
 
-                foreach (var command in action.Commands) {
-                    if (command is MachineCommand machineCommand) {
-                        string name = machineCommand.Text;
+                foreach (var command in action.Activities) {
+                    if (command is CallActivity machineCommand) {
+                        string name = machineCommand.MethodName;
                         if (!names.Contains(name))
                             names.Add(name);
                     }

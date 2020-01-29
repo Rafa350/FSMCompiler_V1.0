@@ -32,18 +32,18 @@
 
         private void GenerateMachineHeader(Machine machine) {
 
-            if (!String.IsNullOrEmpty(options.MachineHeaderFileName))
-                using (StreamWriter writer = File.CreateText(options.MachineHeaderFileName)) {
-                    MachineHeaderVisitor visitor = new MachineHeaderVisitor(writer, options);
+            if (!String.IsNullOrEmpty(options.ContextHeaderFileName))
+                using (StreamWriter writer = File.CreateText(options.ContextHeaderFileName)) {
+                    ContextHeaderVisitor visitor = new ContextHeaderVisitor(writer, options);
                     machine.AcceptVisitor(visitor);
                 }
         }
 
         private void GenerateMachineCode(Machine machine) { 
 
-            if (!String.IsNullOrEmpty(options.MachineCodeFileName))
-                using (StreamWriter writer = File.CreateText(options.MachineCodeFileName)) {
-                    MachineCodeVisitor visitor = new MachineCodeVisitor(writer, options);
+            if (!String.IsNullOrEmpty(options.ContextCodeFileName))
+                using (StreamWriter writer = File.CreateText(options.ContextCodeFileName)) {
+                    ContextCodeVisitor visitor = new ContextCodeVisitor(writer, options);
                     machine.AcceptVisitor(visitor);
                 }
         }

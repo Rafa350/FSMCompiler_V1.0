@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Text;
     using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
     internal sealed class CodeGenerator {
 
@@ -342,8 +342,8 @@
         /// 
         private void EmitActionBody(CodeBuilder codeBuilder, Model.Action action) {
 
-            foreach (Command command in action.Commands) {
-                InlineCommand inlineCmd = command as InlineCommand;
+            foreach (Activity command in action.Activities) {
+                CodeActity inlineCmd = command as CodeActity;
                 if (inlineCmd != null)
                     codeBuilder.WriteLine(inlineCmd.Text);
             }

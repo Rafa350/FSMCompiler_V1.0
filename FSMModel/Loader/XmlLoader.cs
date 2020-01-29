@@ -1,7 +1,7 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Loader {
 
     using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Commands;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
     using System;
     using System.Xml;
 
@@ -98,11 +98,13 @@
 
             foreach (XmlNode node in actionNode.ChildNodes) {
                 switch (node.Name) {
+                    case "code":
                     case "inline": 
-                        action.AddCommand(ProcessInlineCommandNode(node, machine));
+                        action.AddActivity(ProcessCodeActivityNode(node, machine));
                         break;
+                    case "call":
                     case "command":
-                        action.AddCommand(ProcessMachineCommandNode(node, machine));
+                        action.AddActivity(ProcessCallActivityNode(node, machine));
                         break;
                 }
             }
@@ -110,20 +112,20 @@
             return action;
         }
 
-        private Command ProcessInlineCommandNode(XmlNode inlineActionNode, Machine machine) {
+        private Activity ProcessCodeActivityNode(XmlNode inlineActionNode, Machine machine) {
 
-            InlineCommand command = new InlineCommand();
-            command.Text = inlineActionNode.InnerText;
+            CodeActity actifity = new CodeActity();
+            actifity.Text = inlineActionNode.InnerText;
 
-            return command;
+            return actifity;
         }
 
-        private Command ProcessMachineCommandNode(XmlNode commandActionNode, Machine machine) {
+        private Activity ProcessCallActivityNode(XmlNode commandActionNode, Machine machine) {
 
-            MachineCommand command = new MachineCommand();
-            command.Text = GetAttribute(commandActionNode, "name");
+            CallActivity activity = new CallActivity();
+            activity.MethodName = GetAttribute(commandActionNode, "name");
 
-            return command;
+            return activity;
         }
 
         private Transition ProcessTransitionNode(XmlNode transitionNode, Machine machine) {
@@ -146,11 +148,11 @@
             //
             string name = GetAttribute(transitionNode, "state");
             if (System.String.IsNullOrEmpty(name))
-                transition.Mode = TransitionMode.Null;
+                transition.Mode = TransitionMode.InternalLoop;
 
             else {
                 if (name == "*")
-                    transition.Mode = TransitionMode.ReturnFromState;
+                    transition.Mode = TransitionMode.Pop;
 
                 else {
                     if (name.Contains(":"))
@@ -164,7 +166,7 @@
                     }
                     
                     transition.NextState = GetState(machine, name);
-                    transition.Mode = TransitionMode.JumpToState;
+                    transition.Mode = TransitionMode.Jump;
                 }
             }
 
