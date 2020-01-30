@@ -20,15 +20,15 @@
             return names;
         }
 
-        public static IEnumerable<string> GetCommandNames(this Machine machine) {
+        public static IEnumerable<string> GetActivityNames(this Machine machine) {
 
             List<string> names = new List<string>();
 
             void PopulateList(Action action) {
 
-                foreach (var command in action.Activities) {
-                    if (command is CallActivity machineCommand) {
-                        string name = machineCommand.MethodName;
+                foreach (var activity in action.Activities) {
+                    if (activity is CallActivity callActivity) {
+                        string name = callActivity.MethodName;
                         if (!names.Contains(name))
                             names.Add(name);
                     }

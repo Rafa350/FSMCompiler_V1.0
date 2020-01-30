@@ -46,7 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generator\CodeBuilder.cs" />
-    <Compile Include="Generator\CPP2\CppCodeGenerator\Generator.cs" />
+    <Compile Include="Generator\CPP2\ContextClassGenerator.cs" />
+    <Compile Include="Generator\CPP2\CppCodeGenerator\ClassDeclarationExtensions.cs" />
+    <Compile Include="Generator\CPP2\CppCodeGenerator\CodeGenerator.cs" />
+    <Compile Include="Generator\CPP2\CppCodeGenerator\HeaderGenerator.cs" />
     <Compile Include="Generator\CPP2\CppCodeGenerator\StringBuilderExtensions.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\ArgumentDefinition.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\ClassDeclaration.cs" />
@@ -65,8 +68,6 @@
     <Compile Include="Generator\CPP2\CppCodeModel\UnitDeclaration.cs" />
     <Compile Include="Generator\CPP2\CPPGenerator.cs" />
     <Compile Include="Generator\CPP2\CPPGeneratorOptions.cs" />
-    <Compile Include="Generator\CPP2\ContextCodeVisitor.cs" />
-    <Compile Include="Generator\CPP2\ContextHeaderVisitor.cs" />
     <Compile Include="Generator\CPP2\MachineHelper.cs" />
     <Compile Include="Generator\CPP2\StateCodeVisitor.cs" />
     <Compile Include="Generator\CPP2\StateHeaderVisitor.cs" />

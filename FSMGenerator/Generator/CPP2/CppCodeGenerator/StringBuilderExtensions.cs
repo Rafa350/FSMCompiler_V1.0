@@ -13,5 +13,13 @@
 
             return sb;
         }
+
+        public static StringBuilder AppendLine(this StringBuilder sb, string format, params object[] args) {
+
+            sb.AppendFormat(format, args);
+            sb.AppendLine();
+
+            return sb;
+        }
     }
 }

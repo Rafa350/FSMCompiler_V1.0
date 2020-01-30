@@ -14,7 +14,7 @@
 
         static void Main(string[] args) {
 
-        try {
+            try {
                 CmdLineParser cmdLineParser = new CmdLineParser("FSMCompiler v1.0");
                 cmdLineParser.Add(new ArgumentDefinition("source", 1, "Archivo de entrada.", true));
                 cmdLineParser.Add(new OptionDefinition("G", "Generador."));
@@ -84,7 +84,7 @@
 
                     generator.Generate(machine);
                 }
-           }
+            }
 
             catch (Exception e) {
                 while (e != null) {

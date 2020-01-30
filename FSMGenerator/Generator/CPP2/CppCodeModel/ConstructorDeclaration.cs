@@ -8,7 +8,7 @@
         private readonly IEnumerable<ArgumentDefinition> arguments;
         private readonly string body;
 
-        public ConstructorDeclaration(AccessSpecifier access, IEnumerable<ArgumentDefinition> arguments, string body) {
+        public ConstructorDeclaration(AccessSpecifier access, IEnumerable<ArgumentDefinition> arguments = null, string body = null) {
 
             this.access = access;
             this.arguments = arguments;
