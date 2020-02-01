@@ -6,7 +6,7 @@
 
     internal static class ClassDeclarationExtensions {
 
-        public static IEnumerable<ConstructorDeclaration> GetConstructors(this ClassDeclaration classDeclaration, AccessSpecifier access) {
+        public static IEnumerable<ConstructorDeclaration> GetConstructors(this ClassDeclaration classDeclaration, AccessMode access) {
 
             List<ConstructorDeclaration> constructors = null;
 
@@ -22,29 +22,29 @@
             return constructors;
         }
 
-        public static IEnumerable<MethodDeclaration> GetMethods(this ClassDeclaration classDeclaration) {
+        public static IEnumerable<MemberFunctionDeclaration> GetMemberFunctions(this ClassDeclaration classDeclaration) {
 
-            List<MethodDeclaration> methods = null;
+            List<MemberFunctionDeclaration> methods = null;
 
-            if (classDeclaration.Methods != null)
-                foreach (MethodDeclaration method in classDeclaration.Methods.OfType<MethodDeclaration>()) {
+            if (classDeclaration.Functions != null)
+                foreach (MemberFunctionDeclaration method in classDeclaration.Functions.OfType<MemberFunctionDeclaration>()) {
                     if (methods == null)
-                        methods = new List<MethodDeclaration>();
+                        methods = new List<MemberFunctionDeclaration>();
                     methods.Add(method);
                 }
 
             return methods;
         }
 
-        public static IEnumerable<MethodDeclaration> GetMethods(this ClassDeclaration classDeclaration, AccessSpecifier access) {
+        public static IEnumerable<MemberFunctionDeclaration> GetMemberFunctions(this ClassDeclaration classDeclaration, AccessMode access) {
 
-            List<MethodDeclaration> methods = null;
+            List<MemberFunctionDeclaration> methods = null;
 
-            if (classDeclaration.Methods != null)
-                foreach (MethodDeclaration method in classDeclaration.Methods.OfType<MethodDeclaration>()) {
-                    if (method.Access == access) {
+            if (classDeclaration.Functions != null)
+                foreach (MemberFunctionDeclaration method in classDeclaration.Functions.OfType<MemberFunctionDeclaration>()) {
+                    if (method.AccessMode == access) {
                         if (methods == null)
-                            methods = new List<MethodDeclaration>();
+                            methods = new List<MemberFunctionDeclaration>();
                         methods.Add(method);
                     }
                 }

@@ -4,11 +4,11 @@
 
     public sealed class ConstructorDeclaration: IVisitable {
 
-        private readonly AccessSpecifier access;
+        private readonly AccessMode access;
         private readonly IEnumerable<ArgumentDefinition> arguments;
-        private readonly string body;
+        private readonly Block body;
 
-        public ConstructorDeclaration(AccessSpecifier access, IEnumerable<ArgumentDefinition> arguments = null, string body = null) {
+        public ConstructorDeclaration(AccessMode access, IEnumerable<ArgumentDefinition> arguments = null, Block body = null) {
 
             this.access = access;
             this.arguments = arguments;
@@ -20,8 +20,8 @@
             visitor.Visit(this);
         }
 
-        public AccessSpecifier Access => access;
+        public AccessMode Access => access;
         public IEnumerable<ArgumentDefinition> Arguments => arguments;
-        public string Body => body;
+        public Block Body => body;
     }
 }

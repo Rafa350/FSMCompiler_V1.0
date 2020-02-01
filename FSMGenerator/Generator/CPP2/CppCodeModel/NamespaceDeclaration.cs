@@ -3,10 +3,10 @@
     using System;
     using System.Collections.Generic;
 
-    public sealed class NamespaceDeclaration: IVisitable, INamespaceMember, IUnitMember {
+    public sealed class NamespaceDeclaration: IVisitable, IUnitMember {
 
         private string name;
-        private readonly List<INamespaceMember> members = new List<INamespaceMember>();
+        private List<IUnitMember> memberList;
 
         /// <summary>
         /// Constructor per defecte.
@@ -33,12 +33,24 @@
         /// </summary>
         /// <param name="member">El membre a afeigir.</param>
         /// 
-        public void AddMember(INamespaceMember member) {
+        public void AddMember(IUnitMember member) {
 
             if (member == null)
                 throw new ArgumentNullException(nameof(member));
 
-            members.Add(member);
+            if (memberList == null)
+                memberList = new List<IUnitMember>();
+
+            memberList.Add(member);
+        }
+
+        public void AddMembers(IEnumerable<IUnitMember> members) {
+
+            if (members == null)
+                throw new ArgumentNullException(nameof(members));
+
+            foreach (var member in members)
+                AddMember(member);
         }
 
         /// <summary>
@@ -54,6 +66,6 @@
         /// Enumera els membres.
         /// </summary>
         /// 
-        public IEnumerable<INamespaceMember> Members => members;
+        public IEnumerable<IUnitMember> Members => memberList;
     }
 }

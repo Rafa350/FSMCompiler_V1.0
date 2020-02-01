@@ -5,7 +5,7 @@
 
     public sealed class UnitDeclaration: IVisitable {
 
-        private readonly List<IUnitMember> members = new List<IUnitMember>();
+        private readonly List<IUnitMember> memberList = new List<IUnitMember>();
 
         /// <summary>
         /// Constructor per defecte.
@@ -23,7 +23,20 @@
             if (member == null)
                 throw new ArgumentNullException(nameof(member));
 
-            members.Add(member);
+            memberList.Add(member);
+        }
+
+        /// <summary>
+        /// Afegeig un membre.
+        /// </summary>
+        /// <param name="member">El membre a afeigir.</param>
+        /// 
+        public void AddMembers(IEnumerable<IUnitMember> members) {
+
+            if (members == null)
+                throw new ArgumentNullException(nameof(members));
+
+            memberList.AddRange(members);
         }
 
         /// <summary>
@@ -43,6 +56,6 @@
         /// Enumera els membres.
         /// </summary>
         /// 
-        public IEnumerable<IUnitMember> Members => members;
+        public IEnumerable<IUnitMember> Members => memberList;
     }
 }

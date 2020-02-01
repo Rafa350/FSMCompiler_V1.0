@@ -24,7 +24,7 @@
 
             public override void Visit(ArgumentDefinition obj) {
 
-                sb.Append(obj.TypeName);
+                sb.Append(obj.ValueType.Name);
                 sb.Append(' ');
                 sb.Append(obj.Name);
             }
@@ -39,9 +39,9 @@
                 sb.Append(obj.Name);
                 if (!String.IsNullOrEmpty(obj.BaseName)) { 
                     sb.Append(": ");
-                    if (obj.BaseAccess == AccessSpecifier.Private)
+                    if (obj.BaseAccess == AccessMode.Private)
                         sb.Append("private ");
-                    else if (obj.BaseAccess == AccessSpecifier.Protected)
+                    else if (obj.BaseAccess == AccessMode.Protected)
                         sb.Append("protected ");
                     else
                         sb.Append("public ");
@@ -52,13 +52,13 @@
 
                 indent++;
 
-                IEnumerable<ConstructorDeclaration> privateConstructors = obj.GetConstructors(AccessSpecifier.Private);
-                IEnumerable<ConstructorDeclaration> protectedConstructors = obj.GetConstructors(AccessSpecifier.Protected);
-                IEnumerable<ConstructorDeclaration> publicConstructors = obj.GetConstructors(AccessSpecifier.Public);
+                IEnumerable<ConstructorDeclaration> privateConstructors = obj.GetConstructors(AccessMode.Private);
+                IEnumerable<ConstructorDeclaration> protectedConstructors = obj.GetConstructors(AccessMode.Protected);
+                IEnumerable<ConstructorDeclaration> publicConstructors = obj.GetConstructors(AccessMode.Public);
 
-                IEnumerable<MethodDeclaration> privateMethods = obj.GetMethods(AccessSpecifier.Private);
-                IEnumerable<MethodDeclaration> protectedMethods = obj.GetMethods(AccessSpecifier.Protected);
-                IEnumerable<MethodDeclaration> publicMethods = obj.GetMethods(AccessSpecifier.Public);
+                IEnumerable<MemberFunctionDeclaration> privateMethods = obj.GetMemberFunctions(AccessMode.Private);
+                IEnumerable<MemberFunctionDeclaration> protectedMethods = obj.GetMemberFunctions(AccessMode.Protected);
+                IEnumerable<MemberFunctionDeclaration> publicMethods = obj.GetMemberFunctions(AccessMode.Public);
 
                 if ((privateConstructors != null) || (privateMethods != null)) {
                     sb.AppendLine();
@@ -135,17 +135,29 @@
                 sb.AppendLine();
             }
 
-            public override void Visit(FieldDeclaration obj) {
+            public override void Visit(MemberVariableDeclaration obj) {
+
+                if (obj.Mode == MemberVariableMode.Static)
+                    sb.Append("static ");
 
                 sb.AppendIndent(indent);
-                sb.AppendLine("{0} {1};", obj.TypeName, obj.Name);
+                sb.AppendLine("{0} {1};", obj.ValueType.Name, obj.Name);
             }
 
-            public override void Visit(MethodDeclaration obj) {
+            public override void Visit(MemberFunctionDeclaration obj) {
 
                 sb.AppendIndent(indent);
-                sb.AppendFormat("{0} {1}(", obj.TypeName, obj.Name);
+                switch (obj.Mode) {
+                    case MemberFunctionMode.Virtual:
+                        sb.Append("virtual ");
+                        break;
 
+                    case MemberFunctionMode.Static:
+                        sb.Append("static ");
+                        break;
+                }
+                
+                sb.AppendFormat("{0} {1}(", obj.ReturnType.Name, obj.Name);
                 if (obj.Arguments != null) {
                     bool first = true;
                     foreach (var argument in obj.Arguments) {
@@ -156,8 +168,22 @@
                         argument.AcceptVisitor(this);
                     }
                 }
+                sb.Append(")");
+                
+                switch (obj.Mode) {
+                    case MemberFunctionMode.Abstract:
+                        sb.Append(" = 0;");
+                        break;
 
-                sb.Append(");");
+                    case MemberFunctionMode.Override:
+                        sb.Append(" override;");
+                        break;
+
+                    default:
+                        sb.Append(';');
+                        break;
+                }
+                
                 sb.AppendLine(); 
             }
 
@@ -185,7 +211,7 @@
             }
         }
 
-        public string Generate(UnitDeclaration unitDeclaration) {
+        public static string Generate(UnitDeclaration unitDeclaration) {
 
             if (unitDeclaration == null)
                 throw new ArgumentNullException(nameof(unitDeclaration));

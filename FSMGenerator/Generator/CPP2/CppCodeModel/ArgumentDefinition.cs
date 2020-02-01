@@ -5,18 +5,15 @@
     public sealed class ArgumentDefinition: IVisitable {
 
         private readonly string name;
-        private readonly string typeName;
+        private readonly TypeIdentifier valueType;
 
-        public ArgumentDefinition(string name, string typeName) {
+        public ArgumentDefinition(string name, TypeIdentifier valueType) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            if (String.IsNullOrEmpty(typeName))
-                throw new ArgumentNullException(nameof(typeName));
-
             this.name = name;
-            this.typeName = typeName;
+            this.valueType = valueType;
         }
 
         public void AcceptVisitor(IVisitor visitor) {
@@ -25,6 +22,6 @@
         }
 
         public string Name => name;
-        public string TypeName => typeName;
+        public TypeIdentifier ValueType => valueType;
     }
 }

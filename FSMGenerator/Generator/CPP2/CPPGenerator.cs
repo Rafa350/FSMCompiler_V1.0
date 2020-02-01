@@ -27,12 +27,13 @@
 
         public override void Generate(Machine machine) {
 
-            UnitDeclaration contextUnit = MakeContextUnitDeclaration(machine);
+            UnitDeclaration contextUnit = ContextUnitGenerator.Generate(machine, options);
             GenerateContextHeader(contextUnit);
             GenerateContextCode(contextUnit);
 
-            GenerateStateHeader(machine);
-            GenerateStateCode(machine);
+            UnitDeclaration stateUnit = StateUnitGenerator.Generate(machine, options);
+            GenerateStateHeader(stateUnit);
+            GenerateStateCode(stateUnit);
         }
 
         private void GenerateContextHeader(UnitDeclaration unitDeclaration) {
@@ -40,8 +41,7 @@
             if (!String.IsNullOrEmpty(options.ContextHeaderFileName))
                 using (StreamWriter writer = File.CreateText(options.ContextHeaderFileName)) {
 
-                    HeaderGenerator cg = new HeaderGenerator();
-                    string header = cg.Generate(unitDeclaration);
+                    string header = HeaderGenerator.Generate(unitDeclaration);
 
                     string guardString = Path.GetFileName(options.ContextHeaderFileName).ToUpper().Replace(".", "_");
 
@@ -68,8 +68,7 @@
             if (!String.IsNullOrEmpty(options.ContextCodeFileName))
                 using (StreamWriter writer = File.CreateText(options.ContextCodeFileName)) {
 
-                    CodeGenerator cg = new CodeGenerator();
-                    string code = cg.Generate(unitDeclaration);
+                    string code = CodeGenerator.Generate(unitDeclaration);
 
                     string contextHeaderFileName = Path.GetFileName(options.ContextHeaderFileName);
                     string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
@@ -86,29 +85,53 @@
                 }
         }
 
-        private void GenerateStateHeader(Machine machine) {
+        private void GenerateStateHeader(UnitDeclaration unitDeclaration) {
 
             if (!String.IsNullOrEmpty(options.StateHeaderFileName))
                 using (StreamWriter writer = File.CreateText(options.StateHeaderFileName)) {
-                    StateHeaderVisitor visitor = new StateHeaderVisitor(writer, options);
-                    machine.AcceptVisitor(visitor);
+
+                    string header = HeaderGenerator.Generate(unitDeclaration);
+
+                    string guardString = Path.GetFileName(options.StateHeaderFileName).ToUpper().Replace(".", "_");
+
+                    StringBuilder sb = new StringBuilder();
+                    sb
+                        .AppendFormat("#ifndef __{0}", guardString).AppendLine()
+                        .AppendFormat("#define __{0}", guardString).AppendLine()
+                        .AppendLine()
+                        .AppendLine()
+                        .AppendLine("#include \"eos.h\"")
+                        .AppendLine("#include \"Services/Fsm/eosFsmStateBase.h\"")
+                        .AppendLine()
+                        .AppendLine()
+                        .AppendLine(header)
+                        .AppendLine()
+                        .AppendFormat("#endif // __{0}", guardString).AppendLine();
+
+                    writer.Write(sb.ToString());
                 }
         }
 
-        private void GenerateStateCode(Machine machine) {
+        private void GenerateStateCode(UnitDeclaration unitDeclaration) {
 
             if (!String.IsNullOrEmpty(options.StateCodeFileName))
                 using (StreamWriter writer = File.CreateText(options.StateCodeFileName)) {
-                    StateCodeVisitor visitor = new StateCodeVisitor(writer, options);
-                    machine.AcceptVisitor(visitor);
+
+                    string code = CodeGenerator.Generate(unitDeclaration);
+
+                    string contextHeaderFileName = Path.GetFileName(options.ContextHeaderFileName);
+                    string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
+
+                    StringBuilder sb = new StringBuilder();
+                    sb
+                        .AppendFormat("#include \"{0}\"", contextHeaderFileName).AppendLine()
+                        .AppendFormat("#include \"{0}\"", stateHeaderFileName).AppendLine()
+                        .AppendLine()
+                        .AppendLine()
+                        .Append(code);
+
+                    writer.Write(sb.ToString());
                 }
         }
-
-        private UnitDeclaration MakeContextUnitDeclaration(Machine machine) {
-
-            ContextClassGenerator ccg = new ContextClassGenerator(options);
-            return ccg.Generate(machine);
-        }
-
     }
 }

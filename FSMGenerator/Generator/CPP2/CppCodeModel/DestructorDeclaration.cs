@@ -4,13 +4,15 @@
 
     public sealed class DestructorDeclaration: IVisitable {
 
-        private readonly AccessSpecifier access;
+        private readonly AccessMode access;
         private readonly string body;
+        private readonly DestructorVirtualMode virtualMode = DestructorVirtualMode.None;
 
-        public DestructorDeclaration(AccessSpecifier access, string body) {
+        public DestructorDeclaration(AccessMode access, string body, bool isVirtual = false) {
 
             this.access = access;
             this.body = body;
+            this.virtualMode = isVirtual ? DestructorVirtualMode.Virtual : DestructorVirtualMode.None;
         }
 
         public void AcceptVisitor(IVisitor visitor) {
@@ -18,7 +20,8 @@
             visitor.Visit(this);
         }
 
-        public AccessSpecifier Access => access;
+        public AccessMode Access => access;
+        public DestructorVirtualMode VirtualMode => virtualMode;
         public string Body => body;
     }
 }
