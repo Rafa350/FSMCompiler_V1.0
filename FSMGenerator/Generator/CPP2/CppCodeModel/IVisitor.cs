@@ -25,6 +25,7 @@
         void Visit(MemberVariableDeclaration obj);
         void Visit(NamespaceDeclaration obj);
         void Visit(ReturnStatement obj);
+        void Visit(SubscriptExpression obj);
         void Visit(UnaryExpression obj);
         void Visit(UnitDeclaration obj);
     }

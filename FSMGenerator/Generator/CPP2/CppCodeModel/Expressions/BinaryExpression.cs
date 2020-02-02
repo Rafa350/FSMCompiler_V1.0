@@ -22,13 +22,24 @@
         Greather,
         GreatherOrEqual,
     }
-    
-    public sealed class BinaryExpression: ExpressionBase {
+
+    /// <summary>
+    /// Clase que representa una expressio binaria.
+    /// </summary>
+    /// 
+    public sealed class BinaryExpression : ExpressionBase {
 
         private readonly BinaryOpCode opCode;
         private readonly ExpressionBase leftExpression;
         private readonly ExpressionBase rightExpression;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="opCode">Codi d'operacio.</param>
+        /// <param name="leftExpression">Expressio de la branca esquerra.</param>
+        /// <param name="rightExpression">Expressio de la branca dreta.</param>
+        /// 
         public BinaryExpression(BinaryOpCode opCode, ExpressionBase leftExpression, ExpressionBase rightExpression) {
 
             if (leftExpression == null)
@@ -42,57 +53,35 @@
             this.rightExpression = rightExpression;
         }
 
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
         public override void AcceptVisitor(IVisitor visitor) {
+
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
         }
 
-        public override string ToString() {
+        /// <summary>
+        /// Obte el codi d'operacio.
+        /// </summary>
+        /// 
+        public BinaryOpCode OpCode => opCode;
 
-            string symbol;
-            switch (opCode) {
-                case BinaryOpCode.Add:
-                    symbol = "+";
-                    break;
+        /// <summary>
+        /// Obte l'expressio de la branca esquerra.
+        /// </summary>
+        /// 
+        public ExpressionBase LeftExpression => leftExpression;
 
-                case BinaryOpCode.Sub:
-                    symbol = "-";
-                    break;
-                
-                case BinaryOpCode.Mul:
-                    symbol = "*";
-                    break;
-                
-                case BinaryOpCode.Div:
-                    symbol = "/";
-                    break;
-
-                case BinaryOpCode.Mod:
-                    symbol = "%";
-                    break;
-                
-                default:
-                    throw new Exception("OpCode no reconocido.");
-            }
-            return String.Format("binary expression '{0}'", symbol);
-        }
-
-        public BinaryOpCode OpCode {
-            get {
-                return opCode;
-            }
-        }
-
-        public ExpressionBase LeftExpression {
-            get {
-                return leftExpression;
-            }
-        }
-
-        public ExpressionBase RightExpression {
-            get {
-                return rightExpression;
-            }
-        }
+        /// <summary>
+        /// Obte l'expressio de la branca dreta.
+        /// </summary>
+        /// 
+        public ExpressionBase RightExpression => rightExpression;
     }
 }

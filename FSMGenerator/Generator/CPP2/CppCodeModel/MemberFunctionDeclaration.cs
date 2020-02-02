@@ -5,7 +5,7 @@
 
     public sealed class MemberFunctionDeclaration: FunctionDeclarationBase, IClassMember {
 
-        private AccessMode accessMode = AccessMode.Private;
+        private AccessMode access = AccessMode.Private;
         private MemberFunctionMode mode = MemberFunctionMode.Instance;
 
         /// <summary>
@@ -32,9 +32,9 @@
         /// Obte o asigna el especificador d'acces.
         /// </summary>
         /// 
-        public AccessMode AccessMode {
-            get { return accessMode; }
-            set { accessMode = value; }
+        public AccessMode Access {
+            get { return access; }
+            set { access = value; }
         }
 
         /// <summary>

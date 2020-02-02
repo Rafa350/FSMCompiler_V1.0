@@ -44,6 +44,10 @@
                 ClassDeclaration oldClass = currentClass;
                 currentClass = obj;
 
+                if (obj.Variables != null)
+                    foreach (var variable in obj.Variables)
+                        variable.AcceptVisitor(this);
+
                 if (obj.Constructors != null)
                     foreach (var constructor in obj.Constructors)
                         constructor.AcceptVisitor(this);
@@ -89,8 +93,12 @@
 
             public override void Visit(FunctionCallExpression obj) {
 
-                sb.Append(obj.Name);
-                sb.Append("()");
+                obj.Function.AcceptVisitor(this);
+                sb.Append('(');
+                if (obj.Arguments != null)
+                    foreach (var argument in obj.Arguments)
+                        argument.AcceptVisitor(this);
+                sb.Append(')');
             }
 
             public override void Visit(FunctionCallStatement obj) {
@@ -106,6 +114,32 @@
                 sb.Append(obj.Name);
             }
 
+            public override void Visit(IfThenElseStatement obj) {
+
+                sb.AppendIndent(indent);
+                sb.Append("if (");
+                if (obj.ConditionExpression == null)
+                    throw new InvalidOperationException("No se especifico la condicion.");
+                obj.ConditionExpression.AcceptVisitor(this);
+                sb.AppendLine(") {");
+                indent++;
+                if (obj.TrueBlock == null)
+                    throw new InvalidOperationException("No se especificoel bloque true.");
+                obj.TrueBlock.AcceptVisitor(this);
+                indent--;
+                sb.AppendIndent(indent);
+                sb.AppendLine("}");
+                if (obj.FalseBlock != null) {
+                    sb.AppendIndent(indent);
+                    sb.AppendLine("else {");
+                    indent++;
+                    obj.FalseBlock.AcceptVisitor(this);
+                    indent--;
+                    sb.AppendIndent(indent);
+                    sb.AppendLine("}");
+                }
+            }
+
             public override void Visit(InlineExpression obj) {
 
                 sb.Append(obj.Code);
@@ -119,10 +153,22 @@
                 sb.AppendLine();
             }
 
+            public override void Visit(LiteralExpression obj) {
+
+                sb.Append(obj.Value);
+            }
+
             public override void Visit(MemberVariableDeclaration obj) {
 
                 sb.AppendIndent(indent);
-                sb.AppendLine("{0} {1};", obj.ValueType.Name, obj.Name);
+                sb.AppendFormat("{0} {1}::{2}", obj.ValueType.Name, currentClass.Name, obj.Name);
+                if (obj.initializer != null) {
+                    sb.Append(" = ");
+                    obj.initializer.AcceptVisitor(this);
+                }
+                sb.Append(';');
+                sb.AppendLine();
+                sb.AppendLine();
             }
 
             public override void Visit(MemberFunctionDeclaration obj) {

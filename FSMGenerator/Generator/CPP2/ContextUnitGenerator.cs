@@ -126,7 +126,7 @@
             MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
             functionDecl.Name = "start";
             functionDecl.ReturnType = TypeIdentifier.FromName("void");
-            functionDecl.AccessMode = AccessMode.Public;
+            functionDecl.Access = AccessMode.Public;
             functionDecl.Body = body;
 
             return functionDecl;
@@ -143,7 +143,7 @@
             MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
             functionDecl.Name = "end";
             functionDecl.ReturnType = TypeIdentifier.FromName("void");
-            functionDecl.AccessMode = AccessMode.Public;
+            functionDecl.Access = AccessMode.Public;
 
             return functionDecl;
         }
@@ -164,7 +164,7 @@
             MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
             functionDecl.Name = String.Format("on{0}", transitionName);
             functionDecl.ReturnType = TypeIdentifier.FromName("void");
-            functionDecl.AccessMode = AccessMode.Public;
+            functionDecl.Access = AccessMode.Public;
             functionDecl.Body = body;
 
             return functionDecl;
@@ -181,7 +181,7 @@
             MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
             functionDecl.Name = String.Format("do{0}", activityName);
             functionDecl.ReturnType = TypeIdentifier.FromName("void");
-            functionDecl.AccessMode = AccessMode.Public;
+            functionDecl.Access = AccessMode.Public;
 
             return functionDecl;
         }
@@ -198,8 +198,11 @@
 
             foreach (var activity in action.Activities) {
                 if (activity is CallActivity callActivity) {
-                    string name = String.Format("do{0}", callActivity.MethodName);
-                    StatementBase stmt = new FunctionCallStatement(new FunctionCallExpression(name, null));
+                    StatementBase stmt = new FunctionCallStatement(
+                        new FunctionCallExpression(
+                            new IdentifierExpression(
+                                String.Format("do{0}", callActivity.MethodName)), 
+                            null));
                     if (stmtList == null)
                         stmtList = new List<StatementBase>();
                     stmtList.Add(stmt);

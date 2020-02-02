@@ -60,12 +60,17 @@
     <Compile Include="Generator\CPP2\CppCodeModel\ExpressionBase.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\Expressions\BinaryExpression.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\Expressions\ConditionalExpression.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\SubscriptExpression.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\Expressions\FuncCallExpression.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\Expressions\IdentifierExpression.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\Expressions\InlineExpression.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\Expressions\LiteralExpression.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\Expressions\UnaryExpression.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\IClassMember.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\IO\ITreeWriter.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\IO\Xml\XmlUnitWriter.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\IO\Xml\XmlVisitor.cs" />
+    <Compile Include="Generator\CPP2\CppCodeModel\IO\Xml\XmlVisitorBase.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\IUnitMember.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\IVisitable.cs" />
     <Compile Include="Generator\CPP2\CppCodeModel\IVisitor.cs" />

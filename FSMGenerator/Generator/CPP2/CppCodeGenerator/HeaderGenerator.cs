@@ -31,78 +31,103 @@
 
             public override void Visit(ClassDeclaration obj) {
 
+                string ToString(AccessMode access) {
+                    
+                    switch(access) {
+                        case AccessMode.Public:
+                            return "public";
+                        case AccessMode.Protected:
+                            return "protected";
+                        default:
+                            return "private";
+                    }
+                }
+
                 ClassDeclaration oldClass = currentClass;
                 currentClass = obj;
 
                 sb.AppendIndent(indent);
                 sb.Append("class ");
                 sb.Append(obj.Name);
-                if (!String.IsNullOrEmpty(obj.BaseName)) { 
-                    sb.Append(": ");
-                    if (obj.BaseAccess == AccessMode.Private)
-                        sb.Append("private ");
-                    else if (obj.BaseAccess == AccessMode.Protected)
-                        sb.Append("protected ");
-                    else
-                        sb.Append("public ");
-                    sb.Append(obj.BaseName);
-                }
+                if (!String.IsNullOrEmpty(obj.BaseName))
+                    sb.AppendFormat(": {0} {1}", ToString(obj.BaseAccess), obj.BaseName);
                 sb.Append(" {");
                 sb.AppendLine();
 
                 indent++;
 
-                IEnumerable<ConstructorDeclaration> privateConstructors = obj.GetConstructors(AccessMode.Private);
-                IEnumerable<ConstructorDeclaration> protectedConstructors = obj.GetConstructors(AccessMode.Protected);
-                IEnumerable<ConstructorDeclaration> publicConstructors = obj.GetConstructors(AccessMode.Public);
+                // Genera les declaracions de variables.
+                //
+                if (obj.Variables != null) {
+                    AccessMode access = AccessMode.Private;
+                    bool first = true;
+                    foreach (var variable in obj.Variables) {
 
-                IEnumerable<MemberFunctionDeclaration> privateMethods = obj.GetMemberFunctions(AccessMode.Private);
-                IEnumerable<MemberFunctionDeclaration> protectedMethods = obj.GetMemberFunctions(AccessMode.Protected);
-                IEnumerable<MemberFunctionDeclaration> publicMethods = obj.GetMemberFunctions(AccessMode.Public);
+                        if (first || (access != variable.Access)) {
+                            access = variable.Access;
+                            first = false;
+                            sb.AppendIndent(indent);
+                            sb.AppendFormat("{0}:", ToString(access));
+                            sb.AppendLine();
+                        }
 
-                if ((privateConstructors != null) || (privateMethods != null)) {
-                    sb.AppendLine();
+                        indent++;
+                        variable.AcceptVisitor(this);
+                        indent--;
+                    }
+                }
+
+                // Genera la declaracio dels constructors.
+                //
+                if (obj.Constructors != null) {
+                    AccessMode access = AccessMode.Private;
+                    bool first = true;
+                    foreach (var constructor in obj.Constructors) {
+
+                        if (first || (access != constructor.Access)) {
+                            access = constructor.Access;
+                            first = false;
+                            sb.AppendIndent(indent);
+                            sb.AppendFormat("{0}:", ToString(access));
+                            sb.AppendLine();
+                        }
+
+                        indent++;
+                        constructor.AcceptVisitor(this);
+                        indent--;
+                    }
+                }
+
+                // Declara el destructor.
+                //
+                if (obj.Destructor != null) {
                     sb.AppendIndent(indent);
-                    sb.Append("private:");
+                    sb.AppendFormat("{0}:", ToString(obj.Destructor.Access));
                     sb.AppendLine();
                     indent++;
-                    if (privateConstructors != null)
-                        foreach (var constructor in privateConstructors)
-                            constructor.AcceptVisitor(this);
-                    if (privateMethods != null)
-                        foreach (var member in privateMethods)
-                            member.AcceptVisitor(this);
+                    obj.Destructor.AcceptVisitor(this);
                     indent--;
                 }
 
-                if ((protectedConstructors != null) || (protectedMethods != null)) {
-                    sb.AppendLine();
-                    sb.AppendIndent(indent);
-                    sb.Append("protected:");
-                    sb.AppendLine();
-                    indent++;
-                    if (protectedConstructors != null)
-                        foreach (var constructor in protectedConstructors)
-                            constructor.AcceptVisitor(this);
-                    if (protectedMethods != null)
-                        foreach (var member in protectedMethods)
-                            member.AcceptVisitor(this);
-                    indent--;
-                }
+                // Declara les funcions.
+                //
+                if (obj.Functions!= null) {
+                    AccessMode access = AccessMode.Private;
+                    bool first = true;
+                    foreach (var function in obj.Functions) {
 
-                if ((publicConstructors != null) || (publicMethods != null)) {
-                    sb.AppendLine();
-                    sb.AppendIndent(indent);
-                    sb.Append("public:");
-                    sb.AppendLine();
-                    indent++;
-                    if (publicConstructors != null)
-                        foreach (var constructor in publicConstructors)
-                            constructor.AcceptVisitor(this);
-                    if (publicMethods != null)
-                        foreach (var member in publicMethods)
-                            member.AcceptVisitor(this);
-                    indent--;
+                        if (first || (access != function.Access)) {
+                            access = function.Access;
+                            first = false;
+                            sb.AppendIndent(indent);
+                            sb.AppendFormat("{0}:", ToString(access));
+                            sb.AppendLine();
+                        }
+
+                        indent++;
+                        function.AcceptVisitor(this);
+                        indent--;
+                    }
                 }
 
                 indent--;
@@ -137,10 +162,9 @@
 
             public override void Visit(MemberVariableDeclaration obj) {
 
+                sb.AppendIndent(indent);
                 if (obj.Mode == MemberVariableMode.Static)
                     sb.Append("static ");
-
-                sb.AppendIndent(indent);
                 sb.AppendLine("{0} {1};", obj.ValueType.Name, obj.Name);
             }
 

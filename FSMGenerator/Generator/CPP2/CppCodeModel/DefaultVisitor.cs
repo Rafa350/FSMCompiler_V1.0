@@ -22,6 +22,21 @@
         }
 
         public virtual void Visit(ClassDeclaration obj) {
+
+            if (obj.Variables != null)
+                foreach (var variables in obj.Variables)
+                    variables.AcceptVisitor(this);
+
+            if (obj.Constructors != null)
+                foreach (var constructor in obj.Constructors)
+                    constructor.AcceptVisitor(this);
+
+            if (obj.Destructor != null)
+                obj.Destructor.AcceptVisitor(this);
+
+            if (obj.Functions != null)
+                foreach (var function in obj.Functions)
+                    function.AcceptVisitor(this);
         }
 
         public virtual void Visit(ConditionalExpression obj) {
@@ -34,6 +49,12 @@
         }
 
         public virtual void Visit(FunctionCallExpression obj) {
+
+            obj.Function.AcceptVisitor(this);
+
+            if (obj.Arguments != null)
+                foreach (var argument in obj.Arguments)
+                    argument.AcceptVisitor(this);
         }
 
         public virtual void Visit(FunctionCallStatement obj) {
@@ -77,6 +98,15 @@
 
             if (obj.Expression != null)
                 obj.Expression.AcceptVisitor(this);
+        }
+
+        public virtual void Visit(SubscriptExpression obj) {
+
+            obj.Address.AcceptVisitor(this);
+
+            if (obj.Indices != null)
+                foreach (var index in obj.Indices)
+                    index.AcceptVisitor(this);
         }
 
         public virtual void Visit(UnaryExpression obj) {

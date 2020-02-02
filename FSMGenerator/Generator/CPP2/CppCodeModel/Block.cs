@@ -3,9 +3,12 @@
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Clase que representa un bloc de codi.
+    /// </summary>
+    /// 
     public sealed class Block: IVisitable {
 
-        private List<VariableDeclarationBase> variableDeclarationList;
         private List<StatementBase> statmentList;
 
         /// <summary>
@@ -13,6 +16,30 @@
         /// </summary>
         /// 
         public Block() { 
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="statements">Llista de estaments.</param>
+        /// 
+        public Block(IEnumerable<StatementBase> statements) {
+
+            if (statements == null)
+                throw new ArgumentNullException(nameof(statements));
+
+            foreach (var statement in statements)
+                InternalAddStatement(statement);
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="statements">Llista de estaments.</param>
+        /// 
+        public Block(params StatementBase[] statements):
+            this((IEnumerable<StatementBase>) statements) {
+
         }
 
         /// <summary>
@@ -26,22 +53,6 @@
         }
 
         /// <summary>
-        /// Afegeix una declaracio de variable.
-        /// </summary>
-        /// <param name="variableDeclaration">La declaracio.</param>
-        /// 
-        public void AddVariableDeclaration(VariableDeclarationBase variableDeclaration) {
-
-            if (variableDeclaration == null)
-                throw new ArgumentNullException(nameof(variableDeclaration));
-
-            if (variableDeclarationList == null)
-                variableDeclarationList = new List<VariableDeclarationBase>();
-
-            variableDeclarationList.Add(variableDeclaration);
-        }
-
-        /// <summary>
         /// Afegeig una ordre.
         /// </summary>
         /// <param name="statement">La ordre.</param>
@@ -51,10 +62,7 @@
             if (statement == null)
                 throw new ArgumentNullException(nameof(statement));
 
-            if (statmentList == null)
-                statmentList = new List<StatementBase>();
-
-            statmentList.Add(statement);
+            InternalAddStatement(statement);
         }
 
         /// <summary>
@@ -68,17 +76,19 @@
                 throw new ArgumentNullException(nameof(statements));
 
             foreach (var statement in statements)
-                AddStatement(statement);
+                InternalAddStatement(statement);
+        }
+
+        private void InternalAddStatement(StatementBase statement) {
+
+            if (statmentList == null)
+                statmentList = new List<StatementBase>();
+
+            statmentList.Add(statement);
         }
 
         /// <summary>
-        /// Enumera les declaracions de variables.
-        /// </summary>
-        /// 
-        public IEnumerable<VariableDeclarationBase> VariableDeclarations => variableDeclarationList;
-
-        /// <summary>
-        /// Enumera les ordres.
+        /// Enumera d'estaments.
         /// </summary>
         /// 
         public IEnumerable<StatementBase> Statements => statmentList;

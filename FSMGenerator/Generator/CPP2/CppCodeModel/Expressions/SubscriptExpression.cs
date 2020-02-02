@@ -7,35 +7,35 @@
     /// Clase que representa una crida a una funcio.
     /// </summary>
     /// 
-    public sealed class FunctionCallExpression: ExpressionBase {
+    public sealed class SubscriptExpression: ExpressionBase {
 
         private readonly ExpressionBase address;
-        private readonly List<ExpressionBase> argumentList;
+        private readonly List<ExpressionBase> indexList;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="address">Nom de la funcio a cridar.</param>
-        /// <param name="arguments">Llista d'arguments de la funcio</param>
+        /// <param name="indices">Llista d'arguments de la funcio</param>
         /// 
-        public FunctionCallExpression(ExpressionBase address, IEnumerable<ExpressionBase> arguments = null) {
+        public SubscriptExpression(ExpressionBase address, IEnumerable<ExpressionBase> indices = null) {
 
             if (address == null)
                 throw new ArgumentNullException(nameof(address));
 
             this.address = address;
-            if (arguments != null)
-                argumentList = new List<ExpressionBase>(arguments);
+            if (indices != null)
+                indexList = new List<ExpressionBase>(indices);
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="address">Nom de la cuncio a cridar.</param>
-        /// <param name="arguments">Llista d'arguments de la funcio.</param>
+        /// <param name="indices">Llista d'arguments de la funcio.</param>
         /// 
-        public FunctionCallExpression(ExpressionBase address, params ExpressionBase[] arguments):
-            this(address, (IEnumerable<ExpressionBase>)arguments) {
+        public SubscriptExpression(ExpressionBase address, params ExpressionBase[] indices):
+            this(address, (IEnumerable<ExpressionBase>)indices) {
         }
 
         /// <summary>
@@ -55,12 +55,12 @@
         /// Obte el nom.
         /// </summary>
         /// 
-        public ExpressionBase Function => address;
+        public ExpressionBase Address => address;
 
         /// <summary>
         /// Enumera els d'arguments.
         /// </summary>
         /// 
-        public IEnumerable<ExpressionBase> Arguments => argumentList;
+        public IEnumerable<ExpressionBase> Indices => indexList;
     }
 }

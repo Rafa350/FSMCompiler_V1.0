@@ -62,7 +62,7 @@
 
             foreach (var transitionName in machine.GetTransitionNames()) {
                 MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
-                functionDecl.AccessMode = AccessMode.Public;
+                functionDecl.Access = AccessMode.Public;
                 functionDecl.Mode = MemberFunctionMode.Virtual;
                 functionDecl.ReturnType = TypeIdentifier.FromName("void");
                 functionDecl.Name = String.Format("on{0}", transitionName);
@@ -117,7 +117,7 @@
 
             MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
             functionDecl.Name = "getInstance";
-            functionDecl.AccessMode = AccessMode.Public;
+            functionDecl.Access = AccessMode.Public;
             functionDecl.Mode = MemberFunctionMode.Static;
             functionDecl.ReturnType = TypeIdentifier.FromName(String.Format("{0}*", state.Name));
             functionDecl.Body = body;
@@ -136,8 +136,24 @@
 
             Block body = new Block();
 
+            foreach (Transition transition in state.Transitions) {
+                if (transition.Name == transitionName) {
+                    Block trueBody = new Block();
+                    if (transition.Action != null) 
+                        trueBody.AddStatements(MakeActionStatements(transition.Action));
+                    if (transition.NextState != null)
+                        trueBody.AddStatement(new FunctionCallStatement(
+                            new FunctionCallExpression(
+                                new IdentifierExpression("context->setState"),
+                                new FunctionCallExpression(
+                                    new IdentifierExpression(String.Format("{0}::getInstance", transition.NextState.Name))))));
+                    ExpressionBase conditionExpr = new InlineExpression(transition.Guard == null ? "true" : transition.Guard.Expression);
+                    body.AddStatement(new IfThenElseStatement(conditionExpr, trueBody, null));
+                }
+            }
+
             MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
-            functionDecl.AccessMode = AccessMode.Public;
+            functionDecl.Access = AccessMode.Public;
             functionDecl.Mode = MemberFunctionMode.Override;
             functionDecl.ReturnType = TypeIdentifier.FromName("void");
             functionDecl.Name = String.Format("on{0}", transitionName);
@@ -164,6 +180,32 @@
             variableDecl.initializer = new LiteralExpression("nullptr");
 
             return variableDecl;
+        }
+
+        /// <summary>
+        /// Crea el programa coresponent a una accio.
+        /// </summary>
+        /// <param name="action">La accio.</param>
+        /// <returns>El programa.</returns>
+        /// 
+        private static IEnumerable<StatementBase> MakeActionStatements(Model.Action action) {
+
+            List<StatementBase> stmtList = null;
+
+            foreach (var activity in action.Activities) {
+                if (activity is CallActivity callActivity) {
+                    StatementBase stmt = new FunctionCallStatement(
+                        new FunctionCallExpression(
+                            new IdentifierExpression(
+                                String.Format("context->do{0}", callActivity.MethodName)),
+                            null));
+                    if (stmtList == null)
+                        stmtList = new List<StatementBase>();
+                    stmtList.Add(stmt);
+                }
+            }
+
+            return stmtList;
         }
     }
 }

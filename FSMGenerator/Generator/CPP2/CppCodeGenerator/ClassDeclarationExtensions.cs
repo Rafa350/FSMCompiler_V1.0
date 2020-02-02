@@ -42,7 +42,7 @@
 
             if (classDeclaration.Functions != null)
                 foreach (MemberFunctionDeclaration method in classDeclaration.Functions.OfType<MemberFunctionDeclaration>()) {
-                    if (method.AccessMode == access) {
+                    if (method.Access == access) {
                         if (methods == null)
                             methods = new List<MemberFunctionDeclaration>();
                         methods.Add(method);

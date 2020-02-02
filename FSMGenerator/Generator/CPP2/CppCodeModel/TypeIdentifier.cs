@@ -4,7 +4,7 @@
 
     public sealed class TypeIdentifier {
 
-        private static Dictionary<string, TypeIdentifier> cache = new Dictionary<string, TypeIdentifier>();
+        private static Dictionary<string, TypeIdentifier> cache;
         private readonly string name;
 
         private TypeIdentifier(string name) {
@@ -16,8 +16,12 @@
 
             TypeIdentifier t;
 
-            if (!cache.TryGetValue(name, out t)) {
+            if ((cache == null) || (!cache.TryGetValue(name, out t))) {
+            
                 t = new TypeIdentifier(name);
+                
+                if (cache == null)
+                    cache = new Dictionary<string, TypeIdentifier>();
                 cache.Add(name, t);
             }
 
@@ -29,7 +33,7 @@
         /// </summary>
         /// 
         public static IEnumerable<string> Names {
-            get { return cache.Keys; }
+            get { return cache == null ? null : cache.Keys; }
         }
 
         /// <summary>
@@ -37,7 +41,7 @@
         /// </summary>
         /// 
         public static IEnumerable<TypeIdentifier> TypeIdentifiers {
-            get { return cache.Values; }
+            get { return cache == null ? null : cache.Values; }
         }
 
         /// <summary>
