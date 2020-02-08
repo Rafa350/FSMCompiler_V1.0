@@ -1,8 +1,8 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator {
 
     using System;
-    
-    public sealed class CppCodeBuilder: CodeBuilder {
+
+    public sealed class CppCodeBuilder : CodeBuilder {
 
         public enum ProtectionLevel {
             Private,
@@ -93,7 +93,7 @@
 
             if (String.IsNullOrEmpty(baseClassName))
                 WriteLine("class {0} {{", className);
-            else 
+            else
                 WriteLine("class {0}: {1} {2} {{", className, "public", baseClassName);
             Indent();
 
@@ -120,9 +120,9 @@
             if (openSection)
                 UnIndent();
 
-            WriteLine("{0}:", 
-                (protectionLevel == ProtectionLevel.Private)   ? "private" :
-                (protectionLevel == ProtectionLevel.Protected) ? "protected" : 
+            WriteLine("{0}:",
+                (protectionLevel == ProtectionLevel.Private) ? "private" :
+                (protectionLevel == ProtectionLevel.Protected) ? "protected" :
                                                                  "public");
             Indent();
 

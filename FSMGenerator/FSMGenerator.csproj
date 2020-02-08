@@ -47,55 +47,10 @@
   <ItemGroup>
     <Compile Include="Generator\CodeBuilder.cs" />
     <Compile Include="Generator\CPP2\ContextUnitGenerator.cs" />
-    <Compile Include="Generator\CPP2\CppCodeGenerator\ClassDeclarationExtensions.cs" />
-    <Compile Include="Generator\CPP2\CppCodeGenerator\CodeGenerator.cs" />
-    <Compile Include="Generator\CPP2\CppCodeGenerator\HeaderGenerator.cs" />
-    <Compile Include="Generator\CPP2\CppCodeGenerator\StringBuilderExtensions.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\ArgumentDefinition.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Block.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\ClassDeclaration.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\AccessMode.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\DestructorDeclaration.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\DefaultVisitor.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\ExpressionBase.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\BinaryExpression.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\ConditionalExpression.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\SubscriptExpression.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\FuncCallExpression.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\IdentifierExpression.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\InlineExpression.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\LiteralExpression.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Expressions\UnaryExpression.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\IClassMember.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\IO\ITreeWriter.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\IO\Xml\XmlUnitWriter.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\IO\Xml\XmlVisitor.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\IO\Xml\XmlVisitorBase.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\IUnitMember.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\IVisitable.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\IVisitor.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\ConstructorDeclaration.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\FunctionDeclarationBase.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\MemberFunctionDeclaration.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\MemberVariableMode.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\MemberVariableDeclaration.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\DestructorVirtualMode.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\MemberFunctionMode.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\NamespaceDeclaration.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\StatementBase.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Statements\AssignStatement.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Statements\FunctionCallStatement.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Statements\IfThenElseStatement.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Statements\InlineStatement.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Statements\LoopStatement.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\Statements\ReturnStatement.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\TypeIdentifier.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\UnitDeclaration.cs" />
-    <Compile Include="Generator\CPP2\CppCodeModel\VariableDeclarationBase.cs" />
     <Compile Include="Generator\CPP2\CPPGenerator.cs" />
     <Compile Include="Generator\CPP2\CPPGeneratorOptions.cs" />
-    <Compile Include="Generator\CPP2\MachineHelper.cs" />
-    <Compile Include="Generator\CPP2\StateHelper.cs" />
+    <Compile Include="Generator\MachineExtensions.cs" />
+    <Compile Include="Generator\StateExtensions.cs" />
     <Compile Include="Generator\CPP2\StateUnitGenerator.cs" />
     <Compile Include="Generator\CppCodeBuilder.cs" />
     <Compile Include="Generator\CPP\CPPGenerator.cs" />
@@ -103,7 +58,7 @@
     <Compile Include="Generator\CPP\CodeGenerator.cs" />
     <Compile Include="Generator\C\CGenerator.cs" />
     <Compile Include="Generator\C\CGeneratorOptions.cs" />
-    <Compile Include="Generator\C\CodeGenerator.cs" />
+    <Compile Include="Generator\C\MachineUnitGenerator.cs" />
     <Compile Include="Generator\DOT\DOTGeneratorOptions.cs" />
     <Compile Include="Generator\DOT\DOTGenerator.cs" />
     <Compile Include="Generator\GeneratorBase.cs" />
@@ -118,6 +73,10 @@
     <ProjectReference Include="..\FSMModel\FSMModel.csproj">
       <Project>{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}</Project>
       <Name>FSMModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MicroC\MicroC.csproj">
+      <Project>{33c9cf49-40d1-4c18-a28d-09b7fc6057fb}</Project>
+      <Name>MicroC</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,13 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
-    
+
     using System;
     using System.Collections.Generic;
-    using MikroPicDesigns.FSMCompiler.v1.Generator.CPP2.CppCodeModel;
-    using MikroPicDesigns.FSMCompiler.v1.Generator.CPP2.CppCodeModel.Expressions;
-    using MikroPicDesigns.FSMCompiler.v1.Generator.CPP2.CppCodeModel.Statements;
+    using MicroCompiler.CodeModel;
+    using MicroCompiler.CodeModel.Expressions;
+    using MicroCompiler.CodeModel.Statements;
     using MikroPicDesigns.FSMCompiler.v1.Model;
     using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
-    
+
     public static class StateUnitGenerator {
 
         private static CPPGeneratorOptions options;
@@ -34,7 +34,7 @@
 
             // Crea les clases dels estats derivats.
             //
-            foreach (State state in machine.States) 
+            foreach (State state in machine.States)
                 classDeclList.Add(MakeDerivedStateClass(state));
 
             // Crea la unitat de compilacio.
@@ -95,7 +95,7 @@
             classDecl.AddMemberFunction(MakeGetInstanceFunction(state));
 
             // Afegeix les funcions de transicio
-            foreach (var transitionName in state.GetTransitionNames()) 
+            foreach (var transitionName in state.GetTransitionNames())
                 classDecl.AddMemberFunction(MakeOnTransitionFunction(state, transitionName));
 
             return classDecl;
@@ -138,15 +138,36 @@
 
             foreach (Transition transition in state.Transitions) {
                 if (transition.Name == transitionName) {
+
                     Block trueBody = new Block();
-                    if (transition.Action != null) 
+
+                    // Accio 'Exit'
+                    //
+                    if (transition.NextState != state) {
+                        if (state.ExitAction != null)
+                            trueBody.AddStatements(MakeActionStatements(state.ExitAction));
+                    }
+
+                    // Accio de transicio.
+                    //
+                    if (transition.Action != null)
                         trueBody.AddStatements(MakeActionStatements(transition.Action));
-                    if (transition.NextState != null)
+
+                    // Accio 'Enter'
+                    //
+                    if (transition.NextState != state) {
+                        if (transition.NextState.EnterAction != null)
+                            trueBody.AddStatements(MakeActionStatements(transition.NextState.EnterAction));
+                    }
+
+                    if (transition.NextState != null) {
                         trueBody.AddStatement(new FunctionCallStatement(
                             new FunctionCallExpression(
                                 new IdentifierExpression("context->setState"),
                                 new FunctionCallExpression(
                                     new IdentifierExpression(String.Format("{0}::getInstance", transition.NextState.Name))))));
+                    }
+
                     ExpressionBase conditionExpr = new InlineExpression(transition.Guard == null ? "true" : transition.Guard.Expression);
                     body.AddStatement(new IfThenElseStatement(conditionExpr, trueBody, null));
                 }

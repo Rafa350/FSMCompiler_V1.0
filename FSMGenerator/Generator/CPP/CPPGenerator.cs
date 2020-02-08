@@ -60,7 +60,7 @@
                 // Genera el enumerador amb els estats de la maquina
                 //
                 generator.GenerateStateTypeDeclaration(codeBuilder);
-                
+
                 // Genera les Accions i les guardes
                 //
                 generator.GenerateActionImplementation(codeBuilder);

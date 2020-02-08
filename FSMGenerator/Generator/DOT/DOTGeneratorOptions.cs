@@ -2,9 +2,9 @@
 
     public sealed class DOTGeneratorOptions {
 
+        public string OutputPath { get; set; }
+
         public DOTGeneratorOptions() {
         }
-
-        public string OutputPath { get; set; }
     }
 }

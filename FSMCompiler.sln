@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSMGenerator", "FSMGenerato
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Setup", "Setup\Setup.wixproj", "{C86E8FB8-E9FF-463E-B41F-E40037A60462}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroC", "MicroC\MicroC.csproj", "{33C9CF49-40D1-4C18-A28D-09B7FC6057FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Release|Any CPU.ActiveCfg = Release|x86
 		{C86E8FB8-E9FF-463E-B41F-E40037A60462}.Release|Any CPU.Build.0 = Release|x86
+		{33C9CF49-40D1-4C18-A28D-09B7FC6057FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33C9CF49-40D1-4C18-A28D-09B7FC6057FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33C9CF49-40D1-4C18-A28D-09B7FC6057FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33C9CF49-40D1-4C18-A28D-09B7FC6057FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,7 +3,7 @@
     using System;
     using MikroPicDesigns.FSMCompiler.v1.Model;
 
-    public abstract class GeneratorBase: IGenerator {
+    public abstract class GeneratorBase : IGenerator {
 
         public virtual void Generate(Machine machine) {
 

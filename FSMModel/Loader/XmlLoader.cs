@@ -1,9 +1,9 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Loader {
 
-    using MikroPicDesigns.FSMCompiler.v1.Model;
-    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
     using System;
     using System.Xml;
+    using MikroPicDesigns.FSMCompiler.v1.Model;
+    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
     public class XmlLoader {
 
@@ -99,7 +99,7 @@
             foreach (XmlNode node in actionNode.ChildNodes) {
                 switch (node.Name) {
                     case "code":
-                    case "inline": 
+                    case "inline":
                         action.AddActivity(ProcessCodeActivityNode(node, machine));
                         break;
                     case "call":
@@ -164,7 +164,7 @@
                             node = node.ParentNode;
                         }
                     }
-                    
+
                     transition.NextState = GetState(machine, name);
                     transition.Mode = TransitionMode.Jump;
                 }

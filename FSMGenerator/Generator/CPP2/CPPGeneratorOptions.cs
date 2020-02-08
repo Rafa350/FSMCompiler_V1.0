@@ -11,6 +11,7 @@
         public string StateClassName { get; set; }
         public string StateHeaderFileName { get; set; }
         public string StateCodeFileName { get; set; }
+        public string OutputType { get; set; }
 
         public CPPGeneratorOptions() {
 

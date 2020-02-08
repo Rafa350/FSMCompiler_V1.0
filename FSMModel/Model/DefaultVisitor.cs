@@ -2,11 +2,11 @@
 
     using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
-    public abstract class DefaultVisitor: IVisitor {
+    public abstract class DefaultVisitor : IVisitor {
 
         public virtual void Visit(Machine machine) {
 
-            foreach (State state in machine.States)
+            foreach (var state in machine.States)
                 state.AcceptVisitor(this);
         }
 
@@ -33,15 +33,15 @@
 
         public virtual void Visit(Action action) {
 
-            if (action.HasActivities)
-                foreach (Activity command in action.Activities)
-                    command.AcceptVisitor(this);
+            if (action.Activities != null)
+                foreach (var activity in action.Activities)
+                    activity.AcceptVisitor(this);
         }
 
-        public virtual void Visit(CodeActity command) {
+        public virtual void Visit(CodeActity activity) {
         }
 
-        public virtual void Visit(CallActivity command) {
+        public virtual void Visit(CallActivity activity) {
         }
     }
 }

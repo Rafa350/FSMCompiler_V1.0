@@ -14,7 +14,7 @@
         public Guard(string expression) {
 
             if (String.IsNullOrEmpty(expression))
-                throw new ArgumentNullException("condition");
+                throw new ArgumentNullException(nameof(expression));
 
             this.expression = expression;
         }
@@ -23,10 +23,6 @@
         /// Obte la condicio.
         /// </summary>
         /// 
-        public string Expression {
-            get {
-                return expression;
-            }
-        }
+        public string Expression => expression;
     }
 }

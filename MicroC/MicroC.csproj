@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{33C9CF49-40D1-4C18-A28D-09B7FC6057FB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MicroCompiler</RootNamespace>
+    <AssemblyName>MicroCCore</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>signature.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CodeGenerator\C\CodeGenerator.cs" />
+    <Compile Include="CodeGenerator\C\HeaderGenerator.cs" />
+    <Compile Include="CodeModel\AccessMode.cs" />
+    <Compile Include="CodeModel\ArgumentDefinition.cs" />
+    <Compile Include="CodeModel\Block.cs" />
+    <Compile Include="CodeModel\ClassDeclaration.cs" />
+    <Compile Include="CodeModel\ConstructorDeclaration.cs" />
+    <Compile Include="CodeModel\DefaultVisitor.cs" />
+    <Compile Include="CodeModel\DestructorDeclaration.cs" />
+    <Compile Include="CodeModel\DestructorVirtualMode.cs" />
+    <Compile Include="CodeModel\ExpressionBase.cs" />
+    <Compile Include="CodeModel\Expressions\BinaryExpression.cs" />
+    <Compile Include="CodeModel\Expressions\ConditionalExpression.cs" />
+    <Compile Include="CodeModel\Expressions\FuncCallExpression.cs" />
+    <Compile Include="CodeModel\Expressions\IdentifierExpression.cs" />
+    <Compile Include="CodeModel\Expressions\InlineExpression.cs" />
+    <Compile Include="CodeModel\Expressions\LiteralExpression.cs" />
+    <Compile Include="CodeModel\Expressions\SubscriptExpression.cs" />
+    <Compile Include="CodeModel\Expressions\UnaryExpression.cs" />
+    <Compile Include="CodeModel\FunctionDeclaration.cs" />
+    <Compile Include="CodeModel\FunctionDeclarationBase.cs" />
+    <Compile Include="CodeModel\IClassMember.cs" />
+    <Compile Include="CodeModel\IO\ITreeWriter.cs" />
+    <Compile Include="CodeModel\IO\Xml\XmlUnitWriter.cs" />
+    <Compile Include="CodeModel\IO\Xml\XmlVisitor.cs" />
+    <Compile Include="CodeModel\IO\Xml\XmlVisitorBase.cs" />
+    <Compile Include="CodeModel\IUnitMember.cs" />
+    <Compile Include="CodeModel\IVisitable.cs" />
+    <Compile Include="CodeModel\IVisitor.cs" />
+    <Compile Include="CodeModel\MemberFunctionDeclaration.cs" />
+    <Compile Include="CodeModel\MemberFunctionMode.cs" />
+    <Compile Include="CodeModel\MemberVariableDeclaration.cs" />
+    <Compile Include="CodeModel\MemberVariableMode.cs" />
+    <Compile Include="CodeModel\NamespaceDeclaration.cs" />
+    <Compile Include="CodeModel\StatementBase.cs" />
+    <Compile Include="CodeModel\Statements\AssignStatement.cs" />
+    <Compile Include="CodeModel\Statements\FunctionCallStatement.cs" />
+    <Compile Include="CodeModel\Statements\IfThenElseStatement.cs" />
+    <Compile Include="CodeModel\Statements\InlineStatement.cs" />
+    <Compile Include="CodeModel\Statements\LoopStatement.cs" />
+    <Compile Include="CodeModel\Statements\ReturnStatement.cs" />
+    <Compile Include="CodeModel\Statements\SwitchCaseStatement.cs" />
+    <Compile Include="CodeModel\Statements\SwitchStatement.cs" />
+    <Compile Include="CodeModel\TypeIdentifier.cs" />
+    <Compile Include="CodeModel\UnitDeclaration.cs" />
+    <Compile Include="CodeModel\VariableDeclarationBase.cs" />
+    <Compile Include="CodeGenerator\Cpp\CodeGenerator.cs" />
+    <Compile Include="CodeGenerator\Cpp\HeaderGenerator.cs" />
+    <Compile Include="CodeGenerator\StringBuilderExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="signature.pfx" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

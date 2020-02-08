@@ -240,7 +240,7 @@
                     if (transition.Guard != null) {
                         if (inlineGuards)
                             sb.AppendFormat(") && ({0})", transition.Guard.Expression);
-                        else 
+                        else
                             sb.AppendFormat(") && {0}()", guardName[transition.Guard]);
                     }
                     sb.Append(") {");

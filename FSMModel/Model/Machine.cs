@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    public sealed class Machine: IVisitable {
+    public sealed class Machine : IVisitable {
 
         private readonly List<State> states = new List<State>();
         private readonly string name;
@@ -75,8 +75,8 @@
         /// </summary>
         /// 
         public string Name {
-            get { 
-                return name; 
+            get {
+                return name;
             }
         }
 

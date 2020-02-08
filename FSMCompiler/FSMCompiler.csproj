@@ -66,6 +66,10 @@
       <Project>{A971FF1B-3E1C-45CA-A6A1-13D0601A2E94}</Project>
       <Name>FSMModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MicroC\MicroC.csproj">
+      <Project>{33c9cf49-40d1-4c18-a28d-09b7fc6057fb}</Project>
+      <Name>MicroC</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

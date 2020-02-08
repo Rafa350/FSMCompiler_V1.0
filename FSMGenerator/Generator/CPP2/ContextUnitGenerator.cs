@@ -2,9 +2,9 @@
 
     using System;
     using System.Collections.Generic;
-    using MikroPicDesigns.FSMCompiler.v1.Generator.CPP2.CppCodeModel;
-    using MikroPicDesigns.FSMCompiler.v1.Generator.CPP2.CppCodeModel.Expressions;
-    using MikroPicDesigns.FSMCompiler.v1.Generator.CPP2.CppCodeModel.Statements;
+    using MicroCompiler.CodeModel;
+    using MicroCompiler.CodeModel.Expressions;
+    using MicroCompiler.CodeModel.Statements;
     using MikroPicDesigns.FSMCompiler.v1.Model;
     using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
@@ -67,19 +67,19 @@
             classDecl.Name = options.ContextClassName;
             classDecl.BaseName = options.ContextBaseClassName;
             classDecl.BaseAccess = AccessMode.Public;
-            
+
             // Afegeix el constructor.
             //
             classDecl.AddConstructor(MakeConstructor());
-            
+
             // Afegeix el metode 'start'.
             //
             classDecl.AddMemberFunction(MakeStartFunction(machine));
-            
+
             // Afegeix la funcio 'end'
             //
             classDecl.AddMemberFunction(MakeEndFunction(machine));
-            
+
             // Afegeix les funcions de les transicions.
             //
             foreach (var transitionName in machine.GetTransitionNames())
@@ -113,10 +113,10 @@
 
             Block body = new Block();
 
-            if (machine.InitializeAction != null) 
+            if (machine.InitializeAction != null)
                 body.AddStatements(MakeActionStatements(machine.InitializeAction));
 
-            if (machine.Start.EnterAction != null) 
+            if (machine.Start.EnterAction != null)
                 body.AddStatements(MakeActionStatements(machine.Start.EnterAction));
 
             body.AddStatement(
@@ -201,7 +201,7 @@
                     StatementBase stmt = new FunctionCallStatement(
                         new FunctionCallExpression(
                             new IdentifierExpression(
-                                String.Format("do{0}", callActivity.MethodName)), 
+                                String.Format("do{0}", callActivity.MethodName)),
                             null));
                     if (stmtList == null)
                         stmtList = new List<StatementBase>();

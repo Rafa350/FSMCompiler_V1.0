@@ -1,12 +1,12 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.DOT {
 
-    using MikroPicDesigns.FSMCompiler.v1.Model;
     using System;
     using System.Collections.Generic;
-    using System.Text;
     using System.IO;
+    using System.Text;
+    using MikroPicDesigns.FSMCompiler.v1.Model;
 
-    public sealed class DOTGenerator: GeneratorBase {
+    public sealed class DOTGenerator : GeneratorBase {
 
         private const string nodeFont = "arial";
         private const int nodeFontSize = 14;
@@ -64,9 +64,10 @@
                 }
             }
 
-            // Crea el firxer fsm_<machine>.dot
+            // Crea el firxer de sortida
             //
-            string fileName = String.Format("fsm{0}.dot", machine.Name);
+            string fileName = String.Format("{0}.dot", machine.Name);
+
             string path = Path.Combine(folder, fileName);
             using (StreamWriter writer = File.CreateText(path)) {
 

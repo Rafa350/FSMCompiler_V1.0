@@ -1,6 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Model.Activities {
-    
-    public sealed class CallActivity: Activity {
+
+    public sealed class CallActivity : Activity {
 
         private string methodName;
 

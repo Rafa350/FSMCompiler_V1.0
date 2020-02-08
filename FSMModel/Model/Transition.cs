@@ -10,7 +10,7 @@
         Pop
     }
 
-    public sealed class Transition: IVisitable {
+    public sealed class Transition : IVisitable {
 
         private readonly string name;
         private Guard guard;
@@ -26,7 +26,7 @@
         public Transition(string name) {
 
             if (String.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             this.name = name;
         }
@@ -45,11 +45,7 @@
         /// Obte el nom de la transicio.
         /// </summary>
         /// 
-        public string Name {
-            get {
-                return name;
-            }
-        }
+        public string Name => name;
 
         /// <summary>
         /// Obte o asigna la guarda d'aquesta transicio.

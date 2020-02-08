@@ -3,9 +3,9 @@
     using System;
     using System.Collections.Generic;
 
-    public sealed class Action: IVisitable {
+    public sealed class Action : IVisitable {
 
-        private List<Activity> activities = new List<Activity>();
+        private List<Activity> activityList;
 
         /// <summary>
         /// Constructor de l'objecte.
@@ -32,9 +32,12 @@
         public void AddActivity(Activity activity) {
 
             if (activity == null)
-                throw new ArgumentNullException("activity");
+                throw new ArgumentNullException(nameof(activity));
 
-            activities.Add(activity);
+            if (activityList == null)
+                activityList = new List<Activity>();
+
+            activityList.Add(activity);
         }
 
         /// <summary>
@@ -43,17 +46,7 @@
         /// 
         public IEnumerable<Activity> Activities {
             get {
-                return activities;
-            }
-        }
-
-        /// <summary>
-        /// Indica si hi han comandes.
-        /// </summary>
-        /// 
-        public bool HasActivities {
-            get {
-                return (activities != null) && (activities.Count > 0);
+                return activityList;
             }
         }
     }

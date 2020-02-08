@@ -7,7 +7,7 @@
         private readonly ArgumentDefinition definition;
         private readonly string value;
 
-        public ArgumentInfo(ArgumentDefinition definition,  string value = null) {
+        public ArgumentInfo(ArgumentDefinition definition, string value = null) {
 
             if (definition == null)
                 throw new ArgumentNullException("definition");
