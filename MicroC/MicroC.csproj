@@ -94,6 +94,7 @@
     <Compile Include="CodeModel\Statements\SwitchStatement.cs" />
     <Compile Include="CodeModel\TypeIdentifier.cs" />
     <Compile Include="CodeModel\UnitDeclaration.cs" />
+    <Compile Include="CodeModel\VariableDeclaration.cs" />
     <Compile Include="CodeModel\VariableDeclarationBase.cs" />
     <Compile Include="CodeGenerator\Cpp\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\Cpp\HeaderGenerator.cs" />

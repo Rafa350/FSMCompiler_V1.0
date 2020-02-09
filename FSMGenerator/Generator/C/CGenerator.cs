@@ -54,7 +54,16 @@
                     .WriteLine("//")
                     .WriteLine("// -----------------------------------------------------------------------")
                     .WriteLine()
-                    .WriteLine()
+                    .WriteLine();
+
+                if (!String.IsNullOrEmpty(options.MachineHeaderFileName)) {
+                    codeBuilder
+                        .WriteLine("#include \"{0}\"", options.MachineHeaderFileName)
+                        .WriteLine()
+                        .WriteLine();
+                }
+
+                codeBuilder
                     .WriteLine(code);
 
                 writer.Write(codeBuilder.ToString());

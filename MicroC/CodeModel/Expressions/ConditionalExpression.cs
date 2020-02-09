@@ -21,14 +21,17 @@
         /// 
         public ConditionalExpression(ExpressionBase conditionExpression, ExpressionBase trueExpression, ExpressionBase falseExpression) {
 
-            if (conditionExpression == null)
+            if (conditionExpression == null) {
                 throw new ArgumentNullException(nameof(conditionExpression));
+            }
 
-            if (trueExpression == null)
+            if (trueExpression == null) {
                 throw new ArgumentNullException(nameof(trueExpression));
+            }
 
-            if (falseExpression == null)
+            if (falseExpression == null) {
                 throw new ArgumentNullException(nameof(falseExpression));
+            }
 
             this.conditionExpression = conditionExpression;
             this.trueExpression = trueExpression;
@@ -42,8 +45,9 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }

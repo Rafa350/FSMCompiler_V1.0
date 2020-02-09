@@ -21,8 +21,9 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }

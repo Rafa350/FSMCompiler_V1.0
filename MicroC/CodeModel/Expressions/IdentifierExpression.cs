@@ -17,8 +17,9 @@
         /// 
         public IdentifierExpression(string name) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException(nameof(name));
+            }
 
             this.name = name;
         }
@@ -30,8 +31,9 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }

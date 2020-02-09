@@ -16,8 +16,9 @@
 
         public CppCodeBuilder WriteInclude(string fileName) {
 
-            if (String.IsNullOrEmpty(fileName))
+            if (String.IsNullOrEmpty(fileName)) {
                 throw new ArgumentNullException("fileName");
+            }
 
             WriteLine("#include \"{0}\"", fileName);
 
@@ -26,8 +27,9 @@
 
         public CppCodeBuilder WriteIncludeStartGuard(string guard) {
 
-            if (String.IsNullOrEmpty(guard))
+            if (String.IsNullOrEmpty(guard)) {
                 throw new ArgumentNullException("guard");
+            }
 
             WriteLine("#ifndef __{0}", guard);
             WriteLine("#define __{0}", guard);
@@ -39,8 +41,9 @@
 
         public CppCodeBuilder WriteIncludeEndGuard() {
 
-            if (String.IsNullOrEmpty(guard))
+            if (String.IsNullOrEmpty(guard)) {
                 throw new Exception("No se llamo a 'WriteIncludeStartGuard'.");
+            }
 
             WriteLine("#endif // __{0}", guard);
 
@@ -91,10 +94,13 @@
 
         public CppCodeBuilder WriteBeginClassDeclaration(string className, string baseClassName) {
 
-            if (String.IsNullOrEmpty(baseClassName))
+            if (String.IsNullOrEmpty(baseClassName)) {
                 WriteLine("class {0} {{", className);
-            else
+            }
+            else {
                 WriteLine("class {0}: {1} {2} {{", className, "public", baseClassName);
+            }
+
             Indent();
 
             openClass = true;
@@ -104,8 +110,9 @@
 
         public CppCodeBuilder WriteEndClassDeclaration() {
 
-            if (openSection)
+            if (openSection) {
                 WriteEndClassSection();
+            }
 
             UnIndent();
             WriteLine("};");
@@ -117,8 +124,9 @@
 
         public CppCodeBuilder WriteBeginClassSection(ProtectionLevel protectionLevel) {
 
-            if (openSection)
+            if (openSection) {
                 UnIndent();
+            }
 
             WriteLine("{0}:",
                 (protectionLevel == ProtectionLevel.Private) ? "private" :
@@ -133,8 +141,9 @@
 
         public CppCodeBuilder WriteEndClassSection() {
 
-            if (openSection)
+            if (openSection) {
                 UnIndent();
+            }
 
             UnIndent();
 

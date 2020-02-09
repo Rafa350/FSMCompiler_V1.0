@@ -18,14 +18,30 @@
 
             List<IUnitMember> memberList = new List<IUnitMember>();
 
+            // Crea la variabe 'state'
+            //
+            VariableDeclaration stateVariable = new VariableDeclaration();
+            stateVariable.Name = "state";
+            stateVariable.ValueType = TypeIdentifier.FromName("int");
+            memberList.Add(stateVariable);
+
             // Crea la funcio [machine]_Start()
             //
             memberList.Add(MakeStartFunction(machine));
 
-            // Crea les funcions de transicio <machine>_on<transition>()
+            // Crea les funcions de deptch de les transicions [machine]_on[transition]()
             //
-            foreach (var transitionName in machine.GetTransitionNames())
-                memberList.Add(MakeTransitionFunction(machine, transitionName));
+            foreach (var transitionName in machine.GetTransitionNames()) {
+                memberList.Add(MakeMachineTransitionFunction(machine, transitionName));
+            }
+
+            // Crea les funcions de transicio [machine]_[state]_on[transition]()
+            //
+            foreach (var state in machine.States) {
+                foreach (var transitionName in state.GetTransitionNames()) {
+                    memberList.Add(MakeStateTransitionFunction(machine, state, transitionName));
+                }
+            }
 
             return new UnitDeclaration(memberList);
         }
@@ -39,7 +55,7 @@
         private static FunctionDeclaration MakeStartFunction(Machine machine) {
 
             FunctionDeclaration function = new FunctionDeclaration();
-            function.Name = String.Format("{0}Machine_Start", machine.Name);
+            function.Name = String.Format("{0}_Start", machine.Name);
             function.ReturnType = TypeIdentifier.FromName("void");
             function.Body = MakeStartFunctionBody(machine);
 
@@ -56,17 +72,22 @@
 
             Block body = new Block();
 
+            // Accions d'inici del estat inicial.
+            //
             if (machine.Start.EnterAction != null) {
                 foreach (var activity in machine.Start.EnterAction.Activities) {
-                    if (activity is CallActivity callActivity)
+                    if (activity is CallActivity callActivity) {
                         body.AddStatement(
                             new FunctionCallStatement(
                                 new FunctionCallExpression(
                                     new IdentifierExpression(callActivity.MethodName),
                                     null)));
+                    }
                 }
             }
 
+            // Seleccio del estat inicial.
+            //
             body.AddStatement(
                 new AssignStatement("state",
                 new LiteralExpression(
@@ -75,85 +96,144 @@
             return body;
         }
 
-        /// <summary>
-        /// Crtea la funcio [machine]_on[transcition]()
-        /// </summary>
-        /// <param name="machine">La maquina.</param>
-        /// <param name="transitionName">El nom de la transicio.</param>
-        /// <returns>La declaracio de la funcio.</returns>
-        /// 
-        private static FunctionDeclaration MakeTransitionFunction(Machine machine, string transitionName) {
+        private static FunctionDeclaration MakeMachineTransitionFunction(Machine machine, string transitionName) {
 
             FunctionDeclaration function = new FunctionDeclaration();
-            function.Name = String.Format("{0}Machine_on{1}", machine.Name, transitionName);
+            function.Name = String.Format("{0}_on{1}", machine.Name, transitionName);
             function.ReturnType = TypeIdentifier.FromName("void");
-            function.Body = MakeTransitionFunctionBody(machine, transitionName);
+            function.Body = MakeMachineTransitionFunctionBody(machine, transitionName);
 
             return function;
         }
 
-        private static Block MakeTransitionFunctionBody(Machine machine, string transitionName) {
+        private static Block MakeMachineTransitionFunctionBody(Machine machine, string transitionName) {
+
+            Block body = new Block();
 
             SwitchStatement switchStmt = new SwitchStatement();
             switchStmt.Expression = new IdentifierExpression("state");
 
             foreach (var state in machine.States) {
-                SwitchCaseStatement caseStmt = new SwitchCaseStatement();
-                caseStmt.Expression = new LiteralExpression(
-                    String.Format("State_{0}", state.Name));
-
-                Block body = new Block();
                 foreach (var transition in state.Transitions) {
                     if (transition.Name == transitionName) {
 
-                        Block trueBlock = new Block();
+                        SwitchCaseStatement caseStmt = new SwitchCaseStatement();
+                        caseStmt.Expression = new LiteralExpression(
+                            String.Format("State_{0}", state.Name));
 
-                        if ((transition.Action != null) && (transition.Action.Activities != null)) {
+                        Block caseStmtBody = new Block();
+                        caseStmtBody.AddStatement(
+                            new FunctionCallStatement(
+                                new FunctionCallExpression(
+                                    new IdentifierExpression(
+                                        String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName)),
+                                    null)));
 
-                            // Accions de sortida del estat actual
-                            //
+                        caseStmt.Body = caseStmtBody;
 
-                            // Accions de la transicio
-                            //
-                            foreach (var activity in transition.Action.Activities)
-                                if (activity is CallActivity callActivity)
-                                    trueBlock.AddStatement(
-                                        new FunctionCallStatement(
-                                            new FunctionCallExpression(
-                                                new IdentifierExpression(callActivity.MethodName),
-                                                null)));
-
-                            // Acciona d'entrada del nou estat
-                            //
-
-                            // Canvi d'estat
-                            //
-                            if (transition.NextState != null)
-                                trueBlock.AddStatement(
-                                    new AssignStatement("state",
-                                    new LiteralExpression(
-                                        String.Format("State_{0}", transition.NextState.Name))));
-                        }
-
-                        if (transition.Guard == null) {
-                            body.AddStatement(new IfThenElseStatement(
-                                new InlineExpression("true"),
-                                trueBlock,
-                                null));
-                        }
-                        else {
-                            body.AddStatement(new IfThenElseStatement(
-                                new InlineExpression(transition.Guard.Expression),
-                                trueBlock,
-                                null));
-                        }
+                        switchStmt.AddSwitchCase(caseStmt);
                     }
                 }
-                caseStmt.Body = body;
-                switchStmt.AddSwitchCase(caseStmt);
             }
 
-            return new Block(switchStmt);
+            body.AddStatement(switchStmt);
+
+            return body;
+        }
+
+        /// <summary>
+        /// Crea la funcio [machine]_[state]_on[transition]()
+        /// </summary>
+        /// <param name="state">La maquina.</param>
+        /// <param name="machineName">El nom de la maquina.</param>
+        /// <param name="transitionName">El nom de la transicio.</param>
+        /// <returns>La declaracio de la funcio.</returns>
+        /// 
+        private static FunctionDeclaration MakeStateTransitionFunction(Machine machine, State state, string transitionName) {
+
+            FunctionDeclaration function = new FunctionDeclaration();
+            function.Name = String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName);
+            function.ReturnType = TypeIdentifier.FromName("void");
+            function.Body = MakeStateTransitionFunctionBody(state, transitionName);
+
+            return function;
+        }
+
+        private static Block MakeStateTransitionFunctionBody(State state, string transitionName) {
+
+            Block body = new Block();
+            foreach (var transition in state.Transitions) {
+                if (transition.Name == transitionName) {
+
+                    Block trueBlock = new Block();
+
+                    // Accions de sortida del estat actual
+                    //
+                    if ((state.ExitAction != null) && (state.ExitAction.Activities != null)) {
+                        foreach (var activity in state.ExitAction.Activities) {
+                            if (activity is CallActivity callActivity) {
+                                trueBlock.AddStatement(
+                                    new FunctionCallStatement(
+                                        new FunctionCallExpression(
+                                            new IdentifierExpression(callActivity.MethodName),
+                                            null)));
+                            }
+                        }
+                    }
+
+                    // Accions de la transicio
+                    //
+                    if ((transition.Action != null) && (transition.Action.Activities != null)) {
+                        foreach (var activity in transition.Action.Activities) {
+                            if (activity is CallActivity callActivity) {
+                                trueBlock.AddStatement(
+                                    new FunctionCallStatement(
+                                        new FunctionCallExpression(
+                                            new IdentifierExpression(callActivity.MethodName),
+                                            null)));
+                            }
+                        }
+                    }
+
+                    // Acciona d'entrada del nou estat
+                    //
+                    if ((transition.NextState.EnterAction != null) && (transition.NextState.EnterAction.Activities != null)) {
+                        foreach (var activity in transition.NextState.EnterAction.Activities) {
+                            if (activity is CallActivity callActivity) {
+                                trueBlock.AddStatement(
+                                    new FunctionCallStatement(
+                                        new FunctionCallExpression(
+                                            new IdentifierExpression(callActivity.MethodName),
+                                            null)));
+                            }
+                        }
+                    }
+
+                    // Seeccio el nou estat
+                    //
+                    if (transition.NextState != null) {
+                        trueBlock.AddStatement(
+                            new AssignStatement("state",
+                            new LiteralExpression(
+                                String.Format("State_{0}", transition.NextState.Name))));
+                    }
+
+                    if (transition.Guard == null) {
+                        body.AddStatement(new IfThenElseStatement(
+                            new InlineExpression("true"),
+                            trueBlock,
+                            null));
+                    }
+                    else {
+                        body.AddStatement(new IfThenElseStatement(
+                            new InlineExpression(transition.Guard.Expression),
+                            trueBlock,
+                            null));
+                    }
+                }
+            }
+
+            return body;
         }
     }
 }

@@ -14,8 +14,9 @@
 
             public GeneratorVisitor(StringBuilder sb, int indent = 0) {
 
-                if (sb == null)
+                if (sb == null) {
                     throw new ArgumentNullException(nameof(sb));
+                }
 
                 this.sb = sb;
                 this.indent = indent;
@@ -48,8 +49,10 @@
                 sb.AppendIndent(indent);
                 sb.Append("class ");
                 sb.Append(obj.Name);
-                if (!String.IsNullOrEmpty(obj.BaseName))
+                if (!String.IsNullOrEmpty(obj.BaseName)) {
                     sb.AppendFormat(": {0} {1}", ToString(obj.BaseAccess), obj.BaseName);
+                }
+
                 sb.Append(" {");
                 sb.AppendLine();
 
@@ -147,10 +150,13 @@
                 if (obj.Arguments != null) {
                     bool first = true;
                     foreach (var argument in obj.Arguments) {
-                        if (first)
+                        if (first) {
                             first = false;
-                        else
+                        }
+                        else {
                             sb.Append(", ");
+                        }
+
                         argument.AcceptVisitor(this);
                     }
                 }
@@ -162,8 +168,10 @@
             public override void Visit(MemberVariableDeclaration obj) {
 
                 sb.AppendIndent(indent);
-                if (obj.Mode == MemberVariableMode.Static)
+                if (obj.Mode == MemberVariableMode.Static) {
                     sb.Append("static ");
+                }
+
                 sb.AppendLine("{0} {1};", obj.ValueType.Name, obj.Name);
             }
 
@@ -184,10 +192,13 @@
                 if (obj.Arguments != null) {
                     bool first = true;
                     foreach (var argument in obj.Arguments) {
-                        if (first)
+                        if (first) {
                             first = false;
-                        else
+                        }
+                        else {
                             sb.Append(", ");
+                        }
+
                         argument.AcceptVisitor(this);
                     }
                 }
@@ -217,9 +228,11 @@
                 sb.AppendLine();
                 indent++;
 
-                if (obj.Members != null)
-                    foreach (var member in obj.Members)
+                if (obj.Members != null) {
+                    foreach (var member in obj.Members) {
                         member.AcceptVisitor(this);
+                    }
+                }
 
                 indent--;
                 sb.Append('}');
@@ -228,16 +241,19 @@
 
             public override void Visit(UnitDeclaration obj) {
 
-                if (obj.Members != null)
-                    foreach (var member in obj.Members)
+                if (obj.Members != null) {
+                    foreach (var member in obj.Members) {
                         member.AcceptVisitor(this);
+                    }
+                }
             }
         }
 
         public static string Generate(UnitDeclaration unitDeclaration) {
 
-            if (unitDeclaration == null)
+            if (unitDeclaration == null) {
                 throw new ArgumentNullException(nameof(unitDeclaration));
+            }
 
             StringBuilder sb = new StringBuilder();
             var visitor = new GeneratorVisitor(sb);

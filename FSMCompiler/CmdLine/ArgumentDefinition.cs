@@ -11,8 +11,9 @@
 
         public ArgumentDefinition(string name, int index, string description = null, bool required = false) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException("name");
+            }
 
             this.name = name;
             this.index = index;

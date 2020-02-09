@@ -26,11 +26,13 @@
         /// 
         public void AddArgument(ArgumentDefinition argument) {
 
-            if (argument == null)
+            if (argument == null) {
                 throw new ArgumentNullException(nameof(argument));
+            }
 
-            if (argumentList == null)
+            if (argumentList == null) {
                 argumentList = new List<ArgumentDefinition>();
+            }
 
             argumentList.Add(argument);
         }

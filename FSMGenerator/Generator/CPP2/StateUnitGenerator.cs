@@ -34,14 +34,16 @@
 
             // Crea les clases dels estats derivats.
             //
-            foreach (State state in machine.States)
+            foreach (State state in machine.States) {
                 classDeclList.Add(MakeDerivedStateClass(state));
+            }
 
             // Crea la unitat de compilacio.
             //
             UnitDeclaration unitDecl = new UnitDeclaration();
-            if (String.IsNullOrEmpty(options.NsName))
+            if (String.IsNullOrEmpty(options.NsName)) {
                 unitDecl.AddMembers(classDeclList);
+            }
             else {
                 NamespaceDeclaration namespaceDecl = new NamespaceDeclaration();
                 namespaceDecl.Name = options.NsName;
@@ -95,8 +97,9 @@
             classDecl.AddMemberFunction(MakeGetInstanceFunction(state));
 
             // Afegeix les funcions de transicio
-            foreach (var transitionName in state.GetTransitionNames())
+            foreach (var transitionName in state.GetTransitionNames()) {
                 classDecl.AddMemberFunction(MakeOnTransitionFunction(state, transitionName));
+            }
 
             return classDecl;
         }
@@ -144,20 +147,23 @@
                     // Accio 'Exit'
                     //
                     if (transition.NextState != state) {
-                        if (state.ExitAction != null)
+                        if (state.ExitAction != null) {
                             trueBody.AddStatements(MakeActionStatements(state.ExitAction));
+                        }
                     }
 
                     // Accio de transicio.
                     //
-                    if (transition.Action != null)
+                    if (transition.Action != null) {
                         trueBody.AddStatements(MakeActionStatements(transition.Action));
+                    }
 
                     // Accio 'Enter'
                     //
                     if (transition.NextState != state) {
-                        if (transition.NextState.EnterAction != null)
+                        if (transition.NextState.EnterAction != null) {
                             trueBody.AddStatements(MakeActionStatements(transition.NextState.EnterAction));
+                        }
                     }
 
                     if (transition.NextState != null) {
@@ -220,8 +226,10 @@
                             new IdentifierExpression(
                                 String.Format("context->do{0}", callActivity.MethodName)),
                             null));
-                    if (stmtList == null)
+                    if (stmtList == null) {
                         stmtList = new List<StatementBase>();
+                    }
+
                     stmtList.Add(stmt);
                 }
             }

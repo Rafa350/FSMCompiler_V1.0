@@ -13,8 +13,9 @@
 
         public OptionDefinition(string name, string description = null, bool required = false, bool multiple = false) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException("name");
+            }
 
             this.name = name;
             this.shortOption = name.Substring(0, 1);

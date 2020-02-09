@@ -31,11 +31,13 @@
         /// 
         public void AddActivity(Activity activity) {
 
-            if (activity == null)
+            if (activity == null) {
                 throw new ArgumentNullException(nameof(activity));
+            }
 
-            if (activityList == null)
+            if (activityList == null) {
                 activityList = new List<Activity>();
+            }
 
             activityList.Add(activity);
         }

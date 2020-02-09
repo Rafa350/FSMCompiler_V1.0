@@ -20,12 +20,14 @@
         /// 
         public FunctionCallExpression(ExpressionBase address, IEnumerable<ExpressionBase> arguments = null) {
 
-            if (address == null)
+            if (address == null) {
                 throw new ArgumentNullException(nameof(address));
+            }
 
             this.address = address;
-            if (arguments != null)
+            if (arguments != null) {
                 argumentList = new List<ExpressionBase>(arguments);
+            }
         }
 
         /// <summary>
@@ -45,8 +47,9 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }

@@ -16,17 +16,17 @@
     <state name="WaitingSW1">
 	
 		<enter>
-			<call name="LED1_OFF"/>
+			<call name="WaitingSW1_Enter"/>
 		</enter>
 
 		<exit>
-			<call name="LED1_ON"/>
+			<call name="WaitingSW1_Exit"/>
 		</exit>
 		
         <!-- Es prem el boto SW1
         -->
         <transition name="SW1_ON" state="WaitingSW2">
-			<command name="LED1_ON" />
+			<command name="WaitingSW1_Transition_SW1_ON" />
         </transition>
 
 	</state>
@@ -36,14 +36,13 @@
     <state name="WaitingSW2">
 	
 		<enter>
-			<command name="LED3_ON"/>
+			<command name="WaitingSW2_Enter"/>
 		</enter>
 
         <!-- Es prem el boto SW2
         -->
         <transition name="SW2_ON" state="WaitingSW3">
-			<command name="LED1_OFF" />
-			<command name="LED2_ON" />
+			<command name="WaitingSW2_Transition_SW2_ON" />
         </transition>
 
     </state>
@@ -55,9 +54,7 @@
         <!-- Es prem el boto SW3
         -->
         <transition name="SW3_ON" state="WaitingTMR1">
-			<command name="LED2_OFF" />
-			<command name="LED3_ON" />
-			<command name="TMR1_START" />
+			<command name="WaitingSW3_Transition_SW3_ON" />
         </transition>
 		
     </state>
@@ -69,7 +66,7 @@
         <!-- Timeout del temporitzador TIMER1
         -->
         <transition name="TMR1_TIMEOUT" state="WaitingSW1">
-			<command name="LED3_OFF" />
+			<command name="WaitingTMR1_OnTMR1_TIMEOUT" />
 		</transition>
 
     </state>

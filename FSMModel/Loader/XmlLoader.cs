@@ -22,10 +22,12 @@
 
         private static string GetAttribute(XmlNode node, string name) {
 
-            if (node.Attributes[name] == null)
+            if (node.Attributes[name] == null) {
                 return null;
-            else
+            }
+            else {
                 return node.Attributes[name].Value;
+            }
         }
 
         /// <summary
@@ -37,22 +39,26 @@
         private Machine ProcessMachineNode(XmlNode machineNode) {
 
             string machineName = GetAttribute(machineNode, "name");
-            if (String.IsNullOrEmpty(machineName))
+            if (String.IsNullOrEmpty(machineName)) {
                 throw new Exception("No se especifico el atributo 'name'");
+            }
 
             string startStateName = GetAttribute(machineNode, "start");
-            if (String.IsNullOrEmpty(startStateName))
+            if (String.IsNullOrEmpty(startStateName)) {
                 throw new Exception("No se especifico el atributo 'start'");
+            }
 
             Machine machine = new Machine(machineName);
 
             XmlNode initializeNode = machineNode.SelectSingleNode("initialize");
-            if (initializeNode != null)
+            if (initializeNode != null) {
                 machine.InitializeAction = ProcessActionNode(initializeNode, machine);
+            }
 
             XmlNode terminateNode = machineNode.SelectSingleNode("terminate");
-            if (terminateNode != null)
+            if (terminateNode != null) {
                 machine.TerminateAction = ProcessActionNode(terminateNode, machine);
+            }
 
             // Procesa cada estat i asigna els parametres
             //
@@ -69,27 +75,32 @@
         private void ProcessStateNode(XmlNode stateNode, Machine machine) {
 
             string stateName = null;
-            if (stateNode.ParentNode.Name == "state")
+            if (stateNode.ParentNode.Name == "state") {
                 stateName = GetAttribute(stateNode.ParentNode, "name");
+            }
+
             stateName += GetAttribute(stateNode, "name");
 
             State state = GetState(machine, stateName);
 
             XmlNode onEnterNode = stateNode.SelectSingleNode("enter");
-            if (onEnterNode != null)
+            if (onEnterNode != null) {
                 state.EnterAction = ProcessActionNode(onEnterNode, machine);
+            }
 
             XmlNode onExitNode = stateNode.SelectSingleNode("exit");
-            if (onExitNode != null)
+            if (onExitNode != null) {
                 state.ExitAction = ProcessActionNode(onExitNode, machine);
+            }
 
             foreach (XmlNode transitionNode in stateNode.SelectNodes("transition")) {
                 Transition transition = ProcessTransitionNode(transitionNode, machine);
                 state.AddTransition(transition);
             }
 
-            foreach (XmlNode childStateNode in stateNode.SelectNodes("state"))
+            foreach (XmlNode childStateNode in stateNode.SelectNodes("state")) {
                 ProcessStateNode(childStateNode, machine);
+            }
         }
 
         private Model.Action ProcessActionNode(XmlNode actionNode, Machine machine) {
@@ -133,30 +144,33 @@
             // Obte el nom
             //
             string transitionName = GetAttribute(transitionNode, "name");
-            if (String.IsNullOrEmpty(transitionName))
+            if (String.IsNullOrEmpty(transitionName)) {
                 throw new Exception("No se especifico el atributo 'name'");
+            }
 
             Transition transition = new Transition(transitionName);
 
             // Obte la guarda
             //
             string condition = GetAttribute(transitionNode, "guard");
-            if (!String.IsNullOrEmpty(condition))
+            if (!String.IsNullOrEmpty(condition)) {
                 transition.Guard = new Guard(condition);
+            }
 
             // Obte el nou estat
             //
             string name = GetAttribute(transitionNode, "state");
-            if (System.String.IsNullOrEmpty(name))
+            if (System.String.IsNullOrEmpty(name)) {
                 transition.Mode = TransitionMode.InternalLoop;
-
+            }
             else {
-                if (name == "*")
+                if (name == "*") {
                     transition.Mode = TransitionMode.Pop;
-
+                }
                 else {
-                    if (name.Contains(":"))
+                    if (name.Contains(":")) {
                         name = name.Replace(":", "");
+                    }
                     else {
                         XmlNode node = transitionNode.ParentNode.ParentNode;
                         while (node.Name == "state") {
@@ -170,8 +184,9 @@
                 }
             }
 
-            if (transitionNode.HasChildNodes)
+            if (transitionNode.HasChildNodes) {
                 transition.Action = ProcessActionNode(transitionNode, machine);
+            }
 
             return transition;
         }

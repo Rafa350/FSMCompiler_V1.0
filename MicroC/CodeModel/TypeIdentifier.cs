@@ -20,8 +20,10 @@
 
                 t = new TypeIdentifier(name);
 
-                if (cache == null)
+                if (cache == null) {
                     cache = new Dictionary<string, TypeIdentifier>();
+                }
+
                 cache.Add(name, t);
             }
 

@@ -31,5 +31,6 @@
         void Visit(SwitchStatement stmt);
         void Visit(UnaryExpression exp);
         void Visit(UnitDeclaration exp);
+        void Visit(VariableDeclaration decl);
     }
 }

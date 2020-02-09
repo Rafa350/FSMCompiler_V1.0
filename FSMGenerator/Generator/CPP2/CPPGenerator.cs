@@ -20,29 +20,37 @@
 
         public CPPGenerator(CPPGeneratorOptions options) {
 
-            if (options == null)
+            if (options == null) {
                 options = new CPPGeneratorOptions();
+            }
+
             this.options = options;
         }
 
         public override void Generate(Machine machine) {
 
             UnitDeclaration contextUnit = ContextUnitGenerator.Generate(machine, options);
-            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextHeader"))
+            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextHeader")) {
                 GenerateContextHeader(contextUnit);
-            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextCode"))
+            }
+
+            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextCode")) {
                 GenerateContextCode(contextUnit);
+            }
 
             UnitDeclaration stateUnit = StateUnitGenerator.Generate(machine, options);
-            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateHeader"))
+            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateHeader")) {
                 GenerateStateHeader(stateUnit);
-            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateCode"))
+            }
+
+            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateCode")) {
                 GenerateStateCode(stateUnit);
+            }
         }
 
         private void GenerateContextHeader(UnitDeclaration unitDeclaration) {
 
-            if (!String.IsNullOrEmpty(options.ContextHeaderFileName))
+            if (!String.IsNullOrEmpty(options.ContextHeaderFileName)) {
                 using (StreamWriter writer = File.CreateText(options.ContextHeaderFileName)) {
 
                     string header = HeaderGenerator.Generate(unitDeclaration);
@@ -74,11 +82,12 @@
 
                     writer.Write(sb.ToString());
                 }
+            }
         }
 
         private void GenerateContextCode(UnitDeclaration unitDeclaration) {
 
-            if (!String.IsNullOrEmpty(options.ContextCodeFileName))
+            if (!String.IsNullOrEmpty(options.ContextCodeFileName)) {
                 using (StreamWriter writer = File.CreateText(options.ContextCodeFileName)) {
 
                     string code = CodeGenerator.Generate(unitDeclaration);
@@ -105,11 +114,12 @@
 
                     writer.Write(sb.ToString());
                 }
+            }
         }
 
         private void GenerateStateHeader(UnitDeclaration unitDeclaration) {
 
-            if (!String.IsNullOrEmpty(options.StateHeaderFileName))
+            if (!String.IsNullOrEmpty(options.StateHeaderFileName)) {
                 using (StreamWriter writer = File.CreateText(options.StateHeaderFileName)) {
 
                     string header = HeaderGenerator.Generate(unitDeclaration);
@@ -141,11 +151,12 @@
 
                     writer.Write(sb.ToString());
                 }
+            }
         }
 
         private void GenerateStateCode(UnitDeclaration unitDeclaration) {
 
-            if (!String.IsNullOrEmpty(options.StateCodeFileName))
+            if (!String.IsNullOrEmpty(options.StateCodeFileName)) {
                 using (StreamWriter writer = File.CreateText(options.StateCodeFileName)) {
 
                     string code = CodeGenerator.Generate(unitDeclaration);
@@ -172,6 +183,7 @@
 
                     writer.Write(sb.ToString());
                 }
+            }
         }
     }
 }

@@ -33,8 +33,10 @@
         /// 
         public CodeBuilder Write(int level, string fmt, params object[] args) {
 
-            if (level > 0)
+            if (level > 0) {
                 sb.Append(new String(' ', level * 4));
+            }
+
             sb.Append(String.Format(fmt, args));
 
             return this;
@@ -58,16 +60,20 @@
 
         public CodeBuilder Write(string text) {
 
-            if (indentLevel > 0)
+            if (indentLevel > 0) {
                 sb.Append(new String(' ', indentLevel * 4));
+            }
+
             sb.Append(text);
             return this;
         }
 
         public CodeBuilder Write(string format, params object[] args) {
 
-            if (indentLevel > 0)
+            if (indentLevel > 0) {
                 sb.Append(new String(' ', indentLevel * 4));
+            }
+
             sb.Append(String.Format(format, args));
             return this;
         }
@@ -99,8 +105,9 @@
 
         public CodeBuilder UnIndent() {
 
-            if (indentLevel > 0)
+            if (indentLevel > 0) {
                 indentLevel--;
+            }
 
             return this;
         }

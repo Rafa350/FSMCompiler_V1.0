@@ -21,15 +21,6 @@
             visitor.Visit(this);
         }
 
-        public override string ToString() {
-
-            return "return";
-        }
-
-        public ExpressionBase Expression {
-            get {
-                return expression;
-            }
-        }
+        public ExpressionBase Expression => expression;
     }
 }

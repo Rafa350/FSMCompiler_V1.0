@@ -25,8 +25,9 @@
         /// 
         public Transition(string name) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException(nameof(name));
+            }
 
             this.name = name;
         }

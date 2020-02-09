@@ -11,11 +11,13 @@
 
         public IfThenElseStatement(ExpressionBase conditionExpression, Block trueBlock, Block falseBlock) {
 
-            if (conditionExpression == null)
+            if (conditionExpression == null) {
                 throw new ArgumentNullException("conditionExpression");
+            }
 
-            if (trueBlock == null)
+            if (trueBlock == null) {
                 throw new ArgumentNullException("trueBlock");
+            }
 
             this.conditionExpression = conditionExpression;
             this.trueBlock = trueBlock;

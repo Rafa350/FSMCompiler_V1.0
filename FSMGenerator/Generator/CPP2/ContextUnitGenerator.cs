@@ -43,8 +43,9 @@
             // Construeix la unitat de compilacio.
             //
             UnitDeclaration unitDecl = new UnitDeclaration();
-            if (String.IsNullOrEmpty(options.NsName))
+            if (String.IsNullOrEmpty(options.NsName)) {
                 unitDecl.AddMember(classDecl);
+            }
             else {
                 NamespaceDeclaration namespaceDecl = new NamespaceDeclaration();
                 namespaceDecl.Name = options.NsName;
@@ -82,13 +83,15 @@
 
             // Afegeix les funcions de les transicions.
             //
-            foreach (var transitionName in machine.GetTransitionNames())
+            foreach (var transitionName in machine.GetTransitionNames()) {
                 classDecl.AddMemberFunction(MakeTransitionFunction(transitionName));
+            }
 
             // Afegeix les funcions de les activitats.
             //
-            foreach (var activityName in machine.GetActivityNames())
+            foreach (var activityName in machine.GetActivityNames()) {
                 classDecl.AddMemberFunction(MakeActivityFunction(activityName));
+            }
 
             return classDecl;
         }
@@ -113,11 +116,13 @@
 
             Block body = new Block();
 
-            if (machine.InitializeAction != null)
+            if (machine.InitializeAction != null) {
                 body.AddStatements(MakeActionStatements(machine.InitializeAction));
+            }
 
-            if (machine.Start.EnterAction != null)
+            if (machine.Start.EnterAction != null) {
                 body.AddStatements(MakeActionStatements(machine.Start.EnterAction));
+            }
 
             body.AddStatement(
                 new InlineStatement(
@@ -203,8 +208,10 @@
                             new IdentifierExpression(
                                 String.Format("do{0}", callActivity.MethodName)),
                             null));
-                    if (stmtList == null)
+                    if (stmtList == null) {
                         stmtList = new List<StatementBase>();
+                    }
+
                     stmtList.Add(stmt);
                 }
             }

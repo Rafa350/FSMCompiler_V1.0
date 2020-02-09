@@ -10,19 +10,22 @@
 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }
 
         public void AddSwitchCase(SwitchCaseStatement switchCase) {
 
-            if (switchCase == null)
+            if (switchCase == null) {
                 throw new ArgumentNullException(nameof(switchCase));
+            }
 
-            if (switchCaseList == null)
+            if (switchCaseList == null) {
                 switchCaseList = new List<SwitchCaseStatement>();
+            }
 
             switchCaseList.Add(switchCase);
         }

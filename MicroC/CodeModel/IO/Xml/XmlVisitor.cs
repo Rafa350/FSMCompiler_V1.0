@@ -22,8 +22,10 @@
         public override void Visit(NamespaceDeclaration obj) {
 
             StartElement("namespaceDeclaration");
-            if (!String.IsNullOrEmpty(obj.Name))
+            if (!String.IsNullOrEmpty(obj.Name)) {
                 Attribute("name", obj.Name);
+            }
+
             base.Visit(obj);
             EndElement();
         }
@@ -46,13 +48,16 @@
 
             if (obj.Arguments != null) {
                 StartElement("parameterDeclarations");
-                foreach (var argument in obj.Arguments)
+                foreach (var argument in obj.Arguments) {
                     argument.AcceptVisitor(this);
+                }
+
                 EndElement();
             }
 
-            if (obj.Body != null)
+            if (obj.Body != null) {
                 obj.Body.AcceptVisitor(this);
+            }
 
             EndElement();
         }
@@ -81,8 +86,10 @@
             StartElement("block");
             if (obj.Statements != null) {
                 StartElement("statements");
-                foreach (var statement in obj.Statements)
+                foreach (var statement in obj.Statements) {
                     statement.AcceptVisitor(this);
+                }
+
                 EndElement();
             }
             EndElement();
@@ -91,8 +98,10 @@
         public override void Visit(ReturnStatement obj) {
 
             StartElement("returnStatement");
-            if (obj.Expression != null)
+            if (obj.Expression != null) {
                 obj.Expression.AcceptVisitor(this);
+            }
+
             EndElement();
         }
 
@@ -116,8 +125,10 @@
             StartElement("conditionalStatement");
             obj.ConditionExpression.AcceptVisitor(this);
             obj.TrueBlock.AcceptVisitor(this);
-            if (obj.FalseBlock != null)
+            if (obj.FalseBlock != null) {
                 obj.FalseBlock.AcceptVisitor(this);
+            }
+
             EndElement();
         }
 
@@ -126,8 +137,10 @@
             StartElement("loopStatement");
             Attribute("conditionPosition", obj.ConditionPosition);
             obj.ConditionExpression.AcceptVisitor(this);
-            if (obj.Body != null)
+            if (obj.Body != null) {
                 obj.Body.AcceptVisitor(this);
+            }
+
             EndElement();
         }
 
@@ -177,8 +190,10 @@
             obj.Function.AcceptVisitor(this);
             if (obj.Arguments != null) {
                 StartElement("parameters");
-                foreach (var argument in obj.Arguments)
+                foreach (var argument in obj.Arguments) {
                     argument.AcceptVisitor(this);
+                }
+
                 EndElement();
             }
             EndElement();

@@ -20,12 +20,14 @@
         /// 
         public SubscriptExpression(ExpressionBase address, IEnumerable<ExpressionBase> indices = null) {
 
-            if (address == null)
+            if (address == null) {
                 throw new ArgumentNullException(nameof(address));
+            }
 
             this.address = address;
-            if (indices != null)
+            if (indices != null) {
                 indexList = new List<ExpressionBase>(indices);
+            }
         }
 
         /// <summary>
@@ -45,8 +47,9 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }

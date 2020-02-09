@@ -9,8 +9,9 @@
 
         public FunctionCallStatement(FunctionCallExpression expression) {
 
-            if (expression == null)
-                throw new ArgumentNullException("expression");
+            if (expression == null) {
+                throw new ArgumentNullException(nameof(expression));
+            }
 
             this.expression = expression;
         }
@@ -22,6 +23,9 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
+
             visitor.Visit(this);
         }
 
@@ -29,10 +33,6 @@
         /// Obte o asigna la expressio.
         /// </summary>
         /// 
-        public FunctionCallExpression Expression {
-            get {
-                return expression;
-            }
-        }
+        public FunctionCallExpression Expression => expression;
     }
 }

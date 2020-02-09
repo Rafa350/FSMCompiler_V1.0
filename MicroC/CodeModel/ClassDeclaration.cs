@@ -28,8 +28,9 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }
@@ -41,8 +42,9 @@
         /// 
         public void AddConstructor(ConstructorDeclaration constructor) {
 
-            if (constructor == null)
+            if (constructor == null) {
                 throw new ArgumentNullException(nameof(constructor));
+            }
 
             InternalAddContructor(constructor);
         }
@@ -54,11 +56,13 @@
         /// 
         public void AddConstructors(IEnumerable<ConstructorDeclaration> constructors) {
 
-            if (constructors == null)
+            if (constructors == null) {
                 throw new ArgumentNullException(nameof(constructors));
+            }
 
-            foreach (var constructor in constructors)
+            foreach (var constructor in constructors) {
                 InternalAddContructor(constructor);
+            }
         }
 
         /// <summary>
@@ -68,8 +72,9 @@
         /// 
         private void InternalAddContructor(ConstructorDeclaration constructor) {
 
-            if (constructorList == null)
+            if (constructorList == null) {
                 constructorList = new List<ConstructorDeclaration>();
+            }
 
             constructorList.Add(constructor);
         }
@@ -81,8 +86,9 @@
         /// 
         public void AddMemberFunction(MemberFunctionDeclaration function) {
 
-            if (function == null)
+            if (function == null) {
                 throw new ArgumentNullException(nameof(function));
+            }
 
             InternalAddMemberFunction(function);
         }
@@ -94,11 +100,13 @@
         /// 
         public void AddMemberFunctions(IEnumerable<MemberFunctionDeclaration> functions) {
 
-            if (functions == null)
+            if (functions == null) {
                 throw new ArgumentNullException(nameof(functions));
+            }
 
-            foreach (var function in functions)
+            foreach (var function in functions) {
                 InternalAddMemberFunction(function);
+            }
         }
 
         /// <summary>
@@ -108,8 +116,9 @@
         /// 
         private void InternalAddMemberFunction(MemberFunctionDeclaration function) {
 
-            if (functionList == null)
+            if (functionList == null) {
                 functionList = new List<MemberFunctionDeclaration>();
+            }
 
             functionList.Add(function);
         }
@@ -121,8 +130,9 @@
         /// 
         public void AddMemberVariable(MemberVariableDeclaration variable) {
 
-            if (variable == null)
+            if (variable == null) {
                 throw new ArgumentNullException(nameof(variable));
+            }
 
             InternalAddMemberVariable(variable);
         }
@@ -134,11 +144,13 @@
         /// 
         public void AddMemberVariable(IEnumerable<MemberVariableDeclaration> variables) {
 
-            if (variables == null)
+            if (variables == null) {
                 throw new ArgumentNullException(nameof(variables));
+            }
 
-            foreach (var variable in Variables)
+            foreach (var variable in Variables) {
                 InternalAddMemberVariable(variable);
+            }
         }
 
         /// <summary>
@@ -148,8 +160,9 @@
         /// 
         private void InternalAddMemberVariable(MemberVariableDeclaration variable) {
 
-            if (variableList == null)
+            if (variableList == null) {
                 variableList = new List<MemberVariableDeclaration>();
+            }
 
             variableList.Add(variable);
         }

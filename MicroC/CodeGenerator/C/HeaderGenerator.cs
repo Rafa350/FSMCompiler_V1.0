@@ -9,7 +9,7 @@
         private sealed class GeneratorVisitor : DefaultVisitor {
 
             private readonly StringBuilder sb;
-            private int indent = 0;
+            private readonly int indent = 0;
 
             public GeneratorVisitor(StringBuilder sb, int indent) {
 
@@ -30,8 +30,9 @@
 
         public static string Generate(UnitDeclaration unitDeclaration) {
 
-            if (unitDeclaration == null)
+            if (unitDeclaration == null) {
                 throw new ArgumentNullException(nameof(unitDeclaration));
+            }
 
             StringBuilder sb = new StringBuilder();
 

@@ -13,8 +13,9 @@
 
         public Machine(string name) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException("name");
+            }
 
             this.name = name;
         }
@@ -36,12 +37,14 @@
         /// 
         public void AddState(State state) {
 
-            if (state == null)
+            if (state == null) {
                 throw new ArgumentNullException("state");
+            }
 
-            if (states.Contains(state))
+            if (states.Contains(state)) {
                 throw new InvalidOperationException(
                     String.Format("El estado '{0}' ya ha sido agregado.", state.FullName));
+            }
 
             states.Add(state);
         }
@@ -55,17 +58,20 @@
         /// 
         public State GetState(string name, bool throwError = true) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException("name");
-
-            foreach (State state in states) {
-                if (state.Name == name)
-                    return state;
             }
 
-            if (throwError)
+            foreach (State state in states) {
+                if (state.Name == name) {
+                    return state;
+                }
+            }
+
+            if (throwError) {
                 throw new InvalidOperationException(
                     String.Format("No se agrego ningun estado con el nombre '{0}'.", name));
+            }
 
             return null;
         }
@@ -89,9 +95,11 @@
                 return start;
             }
             set {
-                if (!states.Contains(value))
+                if (!states.Contains(value)) {
                     throw new InvalidOperationException(
                         String.Format("El estado '{0}', no esta declarado en esta maquina.", value.Name));
+                }
+
                 start = value;
             }
         }
@@ -120,8 +128,9 @@
         /// 
         public IEnumerable<string> StateNames {
             get {
-                foreach (State state in states)
+                foreach (State state in states) {
                     yield return state.Name;
+                }
             }
         }
 
@@ -147,9 +156,11 @@
 
         public IEnumerable<State> FinalStates {
             get {
-                foreach (State state in states)
-                    if (!state.HasChilds)
+                foreach (State state in states) {
+                    if (!state.HasChilds) {
                         yield return state;
+                    }
+                }
             }
         }
     }

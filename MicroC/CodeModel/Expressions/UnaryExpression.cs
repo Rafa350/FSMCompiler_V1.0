@@ -28,8 +28,9 @@
         /// 
         public UnaryExpression(UnaryOpCode opCode, ExpressionBase expression) {
 
-            if (expression == null)
+            if (expression == null) {
                 throw new ArgumentNullException(nameof(expression));
+            }
 
             this.opCode = opCode;
             this.expression = expression;
@@ -42,8 +43,9 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }

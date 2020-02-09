@@ -16,8 +16,9 @@
 
             public GeneratorVisitor(StringBuilder sb, int indent = 0) {
 
-                if (sb == null)
+                if (sb == null) {
                     throw new ArgumentNullException(nameof(sb));
+                }
 
                 this.sb = sb;
                 this.indent = indent;
@@ -37,17 +38,23 @@
                 ClassDeclaration oldClass = currentClass;
                 currentClass = obj;
 
-                if (obj.Variables != null)
-                    foreach (var variable in obj.Variables)
+                if (obj.Variables != null) {
+                    foreach (var variable in obj.Variables) {
                         variable.AcceptVisitor(this);
+                    }
+                }
 
-                if (obj.Constructors != null)
-                    foreach (var constructor in obj.Constructors)
+                if (obj.Constructors != null) {
+                    foreach (var constructor in obj.Constructors) {
                         constructor.AcceptVisitor(this);
+                    }
+                }
 
-                if (obj.Functions != null)
-                    foreach (var function in obj.Functions)
+                if (obj.Functions != null) {
+                    foreach (var function in obj.Functions) {
                         function.AcceptVisitor(this);
+                    }
+                }
 
                 currentClass = oldClass;
             }
@@ -65,17 +72,21 @@
                     indent++;
                     bool first = true;
                     foreach (var argument in obj.Arguments) {
-                        if (first)
+                        if (first) {
                             first = false;
-                        else
+                        }
+                        else {
                             sb.Append(", ");
+                        }
+
                         argument.AcceptVisitor(this);
                     }
                     sb.AppendLine(") {");
                 }
 
-                if (obj.Body != null)
+                if (obj.Body != null) {
                     obj.Body.AcceptVisitor(this);
+                }
 
                 indent--;
                 sb.AppendIndent(indent);
@@ -88,9 +99,12 @@
 
                 obj.Function.AcceptVisitor(this);
                 sb.Append('(');
-                if (obj.Arguments != null)
-                    foreach (var argument in obj.Arguments)
+                if (obj.Arguments != null) {
+                    foreach (var argument in obj.Arguments) {
                         argument.AcceptVisitor(this);
+                    }
+                }
+
                 sb.Append(')');
             }
 
@@ -111,13 +125,17 @@
 
                 sb.AppendIndent(indent);
                 sb.Append("if (");
-                if (obj.ConditionExpression == null)
+                if (obj.ConditionExpression == null) {
                     throw new InvalidOperationException("No se especifico la condicion.");
+                }
+
                 obj.ConditionExpression.AcceptVisitor(this);
                 sb.AppendLine(") {");
                 indent++;
-                if (obj.TrueBlock == null)
+                if (obj.TrueBlock == null) {
                     throw new InvalidOperationException("No se especificoel bloque true.");
+                }
+
                 obj.TrueBlock.AcceptVisitor(this);
                 indent--;
                 sb.AppendIndent(indent);
@@ -177,17 +195,21 @@
                     indent++;
                     bool first = true;
                     foreach (var argument in obj.Arguments) {
-                        if (first)
+                        if (first) {
                             first = false;
-                        else
+                        }
+                        else {
                             sb.Append(", ");
+                        }
+
                         argument.AcceptVisitor(this);
                     }
                     sb.AppendLine(") {");
                 }
 
-                if (obj.Body != null)
+                if (obj.Body != null) {
                     obj.Body.AcceptVisitor(this);
+                }
 
                 indent--;
                 sb.AppendIndent(indent);
@@ -225,8 +247,9 @@
 
         public static string Generate(UnitDeclaration unitDeclaration) {
 
-            if (unitDeclaration == null)
+            if (unitDeclaration == null) {
                 throw new ArgumentNullException(nameof(unitDeclaration));
+            }
 
             StringBuilder sb = new StringBuilder();
             var visitor = new GeneratorVisitor(sb);

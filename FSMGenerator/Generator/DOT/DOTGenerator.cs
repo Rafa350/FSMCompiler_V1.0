@@ -30,8 +30,9 @@
         public override void Generate(Machine machine) {
 
             string folder = options.OutputPath;
-            if (String.IsNullOrEmpty(folder))
+            if (String.IsNullOrEmpty(folder)) {
                 folder = @".\";
+            }
 
             // Genera els noms de les guardes i de les accions
             //
@@ -40,27 +41,33 @@
             Dictionary<Model.Action, string> actionName = new Dictionary<Model.Action, string>();
             Dictionary<Guard, string> guardName = new Dictionary<Guard, string>();
 
-            if (machine.InitializeAction != null)
+            if (machine.InitializeAction != null) {
                 actionName.Add(machine.InitializeAction, MakeActionName(actionCount++));
+            }
 
-            if (machine.TerminateAction != null)
+            if (machine.TerminateAction != null) {
                 actionName.Add(machine.TerminateAction, MakeActionName(actionCount++));
+            }
 
             foreach (State state in machine.States) {
 
-                if (state.EnterAction != null)
+                if (state.EnterAction != null) {
                     actionName.Add(state.EnterAction, MakeActionName(actionCount++));
+                }
 
-                if (state.ExitAction != null)
+                if (state.ExitAction != null) {
                     actionName.Add(state.ExitAction, MakeActionName(actionCount++));
+                }
 
                 foreach (Transition transition in state.Transitions) {
 
-                    if (transition.Guard != null)
+                    if (transition.Guard != null) {
                         guardName.Add(transition.Guard, MakeGuardName(guardCount++));
+                    }
 
-                    if (transition.Action != null)
+                    if (transition.Action != null) {
                         actionName.Add(transition.Action, MakeActionName(actionCount++));
+                    }
                 }
             }
 
@@ -167,8 +174,10 @@
                         if (transition.NextState != null) {
                             sb.AppendFormat("    {0}->{1} [", state.Name, transition.NextState.Name).AppendLine();
                             sb.AppendFormat("        label = \"{0}", transition.Name);
-                            if (transition.Action != null)
+                            if (transition.Action != null) {
                                 sb.AppendFormat(" / {0}", actionName[transition.Action]);
+                            }
+
                             sb.Append("\"").AppendLine();
                             sb.Append("    ];");
                             sb.AppendLine();

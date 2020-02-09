@@ -26,27 +26,33 @@
             int actionCount = 0;
             int guardCount = 0;
 
-            if (machine.InitializeAction != null)
+            if (machine.InitializeAction != null) {
                 actionName.Add(machine.InitializeAction, MakeActionName(actionCount++));
+            }
 
-            if (machine.TerminateAction != null)
+            if (machine.TerminateAction != null) {
                 actionName.Add(machine.TerminateAction, MakeActionName(actionCount++));
+            }
 
             foreach (State state in machine.States) {
 
-                if (state.EnterAction != null)
+                if (state.EnterAction != null) {
                     actionName.Add(state.EnterAction, MakeActionName(actionCount++));
+                }
 
-                if (state.ExitAction != null)
+                if (state.ExitAction != null) {
                     actionName.Add(state.ExitAction, MakeActionName(actionCount++));
+                }
 
                 foreach (Transition transition in state.Transitions) {
 
-                    if (transition.Guard != null)
+                    if (transition.Guard != null) {
                         guardName.Add(transition.Guard, MakeGuardName(guardCount++));
+                    }
 
-                    if (transition.Action != null)
+                    if (transition.Action != null) {
                         actionName.Add(transition.Action, MakeActionName(actionCount++));
+                    }
                 }
             }
         }
@@ -65,8 +71,9 @@
                 .WriteLine("typedef enum {")
                 .Indent();
 
-            foreach (State state in machine.States)
+            foreach (State state in machine.States) {
                 codeBuilder.WriteLine("State_{0},", state.Name);
+            }
 
             codeBuilder
                 .UnIndent()
@@ -186,17 +193,21 @@
                 .WriteLine("state = State::{0};", machine.Start.Name);
 
             if (machine.InitializeAction != null) {
-                if (inlineActions)
+                if (inlineActions) {
                     EmitActionBody(codeBuilder, machine.InitializeAction);
-                else
+                }
+                else {
                     EmitActionCall(codeBuilder, machine.InitializeAction);
+                }
             }
 
             if (machine.Start.EnterAction != null) {
-                if (inlineActions)
+                if (inlineActions) {
                     EmitActionBody(codeBuilder, machine.Start.EnterAction);
-                else
+                }
+                else {
                     EmitActionCall(codeBuilder, machine.Start.EnterAction);
+                }
             }
 
             codeBuilder
@@ -232,16 +243,22 @@
                         firstTransition = false;
                         sb.Append("if (");
                     }
-                    else
+                    else {
                         sb.Append("else if (");
-                    if (transition.Guard != null)
+                    }
+
+                    if (transition.Guard != null) {
                         sb.Append('(');
+                    }
+
                     sb.AppendFormat("event == Machine::Event::{0}", transition.Name);
                     if (transition.Guard != null) {
-                        if (inlineGuards)
+                        if (inlineGuards) {
                             sb.AppendFormat(") && ({0})", transition.Guard.Expression);
-                        else
+                        }
+                        else {
                             sb.AppendFormat(") && {0}()", guardName[transition.Guard]);
+                        }
                     }
                     sb.Append(") {");
 
@@ -253,30 +270,36 @@
                     //
                     if ((transition.NextState != null) && (transition.NextState != state)) {
                         if (state.ExitAction != null) {
-                            if (inlineActions)
+                            if (inlineActions) {
                                 EmitActionBody(codeBuilder, state.ExitAction);
-                            else
+                            }
+                            else {
                                 EmitActionCall(codeBuilder, state.ExitAction);
+                            }
                         }
                     }
 
                     // Genera la crida a la accio de la transicio
                     //
                     if (transition.Action != null) {
-                        if (inlineActions)
+                        if (inlineActions) {
                             EmitActionBody(codeBuilder, transition.Action);
-                        else
+                        }
+                        else {
                             EmitActionCall(codeBuilder, transition.Action);
+                        }
                     }
 
                     // Si hi ha canvi d'estat, genera la crida a la EnterAction del nou estat.
                     //
                     if ((transition.NextState != null) /*OJO auto-transicio*/ && (transition.NextState != state)) {
                         if (transition.NextState.EnterAction != null) {
-                            if (inlineActions)
+                            if (inlineActions) {
                                 EmitActionBody(codeBuilder, transition.NextState.EnterAction);
-                            else
+                            }
+                            else {
                                 EmitActionCall(codeBuilder, transition.NextState.EnterAction);
+                            }
                         }
                         codeBuilder
                             .WriteLine("state = State::{0};", transition.NextState.Name);
@@ -339,8 +362,9 @@
 
             foreach (Activity command in action.Activities) {
                 CodeActity inlineCmd = command as CodeActity;
-                if (inlineCmd != null)
+                if (inlineCmd != null) {
                     codeBuilder.WriteLine(inlineCmd.Text);
+                }
             }
         }
 

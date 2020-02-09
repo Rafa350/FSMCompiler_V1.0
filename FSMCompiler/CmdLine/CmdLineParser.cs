@@ -45,8 +45,9 @@
         /// 
         public CmdLineParser(string title, string description = null, CmdLineMode mode = CmdLineMode.Insensitive, CmdLineStyle style = CmdLineStyle.Windows) {
 
-            if (String.IsNullOrEmpty(title))
+            if (String.IsNullOrEmpty(title)) {
                 throw new ArgumentNullException("title");
+            }
 
             this.title = title;
             this.description = description;
@@ -63,8 +64,9 @@
         /// 
         public void Add(ArgumentDefinition argumentDefinition) {
 
-            if (argumentDefinition == null)
+            if (argumentDefinition == null) {
                 throw new ArgumentNullException("argumentDefinion");
+            }
 
             argumentDefinitions.Add(argumentDefinition);
         }
@@ -76,8 +78,9 @@
         /// 
         public void Add(OptionDefinition optionDefinition) {
 
-            if (optionDefinition == null)
+            if (optionDefinition == null) {
                 throw new ArgumentNullException("optionDefinition");
+            }
 
             optionDefinitions.Add(optionDefinition.Name, optionDefinition);
         }
@@ -121,23 +124,28 @@
 
         private OptionDefinition FindOptionDefinition(string arg) {
 
-            if (String.IsNullOrEmpty(arg))
+            if (String.IsNullOrEmpty(arg)) {
                 throw new ArgumentNullException("arg");
+            }
 
-            if (!arg.StartsWith(optionPrefix))
+            if (!arg.StartsWith(optionPrefix)) {
                 throw new InvalidOperationException("No es una opcion.");
+            }
 
             int len = arg.IndexOf(optionValueSeparator, 1);
-            if (len == -1)
+            if (len == -1) {
                 len = arg.Length;
+            }
+
             string key = arg.Substring(1, len - 1);
             return optionDefinitions[key];
         }
 
         private ArgumentDefinition FindArgumentDefinition(string arg, int index) {
 
-            if (String.IsNullOrEmpty(arg))
+            if (String.IsNullOrEmpty(arg)) {
                 throw new ArgumentNullException("arg");
+            }
 
             return argumentDefinitions[index];
         }
@@ -145,10 +153,12 @@
         private string GetOptionValue(string arg) {
 
             int p = arg.IndexOf(optionValueSeparator);
-            if (p == -1)
+            if (p == -1) {
                 return null;
-            else
+            }
+            else {
                 return arg.Substring(p + 1);
+            }
         }
 
         /// <summary>
@@ -161,8 +171,9 @@
         /// 
         public bool Pupulate(object data, bool ignoreIfNoExists = false, bool throwOnError = true) {
 
-            if (data == null)
+            if (data == null) {
                 throw new ArgumentNullException("data");
+            }
 
             try {
                 Type dataType = data.GetType();
@@ -173,18 +184,21 @@
                         object value = Convert.ChangeType(optionInfo.Value, propInfo.PropertyType);
                         propInfo.SetValue(data, value, null);
                     }
-                    else if (!ignoreIfNoExists)
+                    else if (!ignoreIfNoExists) {
                         throw new InvalidOperationException(
                             String.Format("No se encontro la propiedad '{0}'.", optionInfo.Name));
+                    }
                 }
 
                 return true;
             }
             catch {
-                if (throwOnError)
+                if (throwOnError) {
                     throw;
-                else
+                }
+                else {
                     return false;
+                }
             }
         }
 
@@ -255,16 +269,24 @@
         public string HelpText {
             get {
                 StringBuilder sb = new StringBuilder();
-                if (!String.IsNullOrEmpty(title))
+                if (!String.IsNullOrEmpty(title)) {
                     sb.AppendLine(title);
-                if (!String.IsNullOrEmpty(description))
+                }
+
+                if (!String.IsNullOrEmpty(description)) {
                     sb.AppendLine(description);
+                }
+
                 foreach (ArgumentDefinition argument in argumentDefinitions) {
-                    if (!argument.Required)
+                    if (!argument.Required) {
                         sb.Append('[');
+                    }
+
                     sb.Append(argument.Name);
-                    if (!argument.Required)
+                    if (!argument.Required) {
                         sb.Append(']');
+                    }
+
                     sb.AppendFormat("\t{0}", argument.Description);
                     sb.AppendLine();
                 }

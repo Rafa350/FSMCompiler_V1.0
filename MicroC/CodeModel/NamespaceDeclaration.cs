@@ -22,8 +22,9 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }
@@ -35,22 +36,26 @@
         /// 
         public void AddMember(IUnitMember member) {
 
-            if (member == null)
+            if (member == null) {
                 throw new ArgumentNullException(nameof(member));
+            }
 
-            if (memberList == null)
+            if (memberList == null) {
                 memberList = new List<IUnitMember>();
+            }
 
             memberList.Add(member);
         }
 
         public void AddMembers(IEnumerable<IUnitMember> members) {
 
-            if (members == null)
+            if (members == null) {
                 throw new ArgumentNullException(nameof(members));
+            }
 
-            foreach (var member in members)
+            foreach (var member in members) {
                 AddMember(member);
+            }
         }
 
         /// <summary>

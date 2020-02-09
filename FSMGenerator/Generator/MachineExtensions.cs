@@ -12,8 +12,9 @@
 
             foreach (var state in machine.States) {
                 foreach (string name in state.GetTransitionNames()) {
-                    if (!names.Contains(name))
+                    if (!names.Contains(name)) {
                         names.Add(name);
+                    }
                 }
             }
 
@@ -29,8 +30,9 @@
                 foreach (var activity in action.Activities) {
                     if (activity is CallActivity callActivity) {
                         string name = callActivity.MethodName;
-                        if (!names.Contains(name))
+                        if (!names.Contains(name)) {
                             names.Add(name);
+                        }
                     }
                 }
             }
@@ -38,16 +40,18 @@
             foreach (var state in machine.States) {
                 if (state.HasTransitions) {
                     foreach (var transition in state.Transitions) {
-                        if (transition.Action != null)
+                        if (transition.Action != null) {
                             PopulateList(transition.Action);
+                        }
                     }
                 }
-                if (state.EnterAction != null)
+                if (state.EnterAction != null) {
                     PopulateList(state.EnterAction);
+                }
 
-                if (state.ExitAction != null)
+                if (state.ExitAction != null) {
                     PopulateList(state.ExitAction);
-
+                }
             }
 
             return names;

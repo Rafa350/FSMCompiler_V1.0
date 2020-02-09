@@ -9,11 +9,13 @@
 
         public AssignStatement(string name, ExpressionBase expression) {
 
-            if (String.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
+            if (String.IsNullOrEmpty(name)) {
+                throw new ArgumentNullException(nameof(name));
+            }
 
-            if (expression == null)
-                throw new ArgumentNullException("expression");
+            if (expression == null) {
+                throw new ArgumentNullException(nameof(expression));
+            }
 
             this.name = name;
             this.expression = expression;
@@ -24,21 +26,8 @@
             visitor.Visit(this);
         }
 
-        public override string ToString() {
+        public string Name => name;
 
-            return String.Format("{0} = ", name);
-        }
-
-        public string Name {
-            get {
-                return name;
-            }
-        }
-
-        public ExpressionBase Expression {
-            get {
-                return expression;
-            }
-        }
+        public ExpressionBase Expression => expression;
     }
 }

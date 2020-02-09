@@ -15,8 +15,9 @@
 
         public LoopStatement(ConditionPosition conditionPosition, ExpressionBase conditionExpression, Block body) {
 
-            if (conditionExpression == null)
+            if (conditionExpression == null) {
                 throw new ArgumentNullException(nameof(conditionExpression));
+            }
 
             this.conditionPosition = conditionPosition;
             this.conditionExpression = conditionExpression;

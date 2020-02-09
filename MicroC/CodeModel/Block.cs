@@ -25,8 +25,9 @@
         /// 
         public Block(IEnumerable<StatementBase> statements) {
 
-            if (statements == null)
+            if (statements == null) {
                 throw new ArgumentNullException(nameof(statements));
+            }
 
             statementList = new List<StatementBase>(statements);
         }
@@ -38,8 +39,9 @@
         /// 
         public Block(params StatementBase[] statements) {
 
-            if (statements == null)
+            if (statements == null) {
                 throw new ArgumentNullException(nameof(statements));
+            }
 
             statementList = new List<StatementBase>(statements);
         }
@@ -51,8 +53,9 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }
@@ -64,11 +67,13 @@
         /// 
         public void AddStatement(StatementBase statement) {
 
-            if (statement == null)
+            if (statement == null) {
                 throw new ArgumentNullException(nameof(statement));
+            }
 
-            if (statementList == null)
+            if (statementList == null) {
                 statementList = new List<StatementBase>();
+            }
 
             statementList.Add(statement);
         }
@@ -80,11 +85,13 @@
         /// 
         public void AddStatements(IEnumerable<StatementBase> statements) {
 
-            if (statements == null)
+            if (statements == null) {
                 throw new ArgumentNullException(nameof(statements));
+            }
 
-            if (statementList == null)
+            if (statementList == null) {
                 statementList = new List<StatementBase>();
+            }
 
             statementList.AddRange(statements);
         }

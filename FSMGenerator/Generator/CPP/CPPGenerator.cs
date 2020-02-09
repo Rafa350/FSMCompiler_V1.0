@@ -29,8 +29,9 @@
         private void GenerateMachineCode(Machine machine) {
 
             string folder = options.OutputPath;
-            if (String.IsNullOrEmpty(folder))
+            if (String.IsNullOrEmpty(folder)) {
                 folder = @".\";
+            }
 
             // Crea el fitxer "fsm_<machine>.c"
             //

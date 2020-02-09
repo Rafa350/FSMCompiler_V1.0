@@ -20,8 +20,9 @@
         /// 
         public UnitDeclaration(IEnumerable<IUnitMember> members) {
 
-            if (members == null)
+            if (members == null) {
                 throw new ArgumentNullException(nameof(members));
+            }
 
             memberList.AddRange(members);
         }
@@ -43,8 +44,9 @@
         /// 
         public void AddMember(IUnitMember member) {
 
-            if (member == null)
+            if (member == null) {
                 throw new ArgumentNullException(nameof(member));
+            }
 
             memberList.Add(member);
         }
@@ -56,8 +58,9 @@
         /// 
         public void AddMembers(IEnumerable<IUnitMember> members) {
 
-            if (members == null)
+            if (members == null) {
                 throw new ArgumentNullException(nameof(members));
+            }
 
             memberList.AddRange(members);
         }
@@ -69,8 +72,9 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null)
+            if (visitor == null) {
                 throw new ArgumentNullException(nameof(visitor));
+            }
 
             visitor.Visit(this);
         }

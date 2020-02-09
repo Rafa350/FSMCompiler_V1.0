@@ -9,14 +9,18 @@
 
         public ArgumentDefinition(string name, TypeIdentifier valueType) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException(nameof(name));
+            }
 
             this.name = name;
             this.valueType = valueType;
         }
 
         public void AcceptVisitor(IVisitor visitor) {
+
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
         }

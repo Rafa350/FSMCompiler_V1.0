@@ -15,8 +15,9 @@
 
             public GeneratorVisitor(StringBuilder sb, int indent = 0) {
 
-                if (sb == null)
+                if (sb == null) {
                     throw new ArgumentNullException(nameof(sb));
+                }
 
                 this.sb = sb;
                 this.indent = indent;
@@ -69,8 +70,9 @@
                     indent++;
                     bool first = true;
                     foreach (var argument in dec.Arguments) {
-                        if (first)
+                        if (first) {
                             first = false;
+                        }
                         else {
                             sb.Append(",");
                             sb.AppendLine();
@@ -82,8 +84,9 @@
                 }
                 sb.AppendLine();
 
-                if (dec.Body != null)
+                if (dec.Body != null) {
                     dec.Body.AcceptVisitor(this);
+                }
 
                 indent--;
                 sb.AppendIndent(indent);
@@ -129,8 +132,9 @@
                 if ((stmt.Body != null) && (stmt.Body.Statements != null)) {
 
                     sb.AppendIndent(indent);
-                    if (stmt.Expression == null)
+                    if (stmt.Expression == null) {
                         sb.AppendLine("default:");
+                    }
                     else {
                         sb.Append("case ");
                         stmt.Expression.AcceptVisitor(this);
@@ -157,19 +161,33 @@
                 sb.AppendLine(") {");
 
                 indent++;
-                foreach (var switchCase in stmt.SwitchCases)
+                foreach (var switchCase in stmt.SwitchCases) {
                     switchCase.AcceptVisitor(this);
+                }
+
                 indent--;
 
                 sb.AppendIndent(indent);
                 sb.AppendLine("}");
             }
+
+            public override void Visit(VariableDeclaration decl) {
+
+                sb.AppendIndent(indent);
+                sb.AppendFormat("{0} {1}", decl.ValueType.Name, decl.Name);
+                if (decl.Initializer != null) {
+
+                }
+                sb.AppendLine(";");
+                sb.AppendLine();
+            }
         }
 
         public static string Generate(UnitDeclaration unitDeclaration) {
 
-            if (unitDeclaration == null)
+            if (unitDeclaration == null) {
                 throw new ArgumentNullException(nameof(unitDeclaration));
+            }
 
             StringBuilder sb = new StringBuilder();
 

@@ -29,14 +29,16 @@
         /// 
         public State(State parent, string name) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException("name");
+            }
 
             this.parent = parent;
             this.name = name;
 
-            if (parent != null)
+            if (parent != null) {
                 parent.childs.Add(this);
+            }
         }
 
         /// <summary>
@@ -56,8 +58,9 @@
         /// 
         public void AddTransition(Transition transition) {
 
-            if (transition == null)
+            if (transition == null) {
                 throw new ArgumentNullException("transition");
+            }
 
             transitions.Add(transition);
         }

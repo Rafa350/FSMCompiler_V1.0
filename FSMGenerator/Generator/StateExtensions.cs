@@ -13,8 +13,9 @@
 
             foreach (Transition transition in state.Transitions) {
                 string name = transition.Name;
-                if (!names.Contains(name))
+                if (!names.Contains(name)) {
                     names.Add(name);
+                }
             }
 
             return names;

@@ -10,8 +10,9 @@
 
         public void Add(string text) {
 
-            if (String.IsNullOrEmpty(text))
+            if (String.IsNullOrEmpty(text)) {
                 throw new ArgumentNullException("text");
+            }
 
             string[] s = text.Split(new char[] { '=' });
             Add(s[0], s[1]);
@@ -19,23 +20,27 @@
 
         public void Add(string name, string value) {
 
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name)) {
                 throw new ArgumentNullException("name");
+            }
 
             items.Add(name, value);
         }
 
         public void Populate(object dataObject) {
 
-            if (dataObject == null)
+            if (dataObject == null) {
                 throw new ArgumentNullException("dataObject");
+            }
 
             Type dataObjectType = dataObject.GetType();
             foreach (KeyValuePair<string, string> kv in items) {
                 PropertyInfo propInfo = dataObjectType.GetProperty(kv.Key, BindingFlags.Instance | BindingFlags.Public);
-                if (propInfo == null)
+                if (propInfo == null) {
                     throw new InvalidOperationException(
                         String.Format("No es posible asignar el valor '{1}', al parametro '{0}'.", kv.Key, kv.Value));
+                }
+
                 object value = Convert.ChangeType(kv.Value, propInfo.PropertyType);
                 propInfo.SetValue(dataObject, value, null);
             }
