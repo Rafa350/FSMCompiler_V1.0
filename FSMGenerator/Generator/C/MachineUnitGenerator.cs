@@ -18,11 +18,20 @@
 
             List<IUnitMember> memberList = new List<IUnitMember>();
 
+            // Crea el tipus enumerador pels valosr del estat.
+            //
+            List<string> stateList = new List<string>();
+            foreach (var state in machine.States) {
+                stateList.Add(String.Format("State_{0}", state.Name));
+            }
+            EnumeratorDeclaration stateType = new EnumeratorDeclaration("State", stateList);
+            memberList.Add(stateType);
+
             // Crea la variabe 'state'
             //
             VariableDeclaration stateVariable = new VariableDeclaration();
-            stateVariable.Name = "state";
-            stateVariable.ValueType = TypeIdentifier.FromName("int");
+            stateVariable.Name = String.Format("{0}_state", machine.Name);
+            stateVariable.ValueType = TypeIdentifier.FromName("State");
             memberList.Add(stateVariable);
 
             // Crea la funcio [machine]_Start()
@@ -89,7 +98,8 @@
             // Seleccio del estat inicial.
             //
             body.AddStatement(
-                new AssignStatement("state",
+                new AssignStatement(
+                    String.Format("{0}_state", machine.Name),
                 new LiteralExpression(
                     String.Format("State_{0}", machine.Start.Name))));
 
@@ -111,7 +121,8 @@
             Block body = new Block();
 
             SwitchStatement switchStmt = new SwitchStatement();
-            switchStmt.Expression = new IdentifierExpression("state");
+            switchStmt.Expression = new IdentifierExpression(
+                String.Format("{0}_state", machine.Name));
 
             foreach (var state in machine.States) {
                 foreach (var transition in state.Transitions) {
@@ -136,6 +147,8 @@
                 }
             }
 
+            switchStmt.AddSwitchCase(new SwitchCaseStatement(null, null));
+
             body.AddStatement(switchStmt);
 
             return body;
@@ -154,12 +167,12 @@
             FunctionDeclaration function = new FunctionDeclaration();
             function.Name = String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName);
             function.ReturnType = TypeIdentifier.FromName("void");
-            function.Body = MakeStateTransitionFunctionBody(state, transitionName);
+            function.Body = MakeStateTransitionFunctionBody(machine, state, transitionName);
 
             return function;
         }
 
-        private static Block MakeStateTransitionFunctionBody(State state, string transitionName) {
+        private static Block MakeStateTransitionFunctionBody(Machine machine, State state, string transitionName) {
 
             Block body = new Block();
             foreach (var transition in state.Transitions) {
@@ -197,7 +210,7 @@
 
                     // Acciona d'entrada del nou estat
                     //
-                    if ((transition.NextState.EnterAction != null) && (transition.NextState.EnterAction.Activities != null)) {
+                    if ((transition.NextState != null) && (transition.NextState.EnterAction != null) && (transition.NextState.EnterAction.Activities != null)) {
                         foreach (var activity in transition.NextState.EnterAction.Activities) {
                             if (activity is CallActivity callActivity) {
                                 trueBlock.AddStatement(
@@ -213,20 +226,23 @@
                     //
                     if (transition.NextState != null) {
                         trueBlock.AddStatement(
-                            new AssignStatement("state",
+                            new AssignStatement(
+                                String.Format("{0}_state", machine.Name),
                             new LiteralExpression(
                                 String.Format("State_{0}", transition.NextState.Name))));
                     }
 
                     if (transition.Guard == null) {
                         body.AddStatement(new IfThenElseStatement(
-                            new InlineExpression("true"),
+                            new LiteralExpression(1),
                             trueBlock,
                             null));
                     }
                     else {
                         body.AddStatement(new IfThenElseStatement(
-                            new InlineExpression(transition.Guard.Expression),
+                            new FunctionCallExpression(
+                                new IdentifierExpression(transition.Guard.Expression),
+                                null),
                             trueBlock,
                             null));
                     }

@@ -21,6 +21,8 @@
 
                 sb.AppendIndent(indent);
                 sb.AppendFormat("{0} {1}(", decl.ReturnType.Name, decl.Name);
+                if (decl.Arguments == null)
+                    sb.Append("void");
                 sb.AppendLine(");");
 
                 base.Visit(decl);

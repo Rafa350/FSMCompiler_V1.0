@@ -33,29 +33,42 @@
                 sb.AppendLine(";");
             }
 
-            public override void Visit(IdentifierExpression exp) {
-
-                sb.Append(exp.Name);
-            }
-
-            public override void Visit(InlineExpression exp) {
-
-                sb.Append(exp.Code);
-            }
-
-            public override void Visit(InlineStatement stmt) {
+            public override void Visit(EnumeratorDeclaration decl) {
 
                 sb.AppendIndent(indent);
-                sb.Append(stmt.Code);
-                sb.AppendLine(";");
+                sb.Append("typedef enum {");
+                indent++;
+                bool first = true;
+                foreach (var element in decl.Eements) {
+                    if (first)
+                        first = false;
+                    else 
+                        sb.Append(',');
+                    sb.AppendLine();                   
+                    sb.AppendIndent(indent);
+                    sb.Append(element);
+                }
+                sb.AppendLine();
+                indent--;
+                sb.AppendFormat("}} {0};", decl.Name);
+                sb.AppendLine();
+                sb.AppendLine();
             }
 
             public override void Visit(FunctionCallExpression exp) {
 
-                sb.AppendIndent(indent);
                 exp.Function.AcceptVisitor(this);
                 sb.Append('(');
-                sb.AppendLine(");");
+                sb.Append(")");
+            }
+
+            public override void Visit(FunctionCallStatement stmt) {
+
+                if (stmt.Expression!= null) {
+                    sb.AppendIndent(indent);
+                    stmt.Expression.AcceptVisitor(this);
+                    sb.AppendLine(";");
+                }
             }
 
             public override void Visit(FunctionDeclaration dec) {
@@ -122,6 +135,23 @@
                 }
             }
 
+            public override void Visit(IdentifierExpression exp) {
+
+                sb.Append(exp.Name);
+            }
+
+            public override void Visit(InlineExpression exp) {
+
+                sb.Append(exp.Code);
+            }
+
+            public override void Visit(InlineStatement stmt) {
+
+                sb.AppendIndent(indent);
+                sb.Append(stmt.Code);
+                sb.AppendLine(";");
+            }
+
             public override void Visit(LiteralExpression exp) {
 
                 sb.Append(exp.Value);
@@ -129,28 +159,26 @@
 
             public override void Visit(SwitchCaseStatement stmt) {
 
-                if ((stmt.Body != null) && (stmt.Body.Statements != null)) {
-
-                    sb.AppendIndent(indent);
-                    if (stmt.Expression == null) {
-                        sb.AppendLine("default:");
-                    }
-                    else {
-                        sb.Append("case ");
-                        stmt.Expression.AcceptVisitor(this);
-                        sb.AppendLine(":");
-                    }
-                    indent++;
-
-                    stmt.Body.AcceptVisitor(this);
-
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("break;");
-
-                    indent--;
-
-                    sb.AppendLine();
+                sb.AppendIndent(indent);
+                if (stmt.Expression == null) {
+                    sb.AppendLine("default:");
                 }
+                else {
+                    sb.Append("case ");
+                    stmt.Expression.AcceptVisitor(this);
+                    sb.AppendLine(":");
+                }
+                indent++;
+
+                if (stmt.Body != null)
+                        stmt.Body.AcceptVisitor(this);
+
+                sb.AppendIndent(indent);
+                sb.AppendLine("break;");
+
+                indent--;
+
+                sb.AppendLine();
             }
 
             public override void Visit(SwitchStatement stmt) {

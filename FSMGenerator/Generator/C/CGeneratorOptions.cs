@@ -4,6 +4,7 @@
 
         public string OutputPath { get; set; }
         public string OutputType { get; set; }
+        public string IncludeFileName { get; set; }
         public string MachineHeaderFileName { get; set; }
         public string MachineCodeFileName { get; set; }
         public string StateHeaderFileName { get; set; }

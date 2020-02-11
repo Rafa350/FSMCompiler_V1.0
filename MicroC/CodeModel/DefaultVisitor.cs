@@ -57,6 +57,9 @@
         public virtual void Visit(DestructorDeclaration decl) {
         }
 
+        public virtual void Visit(EnumeratorDeclaration decl) {
+        }
+
         public virtual void Visit(FunctionCallExpression exp) {
 
             exp.Function.AcceptVisitor(this);

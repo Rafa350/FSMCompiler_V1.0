@@ -6,6 +6,16 @@
 
     public static class MachineExtensions {
 
+        public static IEnumerable<string> GetStateNames(this Machine machine) {
+
+            List<string> names = new List<string>();
+
+            foreach (var state in machine.States)
+                names.Add(state.Name);
+
+            return names;
+        }
+
         public static IEnumerable<string> GetTransitionNames(this Machine machine) {
 
             List<string> names = new List<string>();

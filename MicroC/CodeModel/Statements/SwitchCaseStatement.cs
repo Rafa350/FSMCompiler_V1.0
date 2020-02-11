@@ -9,6 +9,16 @@
         private LiteralExpression expression;
         private Block body;
 
+        public SwitchCaseStatement() {
+
+        }
+
+        public SwitchCaseStatement(LiteralExpression expression, Block body) {
+
+            this.expression = expression;
+            this.body = body;
+        }
+
         /// <summary>
         /// Accepta un visitador.
         /// </summary>

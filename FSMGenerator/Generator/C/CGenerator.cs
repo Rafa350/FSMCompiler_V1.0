@@ -96,7 +96,15 @@
                     .WriteLine("#ifndef __{0}__", guardString)
                     .WriteLine("#define __{0}__", guardString)
                     .WriteLine()
-                    .WriteLine()
+                    .WriteLine();
+
+                if (!String.IsNullOrEmpty(options.IncludeFileName))
+                    codeBuilder
+                        .WriteLine("#include \"{0}\"", options.IncludeFileName)
+                        .WriteLine()
+                        .WriteLine();
+
+                codeBuilder
                     .WriteLine(header)
                     .WriteLine()
                     .WriteLine("#endif // __{0}__", guardString);

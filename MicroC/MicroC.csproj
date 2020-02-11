@@ -59,6 +59,7 @@
     <Compile Include="CodeModel\DefaultVisitor.cs" />
     <Compile Include="CodeModel\DestructorDeclaration.cs" />
     <Compile Include="CodeModel\DestructorVirtualMode.cs" />
+    <Compile Include="CodeModel\EnumeratorDeclaration.cs" />
     <Compile Include="CodeModel\ExpressionBase.cs" />
     <Compile Include="CodeModel\Expressions\BinaryExpression.cs" />
     <Compile Include="CodeModel\Expressions\ConditionalExpression.cs" />
