@@ -13,9 +13,8 @@
         /// 
         public Guard(string expression) {
 
-            if (String.IsNullOrEmpty(expression)) {
+            if (String.IsNullOrEmpty(expression))
                 throw new ArgumentNullException(nameof(expression));
-            }
 
             this.expression = expression;
         }

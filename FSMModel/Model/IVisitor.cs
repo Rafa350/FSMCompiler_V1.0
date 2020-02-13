@@ -10,7 +10,8 @@
         void Visit(Guard guard);
         void Visit(Action action);
 
-        void Visit(CodeActity action);
-        void Visit(CallActivity action);
+        void Visit(InlineActity action);
+        void Visit(RunActivity action);
+        void Visit(ThrowActivity action);
     }
 }

@@ -361,7 +361,7 @@
         private void EmitActionBody(CodeBuilder codeBuilder, Model.Action action) {
 
             foreach (Activity command in action.Activities) {
-                CodeActity inlineCmd = command as CodeActity;
+                InlineActity inlineCmd = command as InlineActity;
                 if (inlineCmd != null) {
                     codeBuilder.WriteLine(inlineCmd.Text);
                 }

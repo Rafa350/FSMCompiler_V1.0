@@ -6,7 +6,7 @@
     public sealed class State : IVisitable {
 
         private readonly List<State> childs = new List<State>();
-        private readonly List<Transition> transitions = new List<Transition>();
+        private List<Transition> transitionList;
         private readonly State parent;
         private readonly string name;
         private Action enterAction;
@@ -29,16 +29,14 @@
         /// 
         public State(State parent, string name) {
 
-            if (String.IsNullOrEmpty(name)) {
-                throw new ArgumentNullException("name");
-            }
+            if (String.IsNullOrEmpty(name)) 
+                throw new ArgumentNullException(nameof(name));
 
             this.parent = parent;
             this.name = name;
 
-            if (parent != null) {
+            if (parent != null) 
                 parent.childs.Add(this);
-            }
         }
 
         /// <summary>
@@ -47,6 +45,9 @@
         /// <param name="visitor">El visitador.</param>
         /// 
         public void AcceptVisitor(IVisitor visitor) {
+
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
         }
@@ -58,42 +59,38 @@
         /// 
         public void AddTransition(Transition transition) {
 
-            if (transition == null) {
-                throw new ArgumentNullException("transition");
-            }
+            if (transition == null) 
+                throw new ArgumentNullException(nameof(transition));
 
-            transitions.Add(transition);
+            if (transitionList == null)
+                transitionList = new List<Transition>();
+
+            transitionList.Add(transition);
         }
 
         /// <summary>
         /// Obte l'estat pare
         /// </summary>
         /// 
-        public State Parent {
-            get {
-                return parent;
-            }
-        }
+        public State Parent => parent;
 
         /// <summary>
         /// Obte el nom.
         /// </summary>
         /// 
-        public string Name {
-            get {
-                return name;
-            }
-        }
+        public string Name => name;
 
         /// <summary>
         /// Obte el nom complert, seguint la ruta pare-fill.
         /// </summary>
         /// 
-        public string FullName {
-            get {
-                return (parent == null) ? name : String.Format("{0}{1}", parent.FullName, name);
-            }
-        }
+        public string FullName => (parent == null) ? name : String.Format("{0}{1}", parent.FullName, name);
+
+        /// <summary>
+        /// Indica si hi han transisions.
+        /// </summary>
+        /// 
+        public bool HasTransitions => transitionList != null;
 
         /// <summary>
         /// Obte un enumerador per les transicions.
@@ -101,27 +98,7 @@
         /// 
         public IEnumerable<Transition> Transitions {
             get {
-                return transitions;
-            }
-        }
-
-        /// <summary>
-        /// Obte el nombre de transicions.
-        /// </summary>
-        /// 
-        public int NumberOfTransitions {
-            get {
-                return transitions.Count;
-            }
-        }
-
-        /// <summary>
-        /// Indica si hi han transisions.
-        /// </summary>
-        /// 
-        public bool HasTransitions {
-            get {
-                return transitions.Count > 0;
+                return transitionList;
             }
         }
 

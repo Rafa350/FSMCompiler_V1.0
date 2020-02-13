@@ -83,14 +83,13 @@
 
             // Accions d'inici del estat inicial.
             //
-            if (machine.Start.EnterAction != null) {
+            if ((machine.Start.EnterAction != null) && machine.Start.EnterAction.HasActivities) {
                 foreach (var activity in machine.Start.EnterAction.Activities) {
-                    if (activity is CallActivity callActivity) {
+                    if (activity is RunActivity callActivity) {
                         body.AddStatement(
                             new FunctionCallStatement(
                                 new FunctionCallExpression(
-                                    new IdentifierExpression(callActivity.MethodName),
-                                    null)));
+                                    new IdentifierExpression(callActivity.ProcessName))));
                     }
                 }
             }
@@ -125,26 +124,26 @@
                 String.Format("{0}_state", machine.Name));
 
             foreach (var state in machine.States) {
-                foreach (var transition in state.Transitions) {
-                    if (transition.Name == transitionName) {
+                if (state.HasTransitions)
+                    foreach (var transition in state.Transitions) {
+                        if (transition.Name == transitionName) {
 
-                        SwitchCaseStatement caseStmt = new SwitchCaseStatement();
-                        caseStmt.Expression = new LiteralExpression(
-                            String.Format("State_{0}", state.Name));
+                            SwitchCaseStatement caseStmt = new SwitchCaseStatement();
+                            caseStmt.Expression = new LiteralExpression(
+                                String.Format("State_{0}", state.Name));
 
-                        Block caseStmtBody = new Block();
-                        caseStmtBody.AddStatement(
-                            new FunctionCallStatement(
-                                new FunctionCallExpression(
-                                    new IdentifierExpression(
-                                        String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName)),
-                                    null)));
+                            Block caseStmtBody = new Block();
+                            caseStmtBody.AddStatement(
+                                new FunctionCallStatement(
+                                    new FunctionCallExpression(
+                                        new IdentifierExpression(
+                                            String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName)))));
 
-                        caseStmt.Body = caseStmtBody;
+                            caseStmt.Body = caseStmtBody;
 
-                        switchStmt.AddSwitchCase(caseStmt);
+                            switchStmt.AddSwitchCase(caseStmt);
+                        }
                     }
-                }
             }
 
             switchStmt.AddSwitchCase(new SwitchCaseStatement(null, null));
@@ -182,42 +181,39 @@
 
                     // Accions de sortida del estat actual
                     //
-                    if ((state.ExitAction != null) && (state.ExitAction.Activities != null)) {
+                    if ((state.ExitAction != null) && state.ExitAction.HasActivities) {
                         foreach (var activity in state.ExitAction.Activities) {
-                            if (activity is CallActivity callActivity) {
+                            if (activity is RunActivity callActivity) {
                                 trueBlock.AddStatement(
                                     new FunctionCallStatement(
                                         new FunctionCallExpression(
-                                            new IdentifierExpression(callActivity.MethodName),
-                                            null)));
+                                            new IdentifierExpression(callActivity.ProcessName))));
                             }
                         }
                     }
 
                     // Accions de la transicio
                     //
-                    if ((transition.Action != null) && (transition.Action.Activities != null)) {
+                    if ((transition.Action != null) && transition.Action.HasActivities) {
                         foreach (var activity in transition.Action.Activities) {
-                            if (activity is CallActivity callActivity) {
+                            if (activity is RunActivity callActivity) {
                                 trueBlock.AddStatement(
                                     new FunctionCallStatement(
                                         new FunctionCallExpression(
-                                            new IdentifierExpression(callActivity.MethodName),
-                                            null)));
+                                            new IdentifierExpression(callActivity.ProcessName))));
                             }
                         }
                     }
 
                     // Acciona d'entrada del nou estat
                     //
-                    if ((transition.NextState != null) && (transition.NextState.EnterAction != null) && (transition.NextState.EnterAction.Activities != null)) {
+                    if ((transition.NextState != null) && (transition.NextState.EnterAction != null) && transition.NextState.EnterAction.HasActivities) {
                         foreach (var activity in transition.NextState.EnterAction.Activities) {
-                            if (activity is CallActivity callActivity) {
+                            if (activity is RunActivity callActivity) {
                                 trueBlock.AddStatement(
                                     new FunctionCallStatement(
                                         new FunctionCallExpression(
-                                            new IdentifierExpression(callActivity.MethodName),
-                                            null)));
+                                            new IdentifierExpression(callActivity.ProcessName))));
                             }
                         }
                     }
@@ -241,8 +237,7 @@
                     else {
                         body.AddStatement(new IfThenElseStatement(
                             new FunctionCallExpression(
-                                new IdentifierExpression(transition.Guard.Expression),
-                                null),
+                                new IdentifierExpression(transition.Guard.Expression)),
                             trueBlock,
                             null));
                     }

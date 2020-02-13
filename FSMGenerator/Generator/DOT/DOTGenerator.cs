@@ -9,9 +9,9 @@
     public sealed class DOTGenerator : GeneratorBase {
 
         private const string nodeFont = "arial";
-        private const int nodeFontSize = 14;
+        private const int nodeFontSize = 12;
         private const string edgeFont = "arial";
-        private const int edgeFontSize = 10;
+        private const int edgeFontSize = 8;
 
         private readonly DOTGeneratorOptions options;
 
@@ -59,16 +59,15 @@
                     actionName.Add(state.ExitAction, MakeActionName(actionCount++));
                 }
 
-                foreach (Transition transition in state.Transitions) {
+                if (state.HasTransitions)
+                    foreach (Transition transition in state.Transitions) {
 
-                    if (transition.Guard != null) {
-                        guardName.Add(transition.Guard, MakeGuardName(guardCount++));
-                    }
+                        if (transition.Guard != null) 
+                            guardName.Add(transition.Guard, MakeGuardName(guardCount++));
 
-                    if (transition.Action != null) {
-                        actionName.Add(transition.Action, MakeActionName(actionCount++));
+                        if (transition.Action != null) 
+                            actionName.Add(transition.Action, MakeActionName(actionCount++));
                     }
-                }
             }
 
             // Crea el firxer de sortida
@@ -146,15 +145,16 @@
 
                     // Transicions internes
                     //
-                    foreach (Transition transition in state.Transitions) {
-                        if (transition.NextState == null) {
-                            if (needSeparator) {
-                                needSeparator = false;
-                                sb.Append("<hr/>");
+                    if (state.HasTransitions)
+                        foreach (Transition transition in state.Transitions) {
+                            if (transition.NextState == null) {
+                                if (needSeparator) {
+                                    needSeparator = false;
+                                    sb.Append("<hr/>");
+                                }
+                                sb.AppendFormat("<tr><td><font point-size=\"{2}\"> {0}/ {1} </font></td></tr>", transition.Name, actionName[transition.Action], edgeFontSize);
                             }
-                            sb.AppendFormat("<tr><td><font point-size=\"{2}\"> {0}/ {1} </font></td></tr>", transition.Name, actionName[transition.Action], edgeFontSize);
                         }
-                    }
 
                     sb.Append("</table>>");
                     sb.AppendLine();
@@ -170,20 +170,22 @@
                 sb.AppendLine();
 
                 foreach (State state in machine.States) {
-                    foreach (Transition transition in state.Transitions) {
-                        if (transition.NextState != null) {
-                            sb.AppendFormat("    {0}->{1} [", state.Name, transition.NextState.Name).AppendLine();
-                            sb.AppendFormat("        label = \"{0}", transition.Name);
-                            if (transition.Action != null) {
-                                sb.AppendFormat(" / {0}", actionName[transition.Action]);
-                            }
+                    if (state.HasTransitions) {
+                        foreach (Transition transition in state.Transitions) {
+                            if (transition.NextState != null) {
+                                sb.AppendFormat("    {0}->{1} [", state.Name, transition.NextState.Name).AppendLine();
+                                sb.AppendFormat("        label = \"{0}", transition.Name);
+                                if (transition.Action != null) {
+                                    sb.AppendFormat(" / {0}", actionName[transition.Action]);
+                                }
 
-                            sb.Append("\"").AppendLine();
-                            sb.Append("    ];");
-                            sb.AppendLine();
+                                sb.Append("\"").AppendLine();
+                                sb.Append("    ];");
+                                sb.AppendLine();
+                            }
                         }
+                        sb.AppendLine();
                     }
-                    sb.AppendLine();
                 }
                 sb.Append("}");
 

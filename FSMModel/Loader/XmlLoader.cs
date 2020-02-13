@@ -1,11 +1,14 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Loader {
 
     using System;
+    using System.Collections.Generic;
     using System.Xml;
     using MikroPicDesigns.FSMCompiler.v1.Model;
     using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
     public class XmlLoader {
+
+        private readonly IDictionary<string, State> stateDictionary = new Dictionary<string, State>();
 
         public Machine Load(string fileName) {
 
@@ -30,113 +33,140 @@
             }
         }
 
-        /// <summary
-        /// Crea un objecte Machine a partir d'un node XML
+        /// <summary>
+        /// Procesa un node 'machine'
         /// </summary>
-        /// <param name="machineNode">El node a procesar.</param>
-        /// <returns>L'objecte 'machine' creat.</returns>
+        /// <param name="machineNode">El node.</param>
+        /// <returns>Un objecte 'Machine'.</returns>
         /// 
         private Machine ProcessMachineNode(XmlNode machineNode) {
 
             string machineName = GetAttribute(machineNode, "name");
-            if (String.IsNullOrEmpty(machineName)) {
+            if (String.IsNullOrEmpty(machineName)) 
                 throw new Exception("No se especifico el atributo 'name'");
-            }
 
             string startStateName = GetAttribute(machineNode, "start");
-            if (String.IsNullOrEmpty(startStateName)) {
+            if (String.IsNullOrEmpty(startStateName)) 
                 throw new Exception("No se especifico el atributo 'start'");
-            }
 
             Machine machine = new Machine(machineName);
 
             XmlNode initializeNode = machineNode.SelectSingleNode("initialize");
-            if (initializeNode != null) {
-                machine.InitializeAction = ProcessActionNode(initializeNode, machine);
-            }
+            Model.Action initializeAction = initializeNode == null ? null : ProcessActionNode(initializeNode);
 
             XmlNode terminateNode = machineNode.SelectSingleNode("terminate");
-            if (terminateNode != null) {
-                machine.TerminateAction = ProcessActionNode(terminateNode, machine);
-            }
+            Model.Action terminateAction = terminateNode == null ? null : ProcessActionNode(terminateNode);
 
             // Procesa cada estat i asigna els parametres
             //
-            foreach (XmlNode stateNode in machineNode.SelectNodes("state")) {
+            foreach (XmlNode stateNode in machineNode.SelectNodes("state")) 
                 ProcessStateNode(stateNode, machine);
-            }
 
             startStateName = startStateName.Replace(":", "");
             machine.Start = GetState(machine, startStateName);
+            machine.InitializeAction = initializeAction;
+            machine.TerminateAction = terminateAction;
 
             return machine;
         }
 
+        /// <summary>
+        /// Procesa un node 'state'
+        /// </summary>
+        /// <param name="stateNode">El node.</param>
+        /// <param name="machine">El objecte 'Machine'</param>
+        /// 
         private void ProcessStateNode(XmlNode stateNode, Machine machine) {
 
             string stateName = null;
-            if (stateNode.ParentNode.Name == "state") {
+            if (stateNode.ParentNode.Name == "state") 
                 stateName = GetAttribute(stateNode.ParentNode, "name");
-            }
 
             stateName += GetAttribute(stateNode, "name");
 
             State state = GetState(machine, stateName);
 
             XmlNode onEnterNode = stateNode.SelectSingleNode("enter");
-            if (onEnterNode != null) {
-                state.EnterAction = ProcessActionNode(onEnterNode, machine);
-            }
+            if (onEnterNode != null) 
+                state.EnterAction = ProcessActionNode(onEnterNode);
 
             XmlNode onExitNode = stateNode.SelectSingleNode("exit");
-            if (onExitNode != null) {
-                state.ExitAction = ProcessActionNode(onExitNode, machine);
-            }
+            if (onExitNode != null) 
+                state.ExitAction = ProcessActionNode(onExitNode);
 
             foreach (XmlNode transitionNode in stateNode.SelectNodes("transition")) {
                 Transition transition = ProcessTransitionNode(transitionNode, machine);
                 state.AddTransition(transition);
             }
 
-            foreach (XmlNode childStateNode in stateNode.SelectNodes("state")) {
+            foreach (XmlNode childStateNode in stateNode.SelectNodes("state")) 
                 ProcessStateNode(childStateNode, machine);
-            }
         }
 
-        private Model.Action ProcessActionNode(XmlNode actionNode, Machine machine) {
+        /// <summary>
+        /// Procesa el node 'action'
+        /// </summary>
+        /// <param name="actionNode">El node a procesar.</param>
+        /// <returns>Un objecte 'Action'.</returns>
+        /// 
+        private Model.Action ProcessActionNode(XmlNode actionNode) {
 
-            Model.Action action = new Model.Action();
+            List<Activity> activityList = new List<Activity>();
 
-            foreach (XmlNode node in actionNode.ChildNodes) {
-                switch (node.Name) {
-                    case "code":
-                    case "inline":
-                        action.AddActivity(ProcessCodeActivityNode(node, machine));
-                        break;
-                    case "call":
-                    case "command":
-                        action.AddActivity(ProcessCallActivityNode(node, machine));
-                        break;
+            if (actionNode.HasChildNodes)
+                foreach (XmlNode childNode in actionNode.ChildNodes) {
+                    switch (childNode.Name) {
+                        case "inline":
+                            activityList.Add(ProcessInlineActivityNode(childNode));
+                            break;
+
+                        case "run":
+                            activityList.Add(ProcessRunActivityNode(childNode));
+                            break;
+
+                        case "throw":
+                            activityList.Add(ProcessThrowActivityNode(childNode));
+                            break;
+                    }
                 }
-            }
 
-            return action;
+            return new Model.Action(activityList);
         }
 
-        private Activity ProcessCodeActivityNode(XmlNode inlineActionNode, Machine machine) {
+        /// <summary>
+        /// Procesa un node 'inline'
+        /// </summary>
+        /// <param name="actionNode">El node.</param>
+        /// <returns>'objecte 'Activity'</returns>
+        /// 
+        private Activity ProcessInlineActivityNode(XmlNode actionNode) {
 
-            CodeActity actifity = new CodeActity();
-            actifity.Text = inlineActionNode.InnerText;
-
-            return actifity;
+            string text = actionNode.InnerText;
+            return new InlineActity(text);
         }
 
-        private Activity ProcessCallActivityNode(XmlNode commandActionNode, Machine machine) {
+        /// <summary>
+        /// Procesa un node 'run'
+        /// </summary>
+        /// <param name="actionNode">El node.</param>
+        /// <returns>'objecte 'Activity'</returns>
+        /// 
+        private Activity ProcessRunActivityNode(XmlNode actionNode) {
 
-            CallActivity activity = new CallActivity();
-            activity.MethodName = GetAttribute(commandActionNode, "name");
+            string processName = GetAttribute(actionNode, "name");
+            return new RunActivity(processName);
+        }
 
-            return activity;
+        /// <summary>
+        /// Procesa un node 'throw'
+        /// </summary>
+        /// <param name="actionNode">El node.</param>
+        /// <returns>'objecte 'Activity'</returns>
+        /// 
+        private Activity ProcessThrowActivityNode(XmlNode actionNode) {
+
+            string transitionName = GetAttribute(actionNode, "name");
+            return new ThrowActivity(transitionName);
         }
 
         private Transition ProcessTransitionNode(XmlNode transitionNode, Machine machine) {
@@ -184,9 +214,8 @@
                 }
             }
 
-            if (transitionNode.HasChildNodes) {
-                transition.Action = ProcessActionNode(transitionNode, machine);
-            }
+            if (transitionNode.HasChildNodes) 
+                transition.Action = ProcessActionNode(transitionNode);
 
             return transition;
         }

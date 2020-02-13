@@ -38,8 +38,8 @@
             void PopulateList(Action action) {
 
                 foreach (var activity in action.Activities) {
-                    if (activity is CallActivity callActivity) {
-                        string name = callActivity.MethodName;
+                    if (activity is RunActivity callActivity) {
+                        string name = callActivity.ProcessName;
                         if (!names.Contains(name)) {
                             names.Add(name);
                         }

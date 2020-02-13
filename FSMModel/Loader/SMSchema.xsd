@@ -5,4 +5,25 @@
     xmlns="http://tempuri.org/SMSchema.xsd"
     xmlns:mstns="http://tempuri.org/SMSchema.xsd"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="machine">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="state" maxOccurs="unbounded" minOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+            <xs:attribute name="start" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="state">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="transition" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+            <xs:attribute name="state" use="optional" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>    
+
 </xs:schema>

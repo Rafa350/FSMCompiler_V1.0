@@ -42,13 +42,11 @@
         /// 
         public BinaryExpression(BinaryOpCode opCode, ExpressionBase leftExpression, ExpressionBase rightExpression) {
 
-            if (leftExpression == null) {
+            if (leftExpression == null) 
                 throw new ArgumentNullException(nameof(leftExpression));
-            }
 
-            if (rightExpression == null) {
+            if (rightExpression == null) 
                 throw new ArgumentNullException(nameof(rightExpression));
-            }
 
             this.opCode = opCode;
             this.leftExpression = leftExpression;
@@ -62,9 +60,8 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) {
+            if (visitor == null) 
                 throw new ArgumentNullException(nameof(visitor));
-            }
 
             visitor.Visit(this);
         }

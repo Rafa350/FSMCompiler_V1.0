@@ -5,17 +5,21 @@
 
     public sealed class Machine : IVisitable {
 
-        private readonly List<State> states = new List<State>();
+        private readonly List<State> stateList = new List<State>();
         private readonly string name;
         private State start;
         private Action initializeAction;
         private Action terminateAction;
 
+        /// <summary>
+        /// Constructior.
+        /// </summary>
+        /// <param name="name">El nom de la maquina.</param>
+        /// 
         public Machine(string name) {
 
-            if (String.IsNullOrEmpty(name)) {
-                throw new ArgumentNullException("name");
-            }
+            if (String.IsNullOrEmpty(name)) 
+                throw new ArgumentNullException(nameof(name));
 
             this.name = name;
         }
@@ -27,6 +31,9 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
+
             visitor.Visit(this);
         }
 
@@ -37,16 +44,14 @@
         /// 
         public void AddState(State state) {
 
-            if (state == null) {
-                throw new ArgumentNullException("state");
-            }
+            if (state == null)
+                throw new ArgumentNullException(nameof(state));
 
-            if (states.Contains(state)) {
+            if (stateList.Contains(state))
                 throw new InvalidOperationException(
                     String.Format("El estado '{0}' ya ha sido agregado.", state.FullName));
-            }
 
-            states.Add(state);
+            stateList.Add(state);
         }
 
         /// <summary>
@@ -58,20 +63,16 @@
         /// 
         public State GetState(string name, bool throwError = true) {
 
-            if (String.IsNullOrEmpty(name)) {
-                throw new ArgumentNullException("name");
-            }
+            if (String.IsNullOrEmpty(name)) 
+                throw new ArgumentNullException(nameof(name));
 
-            foreach (State state in states) {
-                if (state.Name == name) {
+            foreach (State state in stateList) 
+                if (state.Name == name) 
                     return state;
-                }
-            }
 
-            if (throwError) {
+            if (throwError) 
                 throw new InvalidOperationException(
                     String.Format("No se agrego ningun estado con el nombre '{0}'.", name));
-            }
 
             return null;
         }
@@ -80,11 +81,7 @@
         /// Obte el nom de la maquina.
         /// </summary>
         /// 
-        public string Name {
-            get {
-                return name;
-            }
-        }
+        public string Name => name;
 
         /// <summary>
         /// Obte l'estat inicial de la maquina.
@@ -95,7 +92,7 @@
                 return start;
             }
             set {
-                if (!states.Contains(value)) {
+                if (!stateList.Contains(value)) {
                     throw new InvalidOperationException(
                         String.Format("El estado '{0}', no esta declarado en esta maquina.", value.Name));
                 }
@@ -128,7 +125,7 @@
         /// 
         public IEnumerable<string> StateNames {
             get {
-                foreach (State state in states) {
+                foreach (State state in stateList) {
                     yield return state.Name;
                 }
             }
@@ -138,11 +135,7 @@
         /// Enumera els estats de la maquina.
         /// </summary>
         /// 
-        public IEnumerable<State> States {
-            get {
-                return states;
-            }
-        }
+        public IEnumerable<State> States => stateList;
 
         /// <summary>
         /// Obte el nombre d'estats.
@@ -150,13 +143,13 @@
         /// 
         public int NumberOfStates {
             get {
-                return states.Count;
+                return stateList.Count;
             }
         }
 
         public IEnumerable<State> FinalStates {
             get {
-                foreach (State state in states) {
+                foreach (State state in stateList) {
                     if (!state.HasChilds) {
                         yield return state;
                     }

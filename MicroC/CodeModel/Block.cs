@@ -23,13 +23,12 @@
         /// </summary>
         /// <param name="statements">Llista de estaments.</param>
         /// 
-        public Block(IEnumerable<StatementBase> statements) {
+        public Block(List<StatementBase> statements) {
 
-            if (statements == null) {
+            if (statements == null)
                 throw new ArgumentNullException(nameof(statements));
-            }
 
-            statementList = new List<StatementBase>(statements);
+            statementList = statements;
         }
 
         /// <summary>
@@ -37,13 +36,19 @@
         /// </summary>
         /// <param name="statements">Llista de estaments.</param>
         /// 
-        public Block(params StatementBase[] statements) {
+        public Block(IEnumerable<StatementBase> statements):
+            this(new List<StatementBase>(statements)) {
 
-            if (statements == null) {
-                throw new ArgumentNullException(nameof(statements));
-            }
+        }
 
-            statementList = new List<StatementBase>(statements);
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="statements">Llista de estaments.</param>
+        /// 
+        public Block(params StatementBase[] statements):
+            this(new List<StatementBase>(statements)) { 
+
         }
 
         /// <summary>

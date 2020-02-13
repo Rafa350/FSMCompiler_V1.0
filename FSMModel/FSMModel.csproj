@@ -47,9 +47,10 @@
   <ItemGroup>
     <Compile Include="Loader\XmlLoader.cs" />
     <Compile Include="Model\Action.cs" />
+    <Compile Include="Model\Activities\ThrowActivity.cs" />
     <Compile Include="Model\Activity.cs" />
-    <Compile Include="Model\Activities\CallActivity.cs" />
-    <Compile Include="Model\Activities\CodeActity.cs" />
+    <Compile Include="Model\Activities\RunActivity.cs" />
+    <Compile Include="Model\Activities\InlineActity.cs" />
     <Compile Include="Model\DefaultVisitor.cs" />
     <Compile Include="Model\Guard.cs" />
     <Compile Include="Model\IVisitable.cs" />

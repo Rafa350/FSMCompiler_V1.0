@@ -202,12 +202,11 @@
             List<StatementBase> stmtList = null;
 
             foreach (var activity in action.Activities) {
-                if (activity is CallActivity callActivity) {
+                if (activity is RunActivity callActivity) {
                     StatementBase stmt = new FunctionCallStatement(
                         new FunctionCallExpression(
                             new IdentifierExpression(
-                                String.Format("do{0}", callActivity.MethodName)),
-                            null));
+                                String.Format("do{0}", callActivity.ProcessName))));
                     if (stmtList == null) {
                         stmtList = new List<StatementBase>();
                     }
