@@ -62,7 +62,7 @@
             EndElement();
         }
 
-        public override void Visit(ArgumentDefinition obj) {
+        public override void Visit(ArgumentDeclaration obj) {
 
             StartElement("parameterDeclaration");
             Attribute("name", obj.Name);

@@ -6,17 +6,29 @@
 
     public sealed class SwitchCaseStatement : IVisitable {
 
-        private LiteralExpression expression;
-        private Block body;
+        private readonly LiteralExpression expression;
+        private readonly Block body;
 
-        public SwitchCaseStatement() {
+        /// <summary>
+        /// Constructor (El cas de 'default'
+        /// </summary>
+        /// <param name="body"></param>
+        /// 
+        public SwitchCaseStatement(Block body) {
 
+            this.body = body ?? throw new ArgumentNullException(nameof(body));
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="body"></param>
+        /// 
         public SwitchCaseStatement(LiteralExpression expression, Block body) {
 
-            this.expression = expression;
-            this.body = body;
+            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            this.body = body ?? throw new ArgumentNullException(nameof(body));
         }
 
         /// <summary>
@@ -26,9 +38,8 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) {
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
-            }
 
             visitor.Visit(this);
         }
@@ -37,18 +48,12 @@
         /// Obte o asigna l'expressio.
         /// </summary>
         /// 
-        public LiteralExpression Expression {
-            get { return expression; }
-            set { expression = value; }
-        }
+        public LiteralExpression Expression => expression;
 
         /// <summary>
         /// Obte o asigna el cos.
         /// </summary>
         /// 
-        public Block Body {
-            get { return body; }
-            set { body = value; }
-        }
+        public Block Body => body;
     }
 }

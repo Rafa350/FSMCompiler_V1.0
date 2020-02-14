@@ -5,7 +5,7 @@
 
     public abstract class DefaultVisitor : IVisitor {
 
-        public virtual void Visit(ArgumentDefinition obj) {
+        public virtual void Visit(ArgumentDeclaration obj) {
         }
 
         public virtual void Visit(AssignStatement stmt) {
@@ -16,36 +16,27 @@
 
         public virtual void Visit(Block block) {
 
-            if (block.Statements != null) {
-                foreach (var statements in block.Statements) {
+            if (block.Statements != null)
+                foreach (var statements in block.Statements)
                     statements.AcceptVisitor(this);
-                }
-            }
         }
 
         public virtual void Visit(ClassDeclaration decl) {
 
-            if (decl.Variables != null) {
-                foreach (var variables in decl.Variables) {
+            if (decl.Variables != null)
+                foreach (var variables in decl.Variables)
                     variables.AcceptVisitor(this);
-                }
-            }
 
-            if (decl.Constructors != null) {
-                foreach (var constructor in decl.Constructors) {
+            if (decl.Constructors != null)
+                foreach (var constructor in decl.Constructors)
                     constructor.AcceptVisitor(this);
-                }
-            }
 
-            if (decl.Destructor != null) {
+            if (decl.Destructor != null)
                 decl.Destructor.AcceptVisitor(this);
-            }
 
-            if (decl.Functions != null) {
-                foreach (var function in decl.Functions) {
+            if (decl.Functions != null)
+                foreach (var function in decl.Functions)
                     function.AcceptVisitor(this);
-                }
-            }
         }
 
         public virtual void Visit(ConditionalExpression exp) {
@@ -64,18 +55,15 @@
 
             exp.Function.AcceptVisitor(this);
 
-            if (exp.Arguments != null) {
-                foreach (var argument in exp.Arguments) {
+            if (exp.Arguments != null)
+                foreach (var argument in exp.Arguments)
                     argument.AcceptVisitor(this);
-                }
-            }
         }
 
         public virtual void Visit(FunctionCallStatement stmt) {
 
-            if (stmt.Expression != null) {
+            if (stmt.Expression != null)
                 stmt.Expression.AcceptVisitor(this);
-            }
         }
 
         public virtual void Visit(FunctionDeclaration decl) {
@@ -107,29 +95,24 @@
 
         public virtual void Visit(NamespaceDeclaration decl) {
 
-            if (decl.Members != null) {
-                foreach (var member in decl.Members) {
+            if (decl.Members != null)
+                foreach (var member in decl.Members)
                     member.AcceptVisitor(this);
-                }
-            }
         }
 
         public virtual void Visit(ReturnStatement stmt) {
 
-            if (stmt.Expression != null) {
+            if (stmt.Expression != null)
                 stmt.Expression.AcceptVisitor(this);
-            }
         }
 
         public virtual void Visit(SubscriptExpression exp) {
 
             exp.Address.AcceptVisitor(this);
 
-            if (exp.Indices != null) {
-                foreach (var index in exp.Indices) {
+            if (exp.Indices != null)
+                foreach (var index in exp.Indices)
                     index.AcceptVisitor(this);
-                }
-            }
         }
 
         public virtual void Visit(SwitchCaseStatement stmt) {
@@ -140,11 +123,12 @@
 
             stmt.Expression.AcceptVisitor(this);
 
-            if (stmt.SwitchCases != null) {
-                foreach (var switchCase in stmt.SwitchCases) {
+            if (stmt.SwitchCases != null)
+                foreach (var switchCase in stmt.SwitchCases)
                     switchCase.AcceptVisitor(this);
-                }
-            }
+
+            if (stmt.DefaultBody != null)
+                stmt.DefaultBody.AcceptVisitor(this);
         }
 
         public virtual void Visit(UnaryExpression exp) {
@@ -152,11 +136,9 @@
 
         public virtual void Visit(UnitDeclaration decl) {
 
-            if (decl.Members != null) {
-                foreach (var member in decl.Members) {
+            if (decl.Members != null)
+                foreach (var member in decl.Members)
                     member.AcceptVisitor(this);
-                }
-            }
         }
 
         public virtual void Visit(VariableDeclaration decl) {

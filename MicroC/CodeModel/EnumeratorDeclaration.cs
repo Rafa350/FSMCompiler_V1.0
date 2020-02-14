@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    public sealed class EnumeratorDeclaration: IUnitMember, IVisitable {
+    public sealed class EnumeratorDeclaration : IUnitMember, IVisitable {
 
         private readonly string name;
         private readonly List<string> elementList;

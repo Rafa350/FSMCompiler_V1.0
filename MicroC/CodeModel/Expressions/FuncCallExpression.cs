@@ -7,22 +7,19 @@
     /// Clase que representa una crida a una funcio.
     /// </summary>
     /// 
-    public sealed class FunctionCallExpression : ExpressionBase {
+    public sealed class FunctionCallExpression : Expression {
 
-        private readonly ExpressionBase address;
-        private readonly List<ExpressionBase> argumentList;
+        private readonly Expression address;
+        private readonly List<Expression> argumentList;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="address">Adressa de la funcio.</param>
         /// 
-        public FunctionCallExpression(ExpressionBase address) {
+        public FunctionCallExpression(Expression address) {
 
-            if (address == null)
-                throw new ArgumentNullException(nameof(address));
-
-            this.address = address;
+            this.address = address ?? throw new ArgumentNullException(nameof(address));
         }
 
         /// <summary>
@@ -31,16 +28,10 @@
         /// <param name="address">Adressa de la funcio.</param>
         /// <param name="arguments">Llista d'arguments.</param>
         /// 
-        public FunctionCallExpression(ExpressionBase address, List<ExpressionBase> arguments) {
+        public FunctionCallExpression(Expression address, List<Expression> arguments) {
 
-            if (address == null)
-                throw new ArgumentNullException(nameof(address));
-
-            if (arguments == null)
-                throw new ArgumentNullException(nameof(arguments));
-
-            this.address = address;
-            argumentList = arguments;
+            this.address = address ?? throw new ArgumentNullException(nameof(address));
+            argumentList = arguments ?? throw new ArgumentNullException(nameof(arguments));
         }
 
         /// <summary>
@@ -49,8 +40,8 @@
         /// <param name="address">Adressa funcio.</param>
         /// <param name="arguments">Llista d'arguments de la funcio</param>
         /// 
-        public FunctionCallExpression(ExpressionBase address, IEnumerable<ExpressionBase> arguments) :
-            this(address, new List<ExpressionBase>(arguments)) { 
+        public FunctionCallExpression(Expression address, IEnumerable<Expression> arguments) :
+            this(address, new List<Expression>(arguments)) {
 
         }
 
@@ -60,8 +51,8 @@
         /// <param name="address">Adressa de la funcio.</param>
         /// <param name="arguments">Llista d'arguments de la funcio.</param>
         /// 
-        public FunctionCallExpression(ExpressionBase address, params ExpressionBase[] arguments) :
-            this(address, new List<ExpressionBase>(arguments)) {
+        public FunctionCallExpression(Expression address, params Expression[] arguments) :
+            this(address, new List<Expression>(arguments)) {
         }
 
         /// <summary>
@@ -71,7 +62,7 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
@@ -81,7 +72,7 @@
         /// Obte el nom.
         /// </summary>
         /// 
-        public ExpressionBase Function => address;
+        public Expression Function => address;
 
         /// <summary>
         /// Indica si hi han arguments.
@@ -93,6 +84,6 @@
         /// Enumera els d'arguments.
         /// </summary>
         /// 
-        public IEnumerable<ExpressionBase> Arguments => argumentList;
+        public IEnumerable<Expression> Arguments => argumentList;
     }
 }

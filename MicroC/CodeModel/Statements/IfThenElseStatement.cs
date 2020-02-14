@@ -3,48 +3,31 @@
     using System;
     using MicroCompiler.CodeModel;
 
-    public sealed class IfThenElseStatement : StatementBase {
+    public sealed class IfThenElseStatement : Statement {
 
-        private readonly ExpressionBase conditionExpression;
+        private readonly Expression conditionExpression;
         private readonly Block trueBlock;
         private readonly Block falseBlock;
 
-        public IfThenElseStatement(ExpressionBase conditionExpression, Block trueBlock, Block falseBlock) {
+        public IfThenElseStatement(Expression conditionExpression, Block trueBlock, Block falseBlock) {
 
-            if (conditionExpression == null) {
-                throw new ArgumentNullException("conditionExpression");
-            }
-
-            if (trueBlock == null) {
-                throw new ArgumentNullException("trueBlock");
-            }
-
-            this.conditionExpression = conditionExpression;
-            this.trueBlock = trueBlock;
+            this.conditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
+            this.trueBlock = trueBlock ?? throw new ArgumentNullException(nameof(trueBlock));
             this.falseBlock = falseBlock;
         }
 
         public override void AcceptVisitor(IVisitor visitor) {
 
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
+
             visitor.Visit(this);
         }
 
-        public ExpressionBase ConditionExpression {
-            get {
-                return conditionExpression;
-            }
-        }
+        public Expression ConditionExpression => conditionExpression;
 
-        public Block TrueBlock {
-            get {
-                return trueBlock;
-            }
-        }
+        public Block TrueBlock => trueBlock;
 
-        public Block FalseBlock {
-            get {
-                return falseBlock;
-            }
-        }
+        public Block FalseBlock => falseBlock;
     }
 }

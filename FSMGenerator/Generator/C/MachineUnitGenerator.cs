@@ -21,9 +21,9 @@
             // Crea el tipus enumerador pels valosr del estat.
             //
             List<string> stateList = new List<string>();
-            foreach (var state in machine.States) {
+            foreach (var state in machine.States)
                 stateList.Add(String.Format("State_{0}", state.Name));
-            }
+
             EnumeratorDeclaration stateType = new EnumeratorDeclaration("State", stateList);
             memberList.Add(stateType);
 
@@ -40,17 +40,14 @@
 
             // Crea les funcions de deptch de les transicions [machine]_on[transition]()
             //
-            foreach (var transitionName in machine.GetTransitionNames()) {
+            foreach (var transitionName in machine.GetTransitionNames())
                 memberList.Add(MakeMachineTransitionFunction(machine, transitionName));
-            }
 
             // Crea les funcions de transicio [machine]_[state]_on[transition]()
             //
-            foreach (var state in machine.States) {
-                foreach (var transitionName in state.GetTransitionNames()) {
+            foreach (var state in machine.States)
+                foreach (var transitionName in state.GetTransitionNames())
                     memberList.Add(MakeStateTransitionFunction(machine, state, transitionName));
-                }
-            }
 
             return new UnitDeclaration(memberList);
         }
@@ -79,30 +76,27 @@
         /// 
         private static Block MakeStartFunctionBody(Machine machine) {
 
-            Block body = new Block();
+            StatementList bodyStmtList = new StatementList();
 
             // Accions d'inici del estat inicial.
             //
-            if ((machine.Start.EnterAction != null) && machine.Start.EnterAction.HasActivities) {
-                foreach (var activity in machine.Start.EnterAction.Activities) {
-                    if (activity is RunActivity callActivity) {
-                        body.AddStatement(
+            if ((machine.Start.EnterAction != null) && machine.Start.EnterAction.HasActivities)
+                foreach (var activity in machine.Start.EnterAction.Activities)
+                    if (activity is RunActivity callActivity)
+                        bodyStmtList.Add(
                             new FunctionCallStatement(
                                 new FunctionCallExpression(
                                     new IdentifierExpression(callActivity.ProcessName))));
-                    }
-                }
-            }
 
             // Seleccio del estat inicial.
             //
-            body.AddStatement(
+            bodyStmtList.Add(
                 new AssignStatement(
                     String.Format("{0}_state", machine.Name),
                 new LiteralExpression(
                     String.Format("State_{0}", machine.Start.Name))));
 
-            return body;
+            return new Block(bodyStmtList);
         }
 
         private static FunctionDeclaration MakeMachineTransitionFunction(Machine machine, string transitionName) {
@@ -117,7 +111,7 @@
 
         private static Block MakeMachineTransitionFunctionBody(Machine machine, string transitionName) {
 
-            Block body = new Block();
+            StatementList bodyStmtList = new StatementList();
 
             SwitchStatement switchStmt = new SwitchStatement();
             switchStmt.Expression = new IdentifierExpression(
@@ -128,29 +122,28 @@
                     foreach (var transition in state.Transitions) {
                         if (transition.Name == transitionName) {
 
-                            SwitchCaseStatement caseStmt = new SwitchCaseStatement();
-                            caseStmt.Expression = new LiteralExpression(
-                                String.Format("State_{0}", state.Name));
-
-                            Block caseStmtBody = new Block();
-                            caseStmtBody.AddStatement(
+                            StatementList caseStmtBodyStmtList = new StatementList();
+                            caseStmtBodyStmtList.Add(
                                 new FunctionCallStatement(
                                     new FunctionCallExpression(
                                         new IdentifierExpression(
                                             String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName)))));
 
-                            caseStmt.Body = caseStmtBody;
+                            SwitchCaseStatement caseStmt = new SwitchCaseStatement(
+                                new LiteralExpression(
+                                    String.Format("State_{0}", state.Name)),
+                                new Block(caseStmtBodyStmtList));
 
                             switchStmt.AddSwitchCase(caseStmt);
                         }
                     }
             }
 
-            switchStmt.AddSwitchCase(new SwitchCaseStatement(null, null));
+            switchStmt.DefaultBody = new Block();
 
-            body.AddStatement(switchStmt);
+            bodyStmtList.Add(switchStmt);
 
-            return body;
+            return new Block(bodyStmtList);
         }
 
         /// <summary>
@@ -173,78 +166,69 @@
 
         private static Block MakeStateTransitionFunctionBody(Machine machine, State state, string transitionName) {
 
-            Block body = new Block();
+            StatementList bodyStmtList = new StatementList();
+
             foreach (var transition in state.Transitions) {
                 if (transition.Name == transitionName) {
 
-                    Block trueBlock = new Block();
+                    StatementList trueBlockStmtList = new StatementList(); ;
 
                     // Accions de sortida del estat actual
                     //
-                    if ((state.ExitAction != null) && state.ExitAction.HasActivities) {
-                        foreach (var activity in state.ExitAction.Activities) {
-                            if (activity is RunActivity callActivity) {
-                                trueBlock.AddStatement(
+                    if ((state.ExitAction != null) && state.ExitAction.HasActivities)
+                        foreach (var activity in state.ExitAction.Activities)
+                            if (activity is RunActivity callActivity)
+                                trueBlockStmtList.Add(
                                     new FunctionCallStatement(
                                         new FunctionCallExpression(
                                             new IdentifierExpression(callActivity.ProcessName))));
-                            }
-                        }
-                    }
 
                     // Accions de la transicio
                     //
-                    if ((transition.Action != null) && transition.Action.HasActivities) {
-                        foreach (var activity in transition.Action.Activities) {
-                            if (activity is RunActivity callActivity) {
-                                trueBlock.AddStatement(
+                    if ((transition.Action != null) && transition.Action.HasActivities)
+                        foreach (var activity in transition.Action.Activities)
+                            if (activity is RunActivity callActivity)
+                                trueBlockStmtList.Add(
                                     new FunctionCallStatement(
                                         new FunctionCallExpression(
                                             new IdentifierExpression(callActivity.ProcessName))));
-                            }
-                        }
-                    }
 
                     // Acciona d'entrada del nou estat
                     //
-                    if ((transition.NextState != null) && (transition.NextState.EnterAction != null) && transition.NextState.EnterAction.HasActivities) {
-                        foreach (var activity in transition.NextState.EnterAction.Activities) {
-                            if (activity is RunActivity callActivity) {
-                                trueBlock.AddStatement(
+                    if ((transition.NextState != null) && (transition.NextState.EnterAction != null) && transition.NextState.EnterAction.HasActivities)
+                        foreach (var activity in transition.NextState.EnterAction.Activities)
+                            if (activity is RunActivity callActivity)
+                                trueBlockStmtList.Add(
                                     new FunctionCallStatement(
                                         new FunctionCallExpression(
                                             new IdentifierExpression(callActivity.ProcessName))));
-                            }
-                        }
-                    }
 
                     // Seeccio el nou estat
                     //
-                    if (transition.NextState != null) {
-                        trueBlock.AddStatement(
+                    if (transition.NextState != null)
+                        trueBlockStmtList.Add(
                             new AssignStatement(
                                 String.Format("{0}_state", machine.Name),
                             new LiteralExpression(
                                 String.Format("State_{0}", transition.NextState.Name))));
-                    }
 
                     if (transition.Guard == null) {
-                        body.AddStatement(new IfThenElseStatement(
+                        bodyStmtList.Add(new IfThenElseStatement(
                             new LiteralExpression(1),
-                            trueBlock,
+                            new Block(trueBlockStmtList),
                             null));
                     }
                     else {
-                        body.AddStatement(new IfThenElseStatement(
+                        bodyStmtList.Add(new IfThenElseStatement(
                             new FunctionCallExpression(
                                 new IdentifierExpression(transition.Guard.Expression)),
-                            trueBlock,
+                            new Block(trueBlockStmtList),
                             null));
                     }
                 }
             }
 
-            return body;
+            return new Block(bodyStmtList);
         }
     }
 }

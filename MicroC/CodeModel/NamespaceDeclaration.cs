@@ -6,7 +6,7 @@
     public sealed class NamespaceDeclaration : IVisitable, IUnitMember {
 
         private string name;
-        private List<IUnitMember> memberList;
+        private List<IUnitMember> members;
 
         /// <summary>
         /// Constructor per defecte.
@@ -40,11 +40,11 @@
                 throw new ArgumentNullException(nameof(member));
             }
 
-            if (memberList == null) {
-                memberList = new List<IUnitMember>();
+            if (members == null) {
+                members = new List<IUnitMember>();
             }
 
-            memberList.Add(member);
+            members.Add(member);
         }
 
         public void AddMembers(IEnumerable<IUnitMember> members) {
@@ -71,6 +71,6 @@
         /// Enumera els membres.
         /// </summary>
         /// 
-        public IEnumerable<IUnitMember> Members => memberList;
+        public IEnumerable<IUnitMember> Members => members;
     }
 }

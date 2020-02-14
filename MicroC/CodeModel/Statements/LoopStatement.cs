@@ -7,20 +7,16 @@
         PostLoop
     }
 
-    public sealed class LoopStatement : StatementBase {
+    public sealed class LoopStatement : Statement {
 
         private readonly ConditionPosition conditionPosition;
-        private readonly ExpressionBase conditionExpression;
+        private readonly Expression conditionExpression;
         private readonly Block body;
 
-        public LoopStatement(ConditionPosition conditionPosition, ExpressionBase conditionExpression, Block body) {
-
-            if (conditionExpression == null) {
-                throw new ArgumentNullException(nameof(conditionExpression));
-            }
+        public LoopStatement(ConditionPosition conditionPosition, Expression conditionExpression, Block body) {
 
             this.conditionPosition = conditionPosition;
-            this.conditionExpression = conditionExpression;
+            this.conditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
             this.body = body;
         }
 
@@ -29,22 +25,11 @@
             visitor.Visit(this);
         }
 
-        public ConditionPosition ConditionPosition {
-            get {
-                return conditionPosition;
-            }
-        }
+        public ConditionPosition ConditionPosition => conditionPosition;
 
-        public ExpressionBase ConditionExpression {
-            get {
-                return conditionExpression;
-            }
-        }
+        public Expression ConditionExpression => conditionExpression;
 
-        public Block Body {
-            get {
-                return body;
-            }
-        }
+        public Block Body => body;
+
     }
 }

@@ -6,8 +6,8 @@
 
         public virtual void Visit(Machine machine) {
 
-            foreach (var state in machine.States) 
-                state.AcceptVisitor(this);            
+            foreach (var state in machine.States)
+                state.AcceptVisitor(this);
         }
 
         public virtual void Visit(State state) {
@@ -25,7 +25,7 @@
 
         public virtual void Visit(Transition transition) {
 
-            if (transition.Action != null) 
+            if (transition.Action != null)
                 transition.Action.AcceptVisitor(this);
         }
 
@@ -34,8 +34,8 @@
 
         public virtual void Visit(Action action) {
 
-            if (action.HasActivities) 
-                foreach (var activity in action.Activities) 
+            if (action.HasActivities)
+                foreach (var activity in action.Activities)
                     activity.AcceptVisitor(this);
         }
 

@@ -6,7 +6,7 @@
     /// Clase que representa codi inline.
     /// </summary>
     /// 
-    public sealed class InlineExpression : ExpressionBase {
+    public sealed class InlineExpression : Expression {
 
         private readonly string code;
 
@@ -27,7 +27,7 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);

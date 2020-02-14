@@ -7,35 +7,41 @@
     /// Clase que representa una crida a una funcio.
     /// </summary>
     /// 
-    public sealed class SubscriptExpression : ExpressionBase {
+    public sealed class SubscriptExpression : Expression {
 
-        private readonly ExpressionBase address;
-        private readonly List<ExpressionBase> indexList;
+        private readonly Expression address;
+        private readonly List<Expression> indexList;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Nom de la funcio a cridar.</param>
-        /// <param name="indices">Llista d'arguments de la funcio</param>
+        /// <param name="address">Expressio pel calcul de l'adressa.</param>
+        /// <param name="indices">Llista de valors del s index.</param>
         /// 
-        public SubscriptExpression(ExpressionBase address, IEnumerable<ExpressionBase> indices = null) {
+        public SubscriptExpression(Expression address, List<Expression> indices) {
 
-            if (address == null) 
-                throw new ArgumentNullException(nameof(address));
-
-            this.address = address;
-            if (indices != null) 
-                indexList = new List<ExpressionBase>(indices);
+            this.address = address ?? throw new ArgumentNullException(nameof(address));
+            indexList = indices ?? throw new ArgumentNullException(nameof(indices));
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Nom de la cuncio a cridar.</param>
-        /// <param name="indices">Llista d'arguments de la funcio.</param>
+        /// <param name="address">Expressio pel calcul de l'adressa.</param>
+        /// <param name="indices">Llista de valors dels index.</param>
         /// 
-        public SubscriptExpression(ExpressionBase address, params ExpressionBase[] indices) :
-            this(address, (IEnumerable<ExpressionBase>)indices) {
+        public SubscriptExpression(Expression address, IEnumerable<Expression> indices) :
+            this(address, new List<Expression>(indices)) {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="address">Expressio pel calcul de l'adressa..</param>
+        /// <param name="indices">Llista de valors dels index.</param>
+        /// 
+        public SubscriptExpression(Expression address, params Expression[] indices) :
+            this(address, new List<Expression>(indices)) {
         }
 
         /// <summary>
@@ -45,7 +51,7 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
@@ -55,12 +61,12 @@
         /// Obte el nom.
         /// </summary>
         /// 
-        public ExpressionBase Address => address;
+        public Expression Address => address;
 
         /// <summary>
         /// Enumera els d'arguments.
         /// </summary>
         /// 
-        public IEnumerable<ExpressionBase> Indices => indexList;
+        public IEnumerable<Expression> Indices => indexList;
     }
 }

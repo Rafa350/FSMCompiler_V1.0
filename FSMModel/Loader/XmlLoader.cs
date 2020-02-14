@@ -25,12 +25,11 @@
 
         private static string GetAttribute(XmlNode node, string name) {
 
-            if (node.Attributes[name] == null) {
+            if (node.Attributes[name] == null)
                 return null;
-            }
-            else {
+
+            else
                 return node.Attributes[name].Value;
-            }
         }
 
         /// <summary>
@@ -41,31 +40,42 @@
         /// 
         private Machine ProcessMachineNode(XmlNode machineNode) {
 
+            // Obte el nom de la maquina
+            //
             string machineName = GetAttribute(machineNode, "name");
-            if (String.IsNullOrEmpty(machineName)) 
+            if (String.IsNullOrEmpty(machineName))
                 throw new Exception("No se especifico el atributo 'name'");
 
+            // Obte el estat inicial.
+            //
             string startStateName = GetAttribute(machineNode, "start");
-            if (String.IsNullOrEmpty(startStateName)) 
+            if (String.IsNullOrEmpty(startStateName))
                 throw new Exception("No se especifico el atributo 'start'");
+            State startState = GetState(startStateName.Replace(":", ""));
 
-            Machine machine = new Machine(machineName);
-
+            // Obte l'accio d'inicialitzacio.
+            //
             XmlNode initializeNode = machineNode.SelectSingleNode("initialize");
-            Model.Action initializeAction = initializeNode == null ? null : ProcessActionNode(initializeNode);
+            Model.Action initializeAction = (initializeNode == null) ? null : ProcessActionNode(initializeNode);
 
+            // Obte l'accio de finalitzacio
+            //
             XmlNode terminateNode = machineNode.SelectSingleNode("terminate");
-            Model.Action terminateAction = terminateNode == null ? null : ProcessActionNode(terminateNode);
+            Model.Action terminateAction = (terminateNode == null) ? null : ProcessActionNode(terminateNode);
 
             // Procesa cada estat i asigna els parametres
             //
-            foreach (XmlNode stateNode in machineNode.SelectNodes("state")) 
-                ProcessStateNode(stateNode, machine);
+            List<State> stateList = new List<State>();
+            foreach (XmlNode stateNode in machineNode.SelectNodes("state"))
+                stateList.Add(ProcessStateNode(stateNode));
 
-            startStateName = startStateName.Replace(":", "");
-            machine.Start = GetState(machine, startStateName);
+            // Crea la maquina
+            //
+            Machine machine = new Machine(machineName);
             machine.InitializeAction = initializeAction;
             machine.TerminateAction = terminateAction;
+            machine.AddStates(stateList);
+            machine.Start = startState;
 
             return machine;
         }
@@ -74,33 +84,49 @@
         /// Procesa un node 'state'
         /// </summary>
         /// <param name="stateNode">El node.</param>
-        /// <param name="machine">El objecte 'Machine'</param>
+        /// <returns>Un objecte 'State'.</returns>
         /// 
-        private void ProcessStateNode(XmlNode stateNode, Machine machine) {
+        private State ProcessStateNode(XmlNode stateNode) {
 
+            // Obte el nom del estat.
+            //
             string stateName = null;
-            if (stateNode.ParentNode.Name == "state") 
+            if (stateNode.ParentNode.Name == "state")
                 stateName = GetAttribute(stateNode.ParentNode, "name");
-
             stateName += GetAttribute(stateNode, "name");
 
-            State state = GetState(machine, stateName);
-
+            // Obte l'accio d'entrada.
+            //
             XmlNode onEnterNode = stateNode.SelectSingleNode("enter");
-            if (onEnterNode != null) 
-                state.EnterAction = ProcessActionNode(onEnterNode);
+            Model.Action enterAction = (onEnterNode == null) ? null : ProcessActionNode(onEnterNode);
 
+            // Obte l'accio de sortida.
+            //
             XmlNode onExitNode = stateNode.SelectSingleNode("exit");
-            if (onExitNode != null) 
-                state.ExitAction = ProcessActionNode(onExitNode);
+            Model.Action exitAction = (onExitNode == null) ? null : ProcessActionNode(onExitNode);
 
+            // Obte les transicions.
+            //
+            List<Transition> transitionList = new List<Transition>();
             foreach (XmlNode transitionNode in stateNode.SelectNodes("transition")) {
-                Transition transition = ProcessTransitionNode(transitionNode, machine);
-                state.AddTransition(transition);
+                Transition transition = ProcessTransitionNode(transitionNode);
+                transitionList.Add(transition);
             }
 
-            foreach (XmlNode childStateNode in stateNode.SelectNodes("state")) 
-                ProcessStateNode(childStateNode, machine);
+            // Obte els stats fills
+            //
+            foreach (XmlNode childStateNode in stateNode.SelectNodes("state"))
+                ProcessStateNode(childStateNode);
+
+            // Crea l'estat
+            //
+            State state = GetState(stateName);
+            state.EnterAction = enterAction;
+            state.ExitAction = exitAction;
+            foreach (var transition in transitionList)
+                state.AddTransition(transition);
+
+            return state;
         }
 
         /// <summary>
@@ -169,30 +195,28 @@
             return new ThrowActivity(transitionName);
         }
 
-        private Transition ProcessTransitionNode(XmlNode transitionNode, Machine machine) {
+        private Transition ProcessTransitionNode(XmlNode transitionNode) {
 
             // Obte el nom
             //
             string transitionName = GetAttribute(transitionNode, "name");
-            if (String.IsNullOrEmpty(transitionName)) {
+            if (String.IsNullOrEmpty(transitionName))
                 throw new Exception("No se especifico el atributo 'name'");
-            }
 
             Transition transition = new Transition(transitionName);
 
             // Obte la guarda
             //
             string condition = GetAttribute(transitionNode, "guard");
-            if (!String.IsNullOrEmpty(condition)) {
+            if (!String.IsNullOrEmpty(condition))
                 transition.Guard = new Guard(condition);
-            }
 
             // Obte el nou estat
             //
             string name = GetAttribute(transitionNode, "state");
-            if (System.String.IsNullOrEmpty(name)) {
+            if (System.String.IsNullOrEmpty(name))
                 transition.Mode = TransitionMode.InternalLoop;
-            }
+
             else {
                 if (name == "*") {
                     transition.Mode = TransitionMode.Pop;
@@ -209,12 +233,12 @@
                         }
                     }
 
-                    transition.NextState = GetState(machine, name);
+                    transition.NextState = GetState(name);
                     transition.Mode = TransitionMode.Jump;
                 }
             }
 
-            if (transitionNode.HasChildNodes) 
+            if (transitionNode.HasChildNodes)
                 transition.Action = ProcessActionNode(transitionNode);
 
             return transition;
@@ -223,19 +247,17 @@
         /// <summary>
         /// Obte l'estat especificat. Si no existeix, el crea
         /// </summary>
-        /// <param name="machine">La maquina.</param>
         /// <param name="name">Nom de l'estat.</param>
         /// <returns>L'estat.</returns>
         /// 
-        private static State GetState(Machine machine, string name) {
+        private State GetState(string name) {
 
-            State ev = machine.GetState(name, false);
-            if (ev == null) {
-                ev = new State(name);
-                machine.AddState(ev);
+            if (!stateDictionary.TryGetValue(name, out State state)) {
+                state = new State(name);
+                stateDictionary.Add(name, state);
             }
-            return ev;
-        }
 
+            return state;
+        }
     }
 }

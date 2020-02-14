@@ -5,7 +5,7 @@
 
     public interface IVisitor {
 
-        void Visit(ArgumentDefinition decl);
+        void Visit(ArgumentDeclaration decl);
         void Visit(AssignStatement stmt);
         void Visit(BinaryExpression exp);
         void Visit(Block block);

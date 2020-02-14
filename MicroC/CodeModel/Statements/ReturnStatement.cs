@@ -1,26 +1,28 @@
 ﻿namespace MicroCompiler.CodeModel.Statements {
 
+    using System;
     using MicroCompiler.CodeModel;
 
-    public sealed class ReturnStatement : StatementBase {
+    public sealed class ReturnStatement : Statement {
 
-        private readonly ExpressionBase expression;
+        private readonly Expression expression;
 
         public ReturnStatement() {
-
-            this.expression = null;
         }
 
-        public ReturnStatement(ExpressionBase expression) {
+        public ReturnStatement(Expression expression) {
 
-            this.expression = expression;
+            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
         public override void AcceptVisitor(IVisitor visitor) {
 
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
+
             visitor.Visit(this);
         }
 
-        public ExpressionBase Expression => expression;
+        public Expression Expression => expression;
     }
 }

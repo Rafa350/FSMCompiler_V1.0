@@ -2,23 +2,18 @@
 
     using System;
 
-    public sealed class AssignStatement : StatementBase {
+    public sealed class AssignStatement : Statement {
 
         private readonly string name;
-        private readonly ExpressionBase expression;
+        private readonly Expression expression;
 
-        public AssignStatement(string name, ExpressionBase expression) {
+        public AssignStatement(string name, Expression expression) {
 
-            if (String.IsNullOrEmpty(name)) {
+            if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
-            }
-
-            if (expression == null) {
-                throw new ArgumentNullException(nameof(expression));
-            }
 
             this.name = name;
-            this.expression = expression;
+            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
         public override void AcceptVisitor(IVisitor visitor) {
@@ -28,6 +23,6 @@
 
         public string Name => name;
 
-        public ExpressionBase Expression => expression;
+        public Expression Expression => expression;
     }
 }

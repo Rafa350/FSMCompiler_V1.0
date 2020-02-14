@@ -1,26 +1,40 @@
 ﻿namespace MicroCompiler.CodeModel {
 
     using System;
-    using System.Collections.Generic;
 
     public sealed class ConstructorDeclaration : IVisitable {
 
-        private readonly AccessMode access;
-        private readonly IEnumerable<ArgumentDefinition> arguments;
-        private readonly Block body;
+        /// <summary>
+        /// Constructor per defecte.
+        /// </summary>
+        /// 
+        public ConstructorDeclaration() {
+
+        }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="access">Mode d'acces.</param>
-        /// <param name="arguments">La llista d'arguments.</param>
-        /// <param name="body">El cos del constructor.</param>
+        /// <param name="access">Modus d'acces.</param>
+        /// <param name="arguments">Llista d'argument.</param>
+        /// <param name="body">El bloc de codi.</param>
         /// 
-        public ConstructorDeclaration(AccessMode access, IEnumerable<ArgumentDefinition> arguments = null, Block body = null) {
+        public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, Block body) {
 
-            this.access = access;
-            this.arguments = arguments;
-            this.body = body;
+            Access = access;
+            Arguments = arguments;
+            Body = body;
+        }
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="access">Modus d'acces.</param>
+        /// <param name="arguments">Llista d'argument.</param>
+        /// <param name="statements">Llista d'instruccions.</param>
+        /// 
+        public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, StatementList statements):
+            this(access, arguments, new Block(statements)) {
         }
 
         /// <summary>
@@ -36,10 +50,22 @@
             visitor.Visit(this);
         }
 
-        public AccessMode Access => access;
+        /// <summary>
+        /// Obte o asigna el modus d'acces.
+        /// </summary>
+        /// 
+        public AccessMode Access { get; set; }
 
-        public IEnumerable<ArgumentDefinition> Arguments => arguments;
+        /// <summary>
+        /// Obte o asigna la llista d'arguments.
+        /// </summary>
+        /// 
+        public ArgumentDeclarationList Arguments { get; set; }
 
-        public Block Body => body;
+        /// <summary>
+        /// Obte o asigna el bloc de codi.
+        /// </summary>
+        /// 
+        public Block Body { get; set; }
     }
 }

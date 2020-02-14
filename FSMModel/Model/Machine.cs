@@ -5,7 +5,7 @@
 
     public sealed class Machine : IVisitable {
 
-        private readonly List<State> stateList = new List<State>();
+        private List<State> stateList;
         private readonly string name;
         private State start;
         private Action initializeAction;
@@ -18,7 +18,7 @@
         /// 
         public Machine(string name) {
 
-            if (String.IsNullOrEmpty(name)) 
+            if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
             this.name = name;
@@ -47,11 +47,28 @@
             if (state == null)
                 throw new ArgumentNullException(nameof(state));
 
+            if (stateList == null)
+                stateList = new List<State>();
+
             if (stateList.Contains(state))
                 throw new InvalidOperationException(
                     String.Format("El estado '{0}' ya ha sido agregado.", state.FullName));
 
             stateList.Add(state);
+        }
+
+        /// <summary>
+        /// Afegeix divesos estats a la maquina.
+        /// </summary>
+        /// <param name="states">Els estats a afeigir.</param>
+        /// 
+        public void AddStates(IEnumerable<State> states) {
+
+            if (states == null)
+                throw new ArgumentNullException(nameof(states));
+
+            foreach (var state in states)
+                AddState(state);
         }
 
         /// <summary>
@@ -63,14 +80,15 @@
         /// 
         public State GetState(string name, bool throwError = true) {
 
-            if (String.IsNullOrEmpty(name)) 
+            if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            foreach (State state in stateList) 
-                if (state.Name == name) 
-                    return state;
+            if (stateList != null)
+                foreach (State state in stateList)
+                    if (state.Name == name)
+                        return state;
 
-            if (throwError) 
+            if (throwError)
                 throw new InvalidOperationException(
                     String.Format("No se agrego ningun estado con el nombre '{0}'.", name));
 
@@ -92,7 +110,7 @@
                 return start;
             }
             set {
-                if (!stateList.Contains(value)) {
+                if ((stateList == null) || !stateList.Contains(value)) {
                     throw new InvalidOperationException(
                         String.Format("El estado '{0}', no esta declarado en esta maquina.", value.Name));
                 }
@@ -136,16 +154,6 @@
         /// </summary>
         /// 
         public IEnumerable<State> States => stateList;
-
-        /// <summary>
-        /// Obte el nombre d'estats.
-        /// </summary>
-        /// 
-        public int NumberOfStates {
-            get {
-                return stateList.Count;
-            }
-        }
 
         public IEnumerable<State> FinalStates {
             get {

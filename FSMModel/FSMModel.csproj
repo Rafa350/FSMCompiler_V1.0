@@ -51,6 +51,7 @@
     <Compile Include="Model\Activity.cs" />
     <Compile Include="Model\Activities\RunActivity.cs" />
     <Compile Include="Model\Activities\InlineActity.cs" />
+    <Compile Include="Model\ActivityList.cs" />
     <Compile Include="Model\DefaultVisitor.cs" />
     <Compile Include="Model\Guard.cs" />
     <Compile Include="Model\IVisitable.cs" />

@@ -5,7 +5,7 @@
     /// <summary>
     /// Clase que representa un valor literal.
     /// </summary>
-    public sealed class LiteralExpression : ExpressionBase {
+    public sealed class LiteralExpression : Expression {
 
         private readonly object value;
 
@@ -26,9 +26,9 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
- 
+
             visitor.Visit(this);
         }
 

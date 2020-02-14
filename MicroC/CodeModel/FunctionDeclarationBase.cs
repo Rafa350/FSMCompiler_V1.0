@@ -1,73 +1,75 @@
 ﻿namespace MicroCompiler.CodeModel {
 
     using System;
-    using System.Collections.Generic;
 
     public abstract class FunctionDeclarationBase : IVisitable {
-
-        private string name;
-        private TypeIdentifier returnType;
-        private List<ArgumentDefinition> argumentList;
-        private Block body;
 
         /// <summary>
         /// Constructor per defecte.
         /// </summary>
         /// 
-        public FunctionDeclarationBase() {
+        protected FunctionDeclarationBase() {
+
+            ReturnType = TypeIdentifier.FromName("void");
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">El nom.</param>
+        /// <param name="returnType">El tipus de retorn.</param>
+        /// <param name="body">El bloc d'instruccions.</param>
+        /// 
+        protected FunctionDeclarationBase(string name, TypeIdentifier returnType, Block body) {
+
+            if (String.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
+            Name = name;
+            ReturnType = returnType;
+            Body = body;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">El nom.</param>
+        /// <param name="returnType">El tipus de retorn.</param>
+        /// <param name="statements">La llista d'instruccions.</param>
+        /// 
+        protected FunctionDeclarationBase(string name, TypeIdentifier returnType, StatementList statements) :
+            this(name, returnType, new Block(statements)) {
+        }
+
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
         public abstract void AcceptVisitor(IVisitor visitor);
 
         /// <summary>
-        /// Afegeig un argument.
-        /// </summary>
-        /// <param name="argument">L'argument.</param>
-        /// 
-        public void AddArgument(ArgumentDefinition argument) {
-
-            if (argument == null) {
-                throw new ArgumentNullException(nameof(argument));
-            }
-
-            if (argumentList == null) {
-                argumentList = new List<ArgumentDefinition>();
-            }
-
-            argumentList.Add(argument);
-        }
-
-        /// <summary>
-        /// Obte o asigna el nom de metode.
+        /// Obte o asigna el nom.
         /// </summary>
         /// 
-        public string Name {
-            get { return name; }
-            set { name = value; }
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// Obte o asigna tipus retornat.
         /// </summary>
         /// 
-        public TypeIdentifier ReturnType {
-            get { return returnType; }
-            set { returnType = value; }
-        }
+        public TypeIdentifier ReturnType { get; set; }
 
         /// <summary>
-        /// Enumera els arguments.
+        /// Obte o asigna la llista d'arguments.
         /// </summary>
         /// 
-        public IEnumerable<ArgumentDefinition> Arguments => argumentList;
+        public ArgumentDeclarationList Arguments { get; set; }
 
         /// <summary>
-        /// Obte o asigna el bloc.
+        /// Obte o asigna el bloc d'instruccions.
         /// </summary>
         /// 
-        public Block Body {
-            get { return body; }
-            set { body = value; }
-        }
+        public Block Body { get; set; }
     }
 }

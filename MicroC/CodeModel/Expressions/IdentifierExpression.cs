@@ -6,7 +6,7 @@
     /// Clase que representa un identificador.
     /// </summary>
     /// 
-    public sealed class IdentifierExpression : ExpressionBase {
+    public sealed class IdentifierExpression : Expression {
 
         private readonly string name;
 
@@ -17,7 +17,7 @@
         /// 
         public IdentifierExpression(string name) {
 
-            if (String.IsNullOrEmpty(name)) 
+            if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
             this.name = name;
@@ -30,7 +30,7 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);

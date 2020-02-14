@@ -5,12 +5,15 @@
 
     public sealed class UnitDeclaration : IVisitable {
 
-        private readonly List<IUnitMember> memberList = new List<IUnitMember>();
+        private readonly List<IUnitMember> members;
 
         /// <summary>
         /// Constructor per defecte.
         /// </summary>
-        public UnitDeclaration() {
+        /// 
+        public UnitDeclaration(List<IUnitMember> members) {
+
+            this.members = members ?? throw new ArgumentNullException(nameof(members));
         }
 
         /// <summary>
@@ -18,13 +21,8 @@
         /// </summary>
         /// <param name="members">Els memberes.</param>
         /// 
-        public UnitDeclaration(IEnumerable<IUnitMember> members) {
-
-            if (members == null) {
-                throw new ArgumentNullException(nameof(members));
-            }
-
-            memberList.AddRange(members);
+        public UnitDeclaration(IEnumerable<IUnitMember> members) :
+            this(new List<IUnitMember>(members)) {
         }
 
         /// <summary>
@@ -33,36 +31,8 @@
         /// <param name="members">Els membres.</param>
         /// 
         public UnitDeclaration(params IUnitMember[] members) :
-            this((IEnumerable<IUnitMember>)members) {
+            this(new List<IUnitMember>(members)) {
 
-        }
-
-        /// <summary>
-        /// Afegeig un membre.
-        /// </summary>
-        /// <param name="member">El membre a afeigir.</param>
-        /// 
-        public void AddMember(IUnitMember member) {
-
-            if (member == null) {
-                throw new ArgumentNullException(nameof(member));
-            }
-
-            memberList.Add(member);
-        }
-
-        /// <summary>
-        /// Afegeig un membre.
-        /// </summary>
-        /// <param name="member">El membre a afeigir.</param>
-        /// 
-        public void AddMembers(IEnumerable<IUnitMember> members) {
-
-            if (members == null) {
-                throw new ArgumentNullException(nameof(members));
-            }
-
-            memberList.AddRange(members);
         }
 
         /// <summary>
@@ -72,9 +42,8 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) {
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
-            }
 
             visitor.Visit(this);
         }
@@ -83,6 +52,6 @@
         /// Enumera els membres.
         /// </summary>
         /// 
-        public IEnumerable<IUnitMember> Members => memberList;
+        public IEnumerable<IUnitMember> Members => members;
     }
 }

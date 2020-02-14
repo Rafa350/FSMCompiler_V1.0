@@ -42,18 +42,19 @@
 
             // Construeix la unitat de compilacio.
             //
-            UnitDeclaration unitDecl = new UnitDeclaration();
-            if (String.IsNullOrEmpty(options.NsName)) {
-                unitDecl.AddMember(classDecl);
-            }
+            List<IUnitMember> memberList = new List<IUnitMember>();
+            if (String.IsNullOrEmpty(options.NsName))
+                memberList.Add(classDecl);
+
             else {
-                NamespaceDeclaration namespaceDecl = new NamespaceDeclaration();
-                namespaceDecl.Name = options.NsName;
+                NamespaceDeclaration namespaceDecl = new NamespaceDeclaration {
+                    Name = options.NsName
+                };
                 namespaceDecl.AddMember(classDecl);
-                unitDecl.AddMember(namespaceDecl);
+                memberList.Add(namespaceDecl);
             }
 
-            return unitDecl;
+            return new UnitDeclaration(memberList);
         }
 
         /// <summary>
@@ -64,46 +65,33 @@
         /// 
         private static ClassDeclaration MakeClassDeclaration(Machine machine) {
 
-            ClassDeclaration classDecl = new ClassDeclaration();
-            classDecl.Name = options.ContextClassName;
-            classDecl.BaseName = options.ContextBaseClassName;
-            classDecl.BaseAccess = AccessMode.Public;
-
-            // Afegeix el constructor.
+            // Crea el constructor
             //
-            classDecl.AddConstructor(MakeConstructor());
+            ConstructorDeclaration constructorDecl = new ConstructorDeclaration {
+                Access = AccessMode.Public
+            };
 
-            // Afegeix el metode 'start'.
+            // Crea les funcions membre
             //
-            classDecl.AddMemberFunction(MakeStartFunction(machine));
+            MemberFunctionDeclarationList memberFunctionDeclList = new MemberFunctionDeclarationList();
+            memberFunctionDeclList.Add(MakeStartFunction(machine));
+            memberFunctionDeclList.Add(MakeEndFunction(machine));
+            foreach (var transitionName in machine.GetTransitionNames())
+                memberFunctionDeclList.Add(MakeTransitionFunction(transitionName));
+            foreach (var activityName in machine.GetActivityNames())
+                memberFunctionDeclList.Add(MakeActivityFunction(activityName));
 
-            // Afegeix la funcio 'end'
+            // Crea la clase
             //
-            classDecl.AddMemberFunction(MakeEndFunction(machine));
-
-            // Afegeix les funcions de les transicions.
-            //
-            foreach (var transitionName in machine.GetTransitionNames()) {
-                classDecl.AddMemberFunction(MakeTransitionFunction(transitionName));
-            }
-
-            // Afegeix les funcions de les activitats.
-            //
-            foreach (var activityName in machine.GetActivityNames()) {
-                classDecl.AddMemberFunction(MakeActivityFunction(activityName));
-            }
-
-            return classDecl;
-        }
-
-        /// <summary>
-        /// Crea la declaracio del constructor.
-        /// </summary>
-        /// <returns>El constructor.</returns>
-        /// 
-        private static ConstructorDeclaration MakeConstructor() {
-
-            return new ConstructorDeclaration(AccessMode.Public);
+            return new ClassDeclaration {
+                Name = options.ContextClassName,
+                BaseName = options.ContextBaseClassName,
+                BaseAccess = AccessMode.Public,
+                Constructors = new ConstructorDeclarationList {
+                    constructorDecl
+                },
+                Functions = memberFunctionDeclList
+            };
         }
 
         /// <summary>
@@ -114,27 +102,23 @@
         /// 
         private static MemberFunctionDeclaration MakeStartFunction(Machine machine) {
 
-            Block body = new Block();
-
-            if (machine.InitializeAction != null) {
-                body.AddStatements(MakeActionStatements(machine.InitializeAction));
-            }
-
-            if (machine.Start.EnterAction != null) {
-                body.AddStatements(MakeActionStatements(machine.Start.EnterAction));
-            }
-
-            body.AddStatement(
+            StatementList bodyStatements = new StatementList();
+            if (machine.InitializeAction != null)
+                bodyStatements.AddRange(MakeActionStatements(machine.InitializeAction));
+            if (machine.Start.EnterAction != null)
+                bodyStatements.AddRange(MakeActionStatements(machine.Start.EnterAction));
+            bodyStatements.Add(
                 new InlineStatement(
                     String.Format("setState({0}::getInstance())", machine.Start.FullName)));
 
-            MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
-            functionDecl.Name = "start";
-            functionDecl.ReturnType = TypeIdentifier.FromName("void");
-            functionDecl.Access = AccessMode.Public;
-            functionDecl.Body = body;
-
-            return functionDecl;
+            return new MemberFunctionDeclaration {
+                Name = "start",
+                ReturnType = TypeIdentifier.FromName("void"),
+                Access = AccessMode.Public,
+                Body = new Block {
+                    Statements = bodyStatements
+                }
+            };
         }
 
         /// <summary>
@@ -145,12 +129,11 @@
         /// 
         private static MemberFunctionDeclaration MakeEndFunction(Machine machine) {
 
-            MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
-            functionDecl.Name = "end";
-            functionDecl.ReturnType = TypeIdentifier.FromName("void");
-            functionDecl.Access = AccessMode.Public;
-
-            return functionDecl;
+            return new MemberFunctionDeclaration {
+                Name = "end",
+                ReturnType = TypeIdentifier.FromName("void"),
+                Access = AccessMode.Public
+            };
         }
 
         /// <summary>
@@ -161,18 +144,17 @@
         /// 
         private static MemberFunctionDeclaration MakeTransitionFunction(string transitionName) {
 
-            Block body = new Block();
-            body.AddStatement(
-                new InlineStatement(
-                    String.Format("static_cast<{0}*>(getState())->on{1}(this)", options.StateClassName, transitionName)));
-
-            MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
-            functionDecl.Name = String.Format("on{0}", transitionName);
-            functionDecl.ReturnType = TypeIdentifier.FromName("void");
-            functionDecl.Access = AccessMode.Public;
-            functionDecl.Body = body;
-
-            return functionDecl;
+            return new MemberFunctionDeclaration {
+                Name = String.Format("on{0}", transitionName),
+                ReturnType = TypeIdentifier.FromName("void"),
+                Access = AccessMode.Public,
+                Body = new Block {
+                    Statements = new StatementList {
+                        new InlineStatement(
+                            String.Format("static_cast<{0}*>(getState())->on{1}(this)", options.StateClassName, transitionName))
+                    }
+                }
+            };
         }
 
         /// <summary>
@@ -183,12 +165,11 @@
         /// 
         private static MemberFunctionDeclaration MakeActivityFunction(string activityName) {
 
-            MemberFunctionDeclaration functionDecl = new MemberFunctionDeclaration();
-            functionDecl.Name = String.Format("do{0}", activityName);
-            functionDecl.ReturnType = TypeIdentifier.FromName("void");
-            functionDecl.Access = AccessMode.Public;
-
-            return functionDecl;
+            return new MemberFunctionDeclaration {
+                Name = String.Format("do{0}", activityName),
+                ReturnType = TypeIdentifier.FromName("void"),
+                Access = AccessMode.Public
+            };
         }
 
         /// <summary>
@@ -197,19 +178,18 @@
         /// <param name="action">La accio.</param>
         /// <returns>El programa.</returns>
         /// 
-        private static IEnumerable<StatementBase> MakeActionStatements(Model.Action action) {
+        private static IEnumerable<Statement> MakeActionStatements(Model.Action action) {
 
-            List<StatementBase> stmtList = null;
+            List<Statement> stmtList = null;
 
             foreach (var activity in action.Activities) {
                 if (activity is RunActivity callActivity) {
-                    StatementBase stmt = new FunctionCallStatement(
+                    Statement stmt = new FunctionCallStatement(
                         new FunctionCallExpression(
                             new IdentifierExpression(
                                 String.Format("do{0}", callActivity.ProcessName))));
-                    if (stmtList == null) {
-                        stmtList = new List<StatementBase>();
-                    }
+                    if (stmtList == null)
+                        stmtList = new List<Statement>();
 
                     stmtList.Add(stmt);
                 }

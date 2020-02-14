@@ -2,28 +2,26 @@
 
     using System;
 
-    /// <summary>
-    /// Clase que representa un bloc de codi.
-    /// </summary>
-    /// 
-    public sealed class Block : IVisitable {
+    public sealed class ArgumentDeclaration : IVisitable {
 
         /// <summary>
         /// Constructor per defecte.
         /// </summary>
         /// 
-        public Block() {
+        public ArgumentDeclaration() {
 
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="statements">Llista d'instruccions.</param>
+        /// <param name="name">El nom.</param>
+        /// <param name="valueType">El tipus del valor.</param>
         /// 
-        public Block(StatementList statements) {
+        public ArgumentDeclaration(string name, TypeIdentifier valueType) {
 
-            Statements = statements;
+            Name = name;
+            ValueType = valueType;
         }
 
         /// <summary>
@@ -40,9 +38,15 @@
         }
 
         /// <summary>
-        /// Obte o asigna la llista d'instruccions.
+        /// Obte o asigna el nom.
         /// </summary>
         /// 
-        public StatementList Statements { get; set; }
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Obte o asigna el tipus del valor.
+        /// </summary>
+        /// 
+        public TypeIdentifier ValueType { get; set; }
     }
 }

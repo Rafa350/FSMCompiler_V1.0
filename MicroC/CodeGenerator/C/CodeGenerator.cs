@@ -15,11 +15,7 @@
 
             public GeneratorVisitor(StringBuilder sb, int indent = 0) {
 
-                if (sb == null) {
-                    throw new ArgumentNullException(nameof(sb));
-                }
-
-                this.sb = sb;
+                this.sb = sb ?? throw new ArgumentNullException(nameof(sb));
                 this.indent = indent;
             }
 
@@ -42,9 +38,9 @@
                 foreach (var element in decl.Eements) {
                     if (first)
                         first = false;
-                    else 
+                    else
                         sb.Append(',');
-                    sb.AppendLine();                   
+                    sb.AppendLine();
                     sb.AppendIndent(indent);
                     sb.Append(element);
                 }
@@ -64,7 +60,7 @@
 
             public override void Visit(FunctionCallStatement stmt) {
 
-                if (stmt.Expression!= null) {
+                if (stmt.Expression != null) {
                     sb.AppendIndent(indent);
                     stmt.Expression.AcceptVisitor(this);
                     sb.AppendLine(";");
@@ -160,18 +156,15 @@
             public override void Visit(SwitchCaseStatement stmt) {
 
                 sb.AppendIndent(indent);
-                if (stmt.Expression == null) {
-                    sb.AppendLine("default:");
-                }
-                else {
-                    sb.Append("case ");
-                    stmt.Expression.AcceptVisitor(this);
-                    sb.AppendLine(":");
-                }
+
+                sb.Append("case ");
+                stmt.Expression.AcceptVisitor(this);
+                sb.AppendLine(":");
+
                 indent++;
 
                 if (stmt.Body != null)
-                        stmt.Body.AcceptVisitor(this);
+                    stmt.Body.AcceptVisitor(this);
 
                 sb.AppendIndent(indent);
                 sb.AppendLine("break;");
@@ -189,8 +182,17 @@
                 sb.AppendLine(") {");
 
                 indent++;
-                foreach (var switchCase in stmt.SwitchCases) {
+                foreach (var switchCase in stmt.SwitchCases)
                     switchCase.AcceptVisitor(this);
+
+                if (stmt.DefaultBody != null) {
+                    sb.AppendIndent(indent);
+                    sb.AppendLine("default:");
+                    indent++;
+                    stmt.DefaultBody.AcceptVisitor(this);
+                    sb.AppendIndent(indent);
+                    sb.AppendLine("break;");
+                    indent--;
                 }
 
                 indent--;

@@ -15,10 +15,10 @@
     /// Clase que represemta una operacio unitaria.
     /// </summary>
     /// 
-    public class UnaryExpression : ExpressionBase {
+    public class UnaryExpression : Expression {
 
         private readonly UnaryOpCode opCode;
-        private readonly ExpressionBase expression;
+        private readonly Expression expression;
 
         /// <summary>
         /// Constructor.
@@ -26,13 +26,10 @@
         /// <param name="opCode">El codi d'operacio.</param>
         /// <param name="expression">Expressio a la que s'aplica l'operacio.</param>
         /// 
-        public UnaryExpression(UnaryOpCode opCode, ExpressionBase expression) {
-
-            if (expression == null) 
-                throw new ArgumentNullException(nameof(expression));
+        public UnaryExpression(UnaryOpCode opCode, Expression expression) {
 
             this.opCode = opCode;
-            this.expression = expression;
+            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
         /// <summary>
@@ -42,7 +39,7 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
@@ -58,6 +55,6 @@
         /// Obte l'expressio.
         /// </summary>
         /// 
-        public ExpressionBase Expression => expression;
+        public Expression Expression => expression;
     }
 }

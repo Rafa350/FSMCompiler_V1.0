@@ -62,10 +62,10 @@
                 if (state.HasTransitions)
                     foreach (Transition transition in state.Transitions) {
 
-                        if (transition.Guard != null) 
+                        if (transition.Guard != null)
                             guardName.Add(transition.Guard, MakeGuardName(guardCount++));
 
-                        if (transition.Action != null) 
+                        if (transition.Action != null)
                             actionName.Add(transition.Action, MakeActionName(actionCount++));
                     }
             }

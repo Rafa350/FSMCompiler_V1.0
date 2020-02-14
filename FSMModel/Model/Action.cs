@@ -5,7 +5,7 @@
 
     public sealed class Action : IVisitable {
 
-        private List<Activity> activityList;
+        private ActivityList activityList;
 
         /// <summary>
         /// Constructor de l'objecte.
@@ -17,16 +17,22 @@
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="activities">Les activitats a afeigit.</param>
+        /// <param name="activities">Les activitats a afeigir.</param>
         /// 
-        public Action(IEnumerable<Activity> activities) {
+        public Action(ActivityList activities) {
 
-            if (activities == null)
-                throw new ArgumentNullException(nameof(activities));
-
-            activityList = new List<Activity>(activities);
+            activityList = activities ?? throw new ArgumentNullException(nameof(activities));
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="activities">Les activitats a afeigit.</param>
+        /// 
+        public Action(IEnumerable<Activity> activities) :
+            this(new ActivityList(activities)) {
+
+        }
 
         /// <summary>
         /// Constructor.
@@ -34,21 +40,8 @@
         /// <param name="activities">Les activitats a afeigir.</param>
         /// 
         public Action(params Activity[] activities) :
-            this((IEnumerable<Activity>) activities) {
+            this(new ActivityList(activities)) {
 
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="activities">Les activitats a afeigir.</param>
-        /// 
-        public Action(List<Activity> activities) {
-
-            if (activities == null)
-                throw new ArgumentNullException(nameof(activities));
-
-            activityList = activities;
         }
 
         /// <summary>
@@ -71,11 +64,11 @@
         /// 
         public void AddActivity(Activity activity) {
 
-            if (activity == null) 
+            if (activity == null)
                 throw new ArgumentNullException(nameof(activity));
 
-            if (activityList == null) 
-                activityList = new List<Activity>();
+            if (activityList == null)
+                activityList = new ActivityList();
 
             activityList.Add(activity);
         }

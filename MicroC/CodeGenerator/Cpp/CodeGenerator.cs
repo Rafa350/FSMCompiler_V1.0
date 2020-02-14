@@ -15,16 +15,11 @@
             private ClassDeclaration currentClass;
 
             public GeneratorVisitor(StringBuilder sb, int indent = 0) {
-
-                if (sb == null) {
-                    throw new ArgumentNullException(nameof(sb));
-                }
-
-                this.sb = sb;
+                this.sb = sb ?? throw new ArgumentNullException(nameof(sb));
                 this.indent = indent;
             }
 
-            public override void Visit(ArgumentDefinition obj) {
+            public override void Visit(ArgumentDeclaration obj) {
 
                 sb.AppendLine();
                 sb.AppendIndent(indent);
@@ -173,9 +168,9 @@
 
                 sb.AppendIndent(indent);
                 sb.AppendFormat("{0} {1}::{2}", obj.ValueType.Name, currentClass.Name, obj.Name);
-                if (obj.initializer != null) {
+                if (obj.Initializer != null) {
                     sb.Append(" = ");
-                    obj.initializer.AcceptVisitor(this);
+                    obj.Initializer.AcceptVisitor(this);
                 }
                 sb.Append(';');
                 sb.AppendLine();

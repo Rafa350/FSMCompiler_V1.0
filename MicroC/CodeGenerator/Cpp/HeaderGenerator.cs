@@ -13,16 +13,11 @@
             private ClassDeclaration currentClass;
 
             public GeneratorVisitor(StringBuilder sb, int indent = 0) {
-
-                if (sb == null) {
-                    throw new ArgumentNullException(nameof(sb));
-                }
-
-                this.sb = sb;
+                this.sb = sb ?? throw new ArgumentNullException(nameof(sb));
                 this.indent = indent;
             }
 
-            public override void Visit(ArgumentDefinition obj) {
+            public override void Visit(ArgumentDeclaration obj) {
 
                 sb.Append(obj.ValueType.Name);
                 sb.Append(' ');

@@ -2,7 +2,7 @@
 
     using System;
 
-    public sealed class ThrowActivity: Activity {
+    public sealed class ThrowActivity : Activity {
 
         private readonly string transitionName;
 

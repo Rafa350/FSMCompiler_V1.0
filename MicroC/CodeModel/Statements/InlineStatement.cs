@@ -2,7 +2,7 @@
 
     using System;
 
-    public sealed class InlineStatement : StatementBase {
+    public sealed class InlineStatement : Statement {
 
         private readonly string code;
 

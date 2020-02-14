@@ -6,11 +6,11 @@
     /// Clase que representa una expressio condicional.
     /// </summary>
     /// 
-    public sealed class ConditionalExpression : ExpressionBase {
+    public sealed class ConditionalExpression : Expression {
 
-        private readonly ExpressionBase conditionExpression;
-        private readonly ExpressionBase trueExpression;
-        private readonly ExpressionBase falseExpression;
+        private readonly Expression conditionExpression;
+        private readonly Expression trueExpression;
+        private readonly Expression falseExpression;
 
         /// <summary>
         /// Constructor
@@ -19,20 +19,11 @@
         /// <param name="trueExpression">Expressio de la branca true.</param>
         /// <param name="falseExpression">Expressio de la branca false.</param>
         /// 
-        public ConditionalExpression(ExpressionBase conditionExpression, ExpressionBase trueExpression, ExpressionBase falseExpression) {
+        public ConditionalExpression(Expression conditionExpression, Expression trueExpression, Expression falseExpression) {
 
-            if (conditionExpression == null) 
-                throw new ArgumentNullException(nameof(conditionExpression));
-
-            if (trueExpression == null) 
-                throw new ArgumentNullException(nameof(trueExpression));
-
-            if (falseExpression == null) 
-                throw new ArgumentNullException(nameof(falseExpression));
-
-            this.conditionExpression = conditionExpression;
-            this.trueExpression = trueExpression;
-            this.falseExpression = falseExpression;
+            this.conditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
+            this.trueExpression = trueExpression ?? throw new ArgumentNullException(nameof(trueExpression));
+            this.falseExpression = falseExpression ?? throw new ArgumentNullException(nameof(falseExpression));
         }
 
         /// <summary>
@@ -42,7 +33,7 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
@@ -52,18 +43,18 @@
         /// Obte l'expressio de la condicio.
         /// </summary>
         /// 
-        public ExpressionBase ConditionExpression => conditionExpression;
+        public Expression ConditionExpression => conditionExpression;
 
         /// <summary>
         /// Obte l'expressio de la branca true.
         /// </summary>
         /// 
-        public ExpressionBase TrueExpression => trueExpression;
+        public Expression TrueExpression => trueExpression;
 
         /// <summary>
         /// Obte l'expressio de la branca false.
         /// </summary>
         /// 
-        public ExpressionBase FalseExpression => falseExpression;
+        public Expression FalseExpression => falseExpression;
     }
 }

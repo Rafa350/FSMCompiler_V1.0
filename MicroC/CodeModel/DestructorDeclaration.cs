@@ -1,25 +1,42 @@
 ﻿namespace MicroCompiler.CodeModel {
 
     using System;
-    
+
     public sealed class DestructorDeclaration : IVisitable {
 
-        private readonly AccessMode access;
-        private readonly string body;
-        private readonly DestructorVirtualMode virtualMode = DestructorVirtualMode.None;
+        /// <summary>
+        /// Constructor per defecte.
+        /// </summary>
+        /// 
+        public DestructorDeclaration() {
+
+            Access = AccessMode.Public;
+            VirtualMode = DestructorVirtualMode.None;
+        }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="access"></param>
-        /// <param name="body"></param>
-        /// <param name="isVirtual"></param>
+        /// <param name="access">Modus d'acces.</param>
+        /// <param name="isVirtual">Indica si es virtual.</param>
+        /// <param name="body">El bloc d'instruccions.</param>
         /// 
-        public DestructorDeclaration(AccessMode access, string body, bool isVirtual = false) {
+        public DestructorDeclaration(AccessMode access, bool isVirtual, Block body) {
 
-            this.access = access;
-            this.body = body;
-            this.virtualMode = isVirtual ? DestructorVirtualMode.Virtual : DestructorVirtualMode.None;
+            Access = access;
+            VirtualMode = isVirtual ? DestructorVirtualMode.Virtual : DestructorVirtualMode.None;
+            Body = body;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="access">El modus d'acces.</param>
+        /// <param name="isVirtual">Indica si es virtual.</param>
+        /// <param name="statements">La llista d'instruccions.</param>
+        /// 
+        public DestructorDeclaration(AccessMode access, bool isVirtual, StatementList statements):
+            this(access, isVirtual, new Block(statements)) { 
         }
 
         /// <summary>
@@ -35,10 +52,22 @@
             visitor.Visit(this);
         }
 
-        public AccessMode Access => access;
-        
-        public DestructorVirtualMode VirtualMode => virtualMode;
-        
-        public string Body => body;
+        /// <summary>
+        /// Obte o asigna el modus d'acces.
+        /// </summary>
+        /// 
+        public AccessMode Access { get; set; }
+
+        /// <summary>
+        /// Obte o asigna el indicador de virtual.
+        /// </summary>
+        /// 
+        public DestructorVirtualMode VirtualMode { get; }
+
+        /// <summary>
+        /// Obte asigna el bloc de codi.
+        /// </summary>
+        /// 
+        public Block Body { get; set; }
     }
 }

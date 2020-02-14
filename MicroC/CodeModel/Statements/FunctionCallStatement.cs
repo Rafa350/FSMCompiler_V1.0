@@ -3,17 +3,13 @@
     using System;
     using MicroCompiler.CodeModel.Expressions;
 
-    public sealed class FunctionCallStatement : StatementBase {
+    public sealed class FunctionCallStatement : Statement {
 
         private readonly FunctionCallExpression expression;
 
         public FunctionCallStatement(FunctionCallExpression expression) {
 
-            if (expression == null) {
-                throw new ArgumentNullException(nameof(expression));
-            }
-
-            this.expression = expression;
+            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
         /// <summary>
