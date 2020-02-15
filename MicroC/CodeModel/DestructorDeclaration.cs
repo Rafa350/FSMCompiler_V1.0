@@ -1,6 +1,7 @@
 ﻿namespace MicroCompiler.CodeModel {
 
     using System;
+    using MicroCompiler.CodeModel.Statements;
 
     public sealed class DestructorDeclaration : IVisitable {
 
@@ -21,7 +22,7 @@
         /// <param name="isVirtual">Indica si es virtual.</param>
         /// <param name="body">El bloc d'instruccions.</param>
         /// 
-        public DestructorDeclaration(AccessMode access, bool isVirtual, Block body) {
+        public DestructorDeclaration(AccessMode access, bool isVirtual, BlockStatement body) {
 
             Access = access;
             VirtualMode = isVirtual ? DestructorVirtualMode.Virtual : DestructorVirtualMode.None;
@@ -36,7 +37,7 @@
         /// <param name="statements">La llista d'instruccions.</param>
         /// 
         public DestructorDeclaration(AccessMode access, bool isVirtual, StatementList statements):
-            this(access, isVirtual, new Block(statements)) { 
+            this(access, isVirtual, new BlockStatement(statements)) { 
         }
 
         /// <summary>
@@ -68,6 +69,6 @@
         /// Obte asigna el bloc de codi.
         /// </summary>
         /// 
-        public Block Body { get; set; }
+        public BlockStatement Body { get; set; }
     }
 }

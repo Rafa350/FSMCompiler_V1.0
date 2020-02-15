@@ -127,19 +127,19 @@
                 obj.ConditionExpression.AcceptVisitor(this);
                 sb.AppendLine(") {");
                 indent++;
-                if (obj.TrueBlock == null) {
+                if (obj.TrueStmt == null) {
                     throw new InvalidOperationException("No se especificoel bloque true.");
                 }
 
-                obj.TrueBlock.AcceptVisitor(this);
+                obj.TrueStmt.AcceptVisitor(this);
                 indent--;
                 sb.AppendIndent(indent);
                 sb.AppendLine("}");
-                if (obj.FalseBlock != null) {
+                if (obj.FalseStmt != null) {
                     sb.AppendIndent(indent);
                     sb.AppendLine("else {");
                     indent++;
-                    obj.FalseBlock.AcceptVisitor(this);
+                    obj.FalseStmt.AcceptVisitor(this);
                     indent--;
                     sb.AppendIndent(indent);
                     sb.AppendLine("}");

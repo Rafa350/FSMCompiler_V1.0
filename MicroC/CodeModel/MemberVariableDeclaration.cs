@@ -23,7 +23,8 @@
         /// <param name="valueType">Tipus del valor.</param>
         /// <param name="initializer">Expressio d'inicialitzacio.</param>
         /// 
-        public MemberVariableDeclaration(string name, AccessMode access, MemberVariableMode mode, TypeIdentifier valueType, Expression initializer) :
+        public MemberVariableDeclaration(string name, AccessMode access, MemberVariableMode mode, 
+            TypeIdentifier valueType, Expression initializer) :
             base(name, valueType, initializer) {
 
             Access = access;

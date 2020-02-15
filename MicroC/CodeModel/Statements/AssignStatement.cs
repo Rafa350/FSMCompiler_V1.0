@@ -2,27 +2,53 @@
 
     using System;
 
+    /// <summary>
+    /// Clase que representa una instruccio d'asignacio.
+    /// </summary>
+    /// 
     public sealed class AssignStatement : Statement {
 
-        private readonly string name;
-        private readonly Expression expression;
+        /// <summary>
+        /// Contructor per defecte.
+        /// </summary>
+        /// 
+        public AssignStatement() {
 
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">El nom.</param>
+        /// <param name="expression">L'expressio.</param>
+        /// 
         public AssignStatement(string name, Expression expression) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            this.name = name;
-            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            this.Name = name;
+            this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
         public override void AcceptVisitor(IVisitor visitor) {
 
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
+
             visitor.Visit(this);
         }
 
-        public string Name => name;
+        /// <summary>
+        /// Obte o asigna el nom de la variable
+        /// </summary>
+        /// 
+        public string Name { get; set; }
 
-        public Expression Expression => expression;
+        /// <summary>
+        /// Obte o asigna l'expressio.
+        /// </summary>
+        /// 
+        public Expression Expression { get; set; }
     }
 }

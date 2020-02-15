@@ -81,7 +81,7 @@
             EndElement();
         }
 
-        public override void Visit(Block obj) {
+        public override void Visit(BlockStatement obj) {
 
             StartElement("block");
             if (obj.Statements != null) {
@@ -124,9 +124,9 @@
 
             StartElement("conditionalStatement");
             obj.ConditionExpression.AcceptVisitor(this);
-            obj.TrueBlock.AcceptVisitor(this);
-            if (obj.FalseBlock != null) {
-                obj.FalseBlock.AcceptVisitor(this);
+            obj.TrueStmt.AcceptVisitor(this);
+            if (obj.FalseStmt != null) {
+                obj.FalseStmt.AcceptVisitor(this);
             }
 
             EndElement();

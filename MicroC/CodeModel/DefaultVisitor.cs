@@ -14,7 +14,7 @@
         public virtual void Visit(BinaryExpression exp) {
         }
 
-        public virtual void Visit(Block block) {
+        public virtual void Visit(BlockStatement block) {
 
             if (block.Statements != null)
                 foreach (var statements in block.Statements)

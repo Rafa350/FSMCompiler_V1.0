@@ -36,25 +36,20 @@
         /// 
         private static UnitDeclaration MakeUnitDeclaration(Machine machine) {
 
+            UnitMemberDeclarationList declList = new UnitMemberDeclarationList();
+
             // Construeix la clase de context.
             //
-            ClassDeclaration classDecl = MakeClassDeclaration(machine);
+            declList.Add(MakeClassDeclaration(machine));
 
             // Construeix la unitat de compilacio.
             //
-            List<IUnitMember> memberList = new List<IUnitMember>();
+            UnitMemberDeclarationList unitMemberDeclList = new UnitMemberDeclarationList();
             if (String.IsNullOrEmpty(options.NsName))
-                memberList.Add(classDecl);
-
-            else {
-                NamespaceDeclaration namespaceDecl = new NamespaceDeclaration {
-                    Name = options.NsName
-                };
-                namespaceDecl.AddMember(classDecl);
-                memberList.Add(namespaceDecl);
-            }
-
-            return new UnitDeclaration(memberList);
+                unitMemberDeclList.AddRange(declList);
+            else 
+                unitMemberDeclList.Add(new NamespaceDeclaration(options.NsName, declList));
+            return new UnitDeclaration(unitMemberDeclList);
         }
 
         /// <summary>
@@ -115,7 +110,7 @@
                 Name = "start",
                 ReturnType = TypeIdentifier.FromName("void"),
                 Access = AccessMode.Public,
-                Body = new Block {
+                Body = new BlockStatement {
                     Statements = bodyStatements
                 }
             };
@@ -148,7 +143,7 @@
                 Name = String.Format("on{0}", transitionName),
                 ReturnType = TypeIdentifier.FromName("void"),
                 Access = AccessMode.Public,
-                Body = new Block {
+                Body = new BlockStatement {
                     Statements = new StatementList {
                         new InlineStatement(
                             String.Format("static_cast<{0}*>(getState())->on{1}(this)", options.StateClassName, transitionName))

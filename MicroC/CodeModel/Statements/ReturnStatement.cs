@@ -4,15 +4,13 @@
     using MicroCompiler.CodeModel;
 
     public sealed class ReturnStatement : Statement {
-
-        private readonly Expression expression;
-
+        
         public ReturnStatement() {
         }
 
         public ReturnStatement(Expression expression) {
 
-            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
         public override void AcceptVisitor(IVisitor visitor) {
@@ -23,6 +21,6 @@
             visitor.Visit(this);
         }
 
-        public Expression Expression => expression;
+        public Expression Expression { get; set; }
     }
 }

@@ -111,19 +111,19 @@
                 sb.AppendLine(") {");
 
                 indent++;
-                stmt.TrueBlock.AcceptVisitor(this);
+                stmt.TrueStmt.AcceptVisitor(this);
                 indent--;
 
                 sb.AppendIndent(indent);
                 sb.AppendLine("}");
 
 
-                if (stmt.FalseBlock != null) {
+                if (stmt.FalseStmt != null) {
                     sb.AppendIndent(indent);
                     sb.AppendLine("else {");
 
                     indent++;
-                    stmt.FalseBlock.AcceptVisitor(this);
+                    stmt.FalseStmt.AcceptVisitor(this);
                     indent--;
 
                     sb.AppendIndent(indent);

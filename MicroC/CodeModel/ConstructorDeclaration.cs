@@ -1,6 +1,7 @@
 ﻿namespace MicroCompiler.CodeModel {
 
     using System;
+    using MicroCompiler.CodeModel.Statements;
 
     public sealed class ConstructorDeclaration : IVisitable {
 
@@ -19,7 +20,7 @@
         /// <param name="arguments">Llista d'argument.</param>
         /// <param name="body">El bloc de codi.</param>
         /// 
-        public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, Block body) {
+        public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, BlockStatement body) {
 
             Access = access;
             Arguments = arguments;
@@ -34,7 +35,7 @@
         /// <param name="statements">Llista d'instruccions.</param>
         /// 
         public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, StatementList statements):
-            this(access, arguments, new Block(statements)) {
+            this(access, arguments, new BlockStatement(statements)) {
         }
 
         /// <summary>
@@ -66,6 +67,6 @@
         /// Obte o asigna el bloc de codi.
         /// </summary>
         /// 
-        public Block Body { get; set; }
+        public BlockStatement Body { get; set; }
     }
 }

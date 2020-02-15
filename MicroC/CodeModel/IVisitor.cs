@@ -8,7 +8,7 @@
         void Visit(ArgumentDeclaration decl);
         void Visit(AssignStatement stmt);
         void Visit(BinaryExpression exp);
-        void Visit(Block block);
+        void Visit(BlockStatement block);
         void Visit(ClassDeclaration decl);
         void Visit(ConditionalExpression exp);
         void Visit(ConstructorDeclaration decl);

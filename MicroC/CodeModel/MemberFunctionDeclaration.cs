@@ -1,6 +1,7 @@
 ﻿namespace MicroCompiler.CodeModel {
 
     using System;
+    using MicroCompiler.CodeModel.Statements;
 
     public sealed class MemberFunctionDeclaration : FunctionDeclarationBase, IClassMember {
 
@@ -23,7 +24,8 @@
         /// <param name="returnType">El tipus de retorn.</param>
         /// <param name="body">El bloc d'instruccions.</param>
         /// 
-        public MemberFunctionDeclaration(string name, AccessMode access, MemberFunctionMode mode, TypeIdentifier returnType, Block body):
+        public MemberFunctionDeclaration(string name, AccessMode access, MemberFunctionMode mode, 
+            TypeIdentifier returnType, BlockStatement body):
             base(name, returnType, body) {
 
             Access = access;

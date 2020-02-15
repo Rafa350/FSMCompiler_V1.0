@@ -11,9 +11,9 @@
 
         private readonly ConditionPosition conditionPosition;
         private readonly Expression conditionExpression;
-        private readonly Block body;
+        private readonly BlockStatement body;
 
-        public LoopStatement(ConditionPosition conditionPosition, Expression conditionExpression, Block body) {
+        public LoopStatement(ConditionPosition conditionPosition, Expression conditionExpression, BlockStatement body) {
 
             this.conditionPosition = conditionPosition;
             this.conditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
@@ -29,7 +29,7 @@
 
         public Expression ConditionExpression => conditionExpression;
 
-        public Block Body => body;
+        public BlockStatement Body => body;
 
     }
 }

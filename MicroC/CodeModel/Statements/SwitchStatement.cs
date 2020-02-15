@@ -6,7 +6,7 @@
     public sealed class SwitchStatement : Statement {
 
         private Expression expression;
-        private Block defaultBody;
+        private BlockStatement defaultBody;
         private List<SwitchCaseStatement> switchCaseList;
 
         public override void AcceptVisitor(IVisitor visitor) {
@@ -37,7 +37,7 @@
             set { expression = value; }
         }
 
-        public Block DefaultBody {
+        public BlockStatement DefaultBody {
             get { return defaultBody; }
             set { defaultBody = value; }
         }

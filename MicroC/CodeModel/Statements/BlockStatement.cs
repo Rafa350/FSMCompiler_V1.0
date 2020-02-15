@@ -1,18 +1,18 @@
-﻿namespace MicroCompiler.CodeModel {
+﻿namespace MicroCompiler.CodeModel.Statements {
 
     using System;
 
     /// <summary>
-    /// Clase que representa un bloc de codi.
+    /// Clase que representa un bloc d'instruccions.
     /// </summary>
     /// 
-    public sealed class Block : IVisitable {
+    public sealed class BlockStatement : Statement {
 
         /// <summary>
         /// Constructor per defecte.
         /// </summary>
         /// 
-        public Block() {
+        public BlockStatement() {
 
         }
 
@@ -21,7 +21,7 @@
         /// </summary>
         /// <param name="statements">Llista d'instruccions.</param>
         /// 
-        public Block(StatementList statements) {
+        public BlockStatement(StatementList statements) {
 
             Statements = statements;
         }
@@ -31,7 +31,7 @@
         /// </summary>
         /// <param name="visitor">El visitador.</param>
         /// 
-        public void AcceptVisitor(IVisitor visitor) {
+        public override void AcceptVisitor(IVisitor visitor) {
 
             if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));

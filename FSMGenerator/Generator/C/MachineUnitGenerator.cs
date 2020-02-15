@@ -16,9 +16,9 @@
 
             MachineUnitGenerator.options = options;
 
-            List<IUnitMember> memberList = new List<IUnitMember>();
+            UnitMemberDeclarationList memberList = new UnitMemberDeclarationList();
 
-            // Crea el tipus enumerador pels valosr del estat.
+            // Crea el tipus enumerador pels valors del estat.
             //
             List<string> stateList = new List<string>();
             foreach (var state in machine.States)
@@ -74,7 +74,7 @@
         /// <param name="machine">La maquina.</param>
         /// <returns>El cos de la funcio.</returns>
         /// 
-        private static Block MakeStartFunctionBody(Machine machine) {
+        private static BlockStatement MakeStartFunctionBody(Machine machine) {
 
             StatementList bodyStmtList = new StatementList();
 
@@ -96,7 +96,7 @@
                 new LiteralExpression(
                     String.Format("State_{0}", machine.Start.Name))));
 
-            return new Block(bodyStmtList);
+            return new BlockStatement(bodyStmtList);
         }
 
         private static FunctionDeclaration MakeMachineTransitionFunction(Machine machine, string transitionName) {
@@ -109,7 +109,7 @@
             return function;
         }
 
-        private static Block MakeMachineTransitionFunctionBody(Machine machine, string transitionName) {
+        private static BlockStatement MakeMachineTransitionFunctionBody(Machine machine, string transitionName) {
 
             StatementList bodyStmtList = new StatementList();
 
@@ -132,18 +132,18 @@
                             SwitchCaseStatement caseStmt = new SwitchCaseStatement(
                                 new LiteralExpression(
                                     String.Format("State_{0}", state.Name)),
-                                new Block(caseStmtBodyStmtList));
+                                new BlockStatement(caseStmtBodyStmtList));
 
                             switchStmt.AddSwitchCase(caseStmt);
                         }
                     }
             }
 
-            switchStmt.DefaultBody = new Block();
+            switchStmt.DefaultBody = new BlockStatement();
 
             bodyStmtList.Add(switchStmt);
 
-            return new Block(bodyStmtList);
+            return new BlockStatement(bodyStmtList);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@
             return function;
         }
 
-        private static Block MakeStateTransitionFunctionBody(Machine machine, State state, string transitionName) {
+        private static BlockStatement MakeStateTransitionFunctionBody(Machine machine, State state, string transitionName) {
 
             StatementList bodyStmtList = new StatementList();
 
@@ -215,20 +215,20 @@
                     if (transition.Guard == null) {
                         bodyStmtList.Add(new IfThenElseStatement(
                             new LiteralExpression(1),
-                            new Block(trueBlockStmtList),
+                            new BlockStatement(trueBlockStmtList),
                             null));
                     }
                     else {
                         bodyStmtList.Add(new IfThenElseStatement(
                             new FunctionCallExpression(
                                 new IdentifierExpression(transition.Guard.Expression)),
-                            new Block(trueBlockStmtList),
+                            new BlockStatement(trueBlockStmtList),
                             null));
                     }
                 }
             }
 
-            return new Block(bodyStmtList);
+            return new BlockStatement(bodyStmtList);
         }
     }
 }

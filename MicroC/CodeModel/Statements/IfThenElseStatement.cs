@@ -5,17 +5,33 @@
 
     public sealed class IfThenElseStatement : Statement {
 
-        private readonly Expression conditionExpression;
-        private readonly Block trueBlock;
-        private readonly Block falseBlock;
+        /// <summary>
+        /// Constructor per defecte.
+        /// </summary>
+        /// 
+        public IfThenElseStatement() {
 
-        public IfThenElseStatement(Expression conditionExpression, Block trueBlock, Block falseBlock) {
-
-            this.conditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
-            this.trueBlock = trueBlock ?? throw new ArgumentNullException(nameof(trueBlock));
-            this.falseBlock = falseBlock;
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="conditionExpression">Expressio de la condicio.</param>
+        /// <param name="trueStmt">Instruccions en fas true.</param>
+        /// <param name="falseStmt">Instruccions en cas false.</param>
+        /// 
+        public IfThenElseStatement(Expression conditionExpression, Statement trueStmt, Statement falseStmt) {
+
+            ConditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
+            TrueStmt = trueStmt ?? throw new ArgumentNullException(nameof(trueStmt));
+            FalseStmt = falseStmt;
+        }
+
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
             if (visitor == null)
@@ -24,10 +40,22 @@
             visitor.Visit(this);
         }
 
-        public Expression ConditionExpression => conditionExpression;
+        /// <summary>
+        /// Obte o asigna l'espressio de la condicio.
+        /// </summary>
+        /// 
+        public Expression ConditionExpression { get; set; }
 
-        public Block TrueBlock => trueBlock;
+        /// <summary>
+        /// Obte o asigna les instruccion del cas true.
+        /// </summary>
+        /// 
+        public Statement TrueStmt { get; set; }
 
-        public Block FalseBlock => falseBlock;
+        /// <summary>
+        /// Obte o asigna les instruccions del cass false.
+        /// </summary>
+        /// 
+        public Statement FalseStmt { get; set; }
     }
 }

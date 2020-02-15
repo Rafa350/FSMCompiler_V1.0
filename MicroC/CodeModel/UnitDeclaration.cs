@@ -5,34 +5,21 @@
 
     public sealed class UnitDeclaration : IVisitable {
 
-        private readonly List<IUnitMember> members;
+        /// <summary>
+        /// Constructor per defecte.
+        /// </summary>
+        /// 
+        public UnitDeclaration() {
+
+        }
 
         /// <summary>
         /// Constructor per defecte.
         /// </summary>
         /// 
-        public UnitDeclaration(List<IUnitMember> members) {
+        public UnitDeclaration(UnitMemberDeclarationList members) {
 
-            this.members = members ?? throw new ArgumentNullException(nameof(members));
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="members">Els memberes.</param>
-        /// 
-        public UnitDeclaration(IEnumerable<IUnitMember> members) :
-            this(new List<IUnitMember>(members)) {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="members">Els membres.</param>
-        /// 
-        public UnitDeclaration(params IUnitMember[] members) :
-            this(new List<IUnitMember>(members)) {
-
+            Members = members ?? throw new ArgumentNullException(nameof(members));
         }
 
         /// <summary>
@@ -49,9 +36,9 @@
         }
 
         /// <summary>
-        /// Enumera els membres.
+        /// Obte o asigna la llista de membres
         /// </summary>
         /// 
-        public IEnumerable<IUnitMember> Members => members;
+        public UnitMemberDeclarationList Members { get; set; }
     }
 }

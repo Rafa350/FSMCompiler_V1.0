@@ -1,6 +1,7 @@
 ﻿namespace MicroCompiler.CodeModel {
 
     using System;
+    using MicroCompiler.CodeModel.Statements;
 
     public abstract class FunctionDeclarationBase : IVisitable {
 
@@ -18,9 +19,9 @@
         /// </summary>
         /// <param name="name">El nom.</param>
         /// <param name="returnType">El tipus de retorn.</param>
-        /// <param name="body">El bloc d'instruccions.</param>
+        /// <param name="body">Les instruccions.</param>
         /// 
-        protected FunctionDeclarationBase(string name, TypeIdentifier returnType, Block body) {
+        protected FunctionDeclarationBase(string name, TypeIdentifier returnType, Statement body) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -38,7 +39,7 @@
         /// <param name="statements">La llista d'instruccions.</param>
         /// 
         protected FunctionDeclarationBase(string name, TypeIdentifier returnType, StatementList statements) :
-            this(name, returnType, new Block(statements)) {
+            this(name, returnType, new BlockStatement(statements)) {
         }
 
         /// <summary>
@@ -67,9 +68,9 @@
         public ArgumentDeclarationList Arguments { get; set; }
 
         /// <summary>
-        /// Obte o asigna el bloc d'instruccions.
+        /// Obte o asigna les instruccions.
         /// </summary>
         /// 
-        public Block Body { get; set; }
+        public Statement Body { get; set; }
     }
 }

@@ -4,7 +4,7 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Clase que representa una crida a una funcio.
+    /// Clase que representa una indexacio.
     /// </summary>
     /// 
     public sealed class SubscriptExpression : Expression {

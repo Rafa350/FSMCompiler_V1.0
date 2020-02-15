@@ -5,6 +5,43 @@
     public sealed class ClassDeclaration : IVisitable, IUnitMember {
 
         /// <summary>
+        /// Constructor per defecte.
+        /// </summary>
+        /// 
+        public ClassDeclaration() {
+
+            BaseAccess = AccessMode.Public;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">El nom.</param>
+        /// <param name="baseName">En nom de la clase base.</param>
+        /// <param name="baseAccess">Modus d'access de la clase base.</param>
+        /// <param name="variables">Llista de variables.</param>
+        /// <param name="functions">Llista de funcions.</param>
+        /// <param name="constructors">Llista de constructors.</param>
+        /// <param name="destructor">Destructor.</param>
+        /// 
+        public ClassDeclaration(string name, string baseName, AccessMode baseAccess, 
+            MemberVariableDeclarationList variables,
+            MemberFunctionDeclarationList functions, ConstructorDeclarationList constructors, 
+            DestructorDeclaration destructor) {
+
+            if (String.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
+            Name = name;
+            BaseName = baseName;
+            BaseAccess = baseAccess;
+            Variables = variables;
+            Functions = functions;
+            Constructors = constructors;
+            Destructor = destructor;
+        }
+
+        /// <summary>
         /// Accepta un visitador.
         /// </summary>
         /// <param name="visitor">El visitador.</param>

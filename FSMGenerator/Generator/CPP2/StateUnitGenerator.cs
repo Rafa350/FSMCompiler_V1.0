@@ -1,7 +1,6 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
 
     using System;
-    using System.Collections.Generic;
     using MicroCompiler.CodeModel;
     using MicroCompiler.CodeModel.Expressions;
     using MicroCompiler.CodeModel.Statements;
@@ -29,31 +28,22 @@
 
             // Crea la clase del estat
             //
-            List<IUnitMember> classList = new List<IUnitMember> {
-                MakeStateClass(machine)
-            };
+            UnitMemberDeclarationList declList = new UnitMemberDeclarationList();
+            declList.Add(MakeStateClass(machine));
 
             // Crea les clases dels estats derivats.
             //
             foreach (State state in machine.States)
-                classList.Add(MakeDerivedStateClass(state));
+                declList.Add(MakeDerivedStateClass(state));
 
             // Crea la unitat de compilacio.
             //
-            List<IUnitMember> memberList = new List<IUnitMember>();
-
+            UnitMemberDeclarationList unitMemberDeclList = new UnitMemberDeclarationList();
             if (String.IsNullOrEmpty(options.NsName))
-                memberList.AddRange(classList);
-
-            else {
-                NamespaceDeclaration namespaceDecl = new NamespaceDeclaration {
-                    Name = options.NsName
-                };
-                namespaceDecl.AddMembers(classList);
-                memberList.Add(namespaceDecl);
-            }
-
-            return new UnitDeclaration(memberList);
+                unitMemberDeclList.AddRange(declList);
+            else
+                unitMemberDeclList.Add(new NamespaceDeclaration(options.NsName, declList));
+            return new UnitDeclaration(unitMemberDeclList);
         }
 
         /// <summary>
@@ -149,7 +139,7 @@
                 Access = AccessMode.Public,
                 Mode = MemberFunctionMode.Static,
                 ReturnType = TypeIdentifier.FromName(String.Format("{0}*", state.Name)),
-                Body = new Block(new StatementList {
+                Body = new BlockStatement(new StatementList {
                         new InlineStatement(String.Format("if (instance == nullptr) instance = new {0}()", state.Name)),
                         new ReturnStatement(
                             new IdentifierExpression("instance"))
@@ -201,7 +191,7 @@
                     Expression conditionExpr = new InlineExpression(transition.Guard == null ? "true" : transition.Guard.Expression);
                     bodyStatements.Add(new IfThenElseStatement(
                         conditionExpr, 
-                        new Block { Statements = trueBodyStatements }, 
+                        new BlockStatement { Statements = trueBodyStatements }, 
                         null));
                 }
             }
@@ -211,7 +201,7 @@
                 Mode = MemberFunctionMode.Override,
                 ReturnType = TypeIdentifier.FromName("void"),
                 Name = String.Format("on{0}", transitionName),
-                Body = new Block(bodyStatements),
+                Body = new BlockStatement(bodyStatements),
                 Arguments = new ArgumentDeclarationList {
                     new ArgumentDeclaration {
                         Name = "context",

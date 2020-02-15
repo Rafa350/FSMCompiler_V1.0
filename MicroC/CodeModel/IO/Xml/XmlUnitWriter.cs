@@ -9,13 +9,11 @@
 
         public void Write(Stream stream, UnitDeclaration unit) {
 
-            if (stream == null) {
+            if (stream == null) 
                 throw new ArgumentNullException(nameof(stream));
-            }
 
-            if (unit == null) {
+            if (unit == null) 
                 throw new ArgumentNullException(nameof(unit));
-            }
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.CloseOutput = false;

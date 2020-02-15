@@ -26,33 +26,27 @@
             int actionCount = 0;
             int guardCount = 0;
 
-            if (machine.InitializeAction != null) {
+            if (machine.InitializeAction != null) 
                 actionName.Add(machine.InitializeAction, MakeActionName(actionCount++));
-            }
 
-            if (machine.TerminateAction != null) {
+            if (machine.TerminateAction != null) 
                 actionName.Add(machine.TerminateAction, MakeActionName(actionCount++));
-            }
 
             foreach (State state in machine.States) {
 
-                if (state.EnterAction != null) {
+                if (state.EnterAction != null) 
                     actionName.Add(state.EnterAction, MakeActionName(actionCount++));
-                }
 
-                if (state.ExitAction != null) {
+                if (state.ExitAction != null) 
                     actionName.Add(state.ExitAction, MakeActionName(actionCount++));
-                }
 
                 foreach (Transition transition in state.Transitions) {
 
-                    if (transition.Guard != null) {
+                    if (transition.Guard != null) 
                         guardName.Add(transition.Guard, MakeGuardName(guardCount++));
-                    }
 
-                    if (transition.Action != null) {
+                    if (transition.Action != null) 
                         actionName.Add(transition.Action, MakeActionName(actionCount++));
-                    }
                 }
             }
         }

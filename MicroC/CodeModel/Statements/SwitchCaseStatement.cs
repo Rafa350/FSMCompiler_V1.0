@@ -7,14 +7,14 @@
     public sealed class SwitchCaseStatement : IVisitable {
 
         private readonly LiteralExpression expression;
-        private readonly Block body;
+        private readonly BlockStatement body;
 
         /// <summary>
         /// Constructor (El cas de 'default'
         /// </summary>
         /// <param name="body"></param>
         /// 
-        public SwitchCaseStatement(Block body) {
+        public SwitchCaseStatement(BlockStatement body) {
 
             this.body = body ?? throw new ArgumentNullException(nameof(body));
         }
@@ -25,7 +25,7 @@
         /// <param name="expression"></param>
         /// <param name="body"></param>
         /// 
-        public SwitchCaseStatement(LiteralExpression expression, Block body) {
+        public SwitchCaseStatement(LiteralExpression expression, BlockStatement body) {
 
             this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
             this.body = body ?? throw new ArgumentNullException(nameof(body));
@@ -54,6 +54,6 @@
         /// Obte o asigna el cos.
         /// </summary>
         /// 
-        public Block Body => body;
+        public BlockStatement Body => body;
     }
 }

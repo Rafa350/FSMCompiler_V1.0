@@ -54,7 +54,7 @@
     <Compile Include="CodeGenerator\C\HeaderGenerator.cs" />
     <Compile Include="CodeModel\AccessMode.cs" />
     <Compile Include="CodeModel\ArgumentDeclaration.cs" />
-    <Compile Include="CodeModel\Block.cs" />
+    <Compile Include="CodeModel\Statements\BlockStatement.cs" />
     <Compile Include="CodeModel\ClassDeclaration.cs" />
     <Compile Include="CodeModel\ConstructorDeclaration.cs" />
     <Compile Include="CodeModel\ConstructorDeclarationList.cs" />
@@ -87,6 +87,7 @@
     <Compile Include="CodeModel\MemberVariableDeclaration.cs" />
     <Compile Include="CodeModel\MemberVariableDeclarationList.cs" />
     <Compile Include="CodeModel\MemberVariableMode.cs" />
+    <Compile Include="CodeModel\UnitBuilder.cs" />
     <Compile Include="CodeModel\NamespaceDeclaration.cs" />
     <Compile Include="CodeModel\Statement.cs" />
     <Compile Include="CodeModel\StatementList.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="CodeModel\Statements\SwitchStatement.cs" />
     <Compile Include="CodeModel\TypeIdentifier.cs" />
     <Compile Include="CodeModel\UnitDeclaration.cs" />
+    <Compile Include="CodeModel\UnitMemberDeclarationList.cs" />
     <Compile Include="CodeModel\VariableDeclaration.cs" />
     <Compile Include="CodeModel\VariableDeclarationBase.cs" />
     <Compile Include="CodeGenerator\Cpp\CodeGenerator.cs" />
