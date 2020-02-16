@@ -4,7 +4,7 @@
     using MicroCompiler.CodeModel;
 
     public sealed class ReturnStatement : Statement {
-        
+
         public ReturnStatement() {
         }
 

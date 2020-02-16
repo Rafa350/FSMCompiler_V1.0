@@ -30,10 +30,10 @@
 
         protected void Attribute(string name, object value) {
 
-            if (value is bool) 
+            if (value is bool)
                 wr.WriteAttributeString(name, Convert((bool)value));
-            
-            else 
+
+            else
                 wr.WriteElementString(name, String.Format(ci, "{0}", value));
         }
 
@@ -64,10 +64,10 @@
 
         private static string Convert(ConditionPosition conditionPosition) {
 
-            if (conditionPosition == ConditionPosition.PostLoop) 
+            if (conditionPosition == ConditionPosition.PostLoop)
                 return "postLoop";
-            
-            else 
+
+            else
                 return "preLoop";
         }
 

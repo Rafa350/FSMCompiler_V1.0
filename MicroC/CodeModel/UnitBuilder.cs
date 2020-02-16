@@ -5,7 +5,7 @@
 
     public sealed class UnitBuilder {
 
-        private readonly Stack<UnitMemberDeclarationList> unitMemberStack = new Stack<UnitMemberDeclarationList>();
+        private readonly Stack<DeclarationBlockMemberList> unitMemberStack = new Stack<DeclarationBlockMemberList>();
         private readonly Stack<ClassDeclaration> classDeclStack = new Stack<ClassDeclaration>();
         private readonly UnitDeclaration unitDecl;
 
@@ -15,7 +15,7 @@
         /// 
         public UnitBuilder() {
 
-            unitDecl = new UnitDeclaration(new UnitMemberDeclarationList());
+            unitDecl = new UnitDeclaration(new DeclarationBlockMemberList());
             unitMemberStack.Push(unitDecl.Members);
         }
 
@@ -27,7 +27,7 @@
         /// 
         public UnitBuilder BeginNamespace(string name) {
 
-            NamespaceDeclaration namespaceDecl = new NamespaceDeclaration(name, new UnitMemberDeclarationList());
+            NamespaceDeclaration namespaceDecl = new NamespaceDeclaration(name, new DeclarationBlockMemberList());
             unitMemberStack.Peek().Add(namespaceDecl);
             unitMemberStack.Push(namespaceDecl.Members);
 
@@ -41,7 +41,7 @@
         /// 
         public UnitBuilder EndNamespace() {
 
-            if (unitMemberStack.Count > 1)
+            if (unitMemberStack.Count < 2)
                 throw new InvalidOperationException("No hay ningun espacio de nombres abierto.");
 
             unitMemberStack.Pop();
@@ -97,6 +97,19 @@
                 throw new InvalidOperationException("No hay ninguna declaracion de clase abierta.");
 
             classDeclStack.Pop();
+
+            return this;
+        }
+
+        public UnitBuilder AddConstructorDeclaration(ConstructorDeclaration constructorDecl) {
+
+            if (classDeclStack.Count == 0)
+                throw new InvalidOperationException("No hay ninguna declaracion de clase abierta.");
+
+            ClassDeclaration classDecl = classDeclStack.Peek();
+            if (classDecl.Constructors == null)
+                classDecl.Constructors = new ConstructorDeclarationList();
+            classDecl.Constructors.Add(constructorDecl);
 
             return this;
         }

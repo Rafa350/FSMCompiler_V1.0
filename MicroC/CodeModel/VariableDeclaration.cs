@@ -2,7 +2,7 @@
 
     using System;
 
-    public sealed class VariableDeclaration : VariableDeclarationBase, IUnitMember {
+    public sealed class VariableDeclaration : VariableDeclarationBase, IDeclarationBlockMember {
 
         /// <summary>
         /// Accepta un visitador.

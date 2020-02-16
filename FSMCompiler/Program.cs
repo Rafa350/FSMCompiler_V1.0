@@ -74,10 +74,6 @@
                     case "CPP":
                         generator = new v1.Generator.CPP.CPPGenerator(generatorParameters);
                         break;
-
-                    case "CPP2":
-                        generator = new v1.Generator.CPP2.CPPGenerator(generatorParameters);
-                        break;
                 }
 
                 generator.Generate(machine);

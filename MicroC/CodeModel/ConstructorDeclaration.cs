@@ -14,6 +14,16 @@
         }
 
         /// <summary>
+        /// Constructor. 
+        /// </summary>
+        /// <param name="access">Modus d'acces.</param>
+        /// 
+        public ConstructorDeclaration(AccessMode access) {
+
+            Access = access;
+        }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="access">Modus d'acces.</param>
@@ -26,7 +36,7 @@
             Arguments = arguments;
             Body = body;
         }
-        
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -34,7 +44,7 @@
         /// <param name="arguments">Llista d'argument.</param>
         /// <param name="statements">Llista d'instruccions.</param>
         /// 
-        public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, StatementList statements):
+        public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, StatementList statements) :
             this(access, arguments, new BlockStatement(statements)) {
         }
 

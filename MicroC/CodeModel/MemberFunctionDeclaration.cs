@@ -22,11 +22,12 @@
         /// <param name="access">El modus d'acces.</param>
         /// <param name="mode">El tipus d'instancia.</param>
         /// <param name="returnType">El tipus de retorn.</param>
+        /// <param name="arguments">Llista d'arguments.</param>
         /// <param name="body">El bloc d'instruccions.</param>
         /// 
-        public MemberFunctionDeclaration(string name, AccessMode access, MemberFunctionMode mode, 
-            TypeIdentifier returnType, BlockStatement body):
-            base(name, returnType, body) {
+        public MemberFunctionDeclaration(string name, AccessMode access, MemberFunctionMode mode,
+            TypeIdentifier returnType, ArgumentDeclarationList arguments, BlockStatement body) :
+            base(name, returnType, arguments, body) {
 
             Access = access;
             Mode = mode;
@@ -39,10 +40,12 @@
         /// <param name="access">El modus d'acces.</param>
         /// <param name="mode">El tipus d'instancia.</param>
         /// <param name="returnType">El tipus de retorn.</param>
+        /// <param name="arguments">Llista d'arguments.</param>
         /// <param name="statements">La llista d'instruccions.</param>
         /// 
-        public MemberFunctionDeclaration(string name, AccessMode access, MemberFunctionMode mode, TypeIdentifier returnType, StatementList statements) :
-            base(name, returnType, statements) {
+        public MemberFunctionDeclaration(string name, AccessMode access, MemberFunctionMode mode,
+            TypeIdentifier returnType, ArgumentDeclarationList arguments, StatementList statements) :
+            base(name, returnType, arguments, statements) {
 
         }
 
@@ -53,7 +56,7 @@
         /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);

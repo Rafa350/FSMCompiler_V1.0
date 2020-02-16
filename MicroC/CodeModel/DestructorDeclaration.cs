@@ -36,8 +36,8 @@
         /// <param name="isVirtual">Indica si es virtual.</param>
         /// <param name="statements">La llista d'instruccions.</param>
         /// 
-        public DestructorDeclaration(AccessMode access, bool isVirtual, StatementList statements):
-            this(access, isVirtual, new BlockStatement(statements)) { 
+        public DestructorDeclaration(AccessMode access, bool isVirtual, StatementList statements) :
+            this(access, isVirtual, new BlockStatement(statements)) {
         }
 
         /// <summary>

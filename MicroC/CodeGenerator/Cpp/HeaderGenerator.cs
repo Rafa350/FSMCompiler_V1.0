@@ -145,12 +145,10 @@
                 if (obj.Arguments != null) {
                     bool first = true;
                     foreach (var argument in obj.Arguments) {
-                        if (first) {
+                        if (first)
                             first = false;
-                        }
-                        else {
+                        else
                             sb.Append(", ");
-                        }
 
                         argument.AcceptVisitor(this);
                     }
@@ -223,11 +221,10 @@
                 sb.AppendLine();
                 indent++;
 
-                if (obj.Members != null) {
-                    foreach (var member in obj.Members) {
+                if (obj.Members != null)
+                    foreach (var member in obj.Members)
                         member.AcceptVisitor(this);
-                    }
-                }
+
 
                 indent--;
                 sb.Append('}');
@@ -236,19 +233,16 @@
 
             public override void Visit(UnitDeclaration obj) {
 
-                if (obj.Members != null) {
-                    foreach (var member in obj.Members) {
+                if (obj.Members != null)
+                    foreach (var member in obj.Members)
                         member.AcceptVisitor(this);
-                    }
-                }
             }
         }
 
         public static string Generate(UnitDeclaration unitDeclaration) {
 
-            if (unitDeclaration == null) {
+            if (unitDeclaration == null)
                 throw new ArgumentNullException(nameof(unitDeclaration));
-            }
 
             StringBuilder sb = new StringBuilder();
             var visitor = new GeneratorVisitor(sb);

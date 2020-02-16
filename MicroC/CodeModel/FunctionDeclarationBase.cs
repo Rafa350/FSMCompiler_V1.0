@@ -19,15 +19,18 @@
         /// </summary>
         /// <param name="name">El nom.</param>
         /// <param name="returnType">El tipus de retorn.</param>
+        /// <param name="arguments">Llista d'arguments.</param>
         /// <param name="body">Les instruccions.</param>
         /// 
-        protected FunctionDeclarationBase(string name, TypeIdentifier returnType, Statement body) {
+        protected FunctionDeclarationBase(string name, TypeIdentifier returnType, ArgumentDeclarationList arguments,
+            Statement body) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
             Name = name;
             ReturnType = returnType;
+            Arguments = arguments;
             Body = body;
         }
 
@@ -36,10 +39,12 @@
         /// </summary>
         /// <param name="name">El nom.</param>
         /// <param name="returnType">El tipus de retorn.</param>
+        /// <param name="arguments">Llista d'arguments.</param>
         /// <param name="statements">La llista d'instruccions.</param>
         /// 
-        protected FunctionDeclarationBase(string name, TypeIdentifier returnType, StatementList statements) :
-            this(name, returnType, new BlockStatement(statements)) {
+        protected FunctionDeclarationBase(string name, TypeIdentifier returnType, ArgumentDeclarationList arguments,
+            StatementList statements) :
+            this(name, returnType, arguments, new BlockStatement(statements)) {
         }
 
         /// <summary>

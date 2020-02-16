@@ -1,9 +1,8 @@
 ﻿namespace MicroCompiler.CodeModel {
 
     using System;
-    using System.Collections.Generic;
 
-    public sealed class NamespaceDeclaration : IVisitable, IUnitMember {
+    public sealed class NamespaceDeclaration : DeclarationBlock, IDeclarationBlockMember {
 
         /// <summary>
         /// Constructor per defecte.
@@ -18,13 +17,13 @@
         /// <param name="name">El nom.</param>
         /// <param name="members">La llista de membres.</param>
         /// 
-        public NamespaceDeclaration(string name, UnitMemberDeclarationList members) {
+        public NamespaceDeclaration(string name, DeclarationBlockMemberList members) :
+            base(members) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
             Name = name;
-            Members = members ?? throw new ArgumentNullException(nameof(members));
         }
 
         /// <summary>
@@ -32,23 +31,18 @@
         /// </summary>
         /// <param name="visitor">El visitador.</param>
         /// 
-        public void AcceptVisitor(IVisitor visitor) {
+        public override void AcceptVisitor(IVisitor visitor) {
 
             if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
         }
+
         /// <summary>
         /// Obte o asigna el nom del espai de noms.
         /// </summary>
         /// 
         public string Name { get; set; }
-
-        /// <summary>
-        /// Obte o asigna la llista de membres.
-        /// </summary>
-        /// 
-        public UnitMemberDeclarationList Members { get; set; }
     }
 }

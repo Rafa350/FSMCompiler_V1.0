@@ -1,4 +1,4 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
+﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP {
 
     using System;
     using MicroCompiler.CodeModel;
@@ -9,60 +9,25 @@
 
     public static class StateUnitGenerator {
 
-        private static CPPGeneratorOptions options;
-
         public static UnitDeclaration Generate(Machine machine, CPPGeneratorOptions options) {
 
-            StateUnitGenerator.options = options;
+            UnitBuilder ub = new UnitBuilder();
 
-            return MakeUnit(machine);
-        }
-
-        /// <summary>
-        /// Crea la declaracio de la unitat de compilacio.
-        /// </summary>
-        /// <param name="machine">La maquina.</param>
-        /// <returns>La unitat de compilacio.</returns>
-        /// 
-        private static UnitDeclaration MakeUnit(Machine machine) {
-
-            // Crea la clase del estat
+            // Obra un espai de noms si cal.
             //
-            UnitMemberDeclarationList declList = new UnitMemberDeclarationList();
-            declList.Add(MakeStateClass(machine));
+            if (!String.IsNullOrEmpty(options.NsName))
+                ub.BeginNamespace(options.NsName);
 
-            // Crea les clases dels estats derivats.
+            // Declara la clase d'estat base
             //
-            foreach (State state in machine.States)
-                declList.Add(MakeDerivedStateClass(state));
+            ub.BeginClass(options.StateClassName, options.StateBaseClassName, AccessMode.Public);
 
-            // Crea la unitat de compilacio.
-            //
-            UnitMemberDeclarationList unitMemberDeclList = new UnitMemberDeclarationList();
-            if (String.IsNullOrEmpty(options.NsName))
-                unitMemberDeclList.AddRange(declList);
-            else
-                unitMemberDeclList.Add(new NamespaceDeclaration(options.NsName, declList));
-            return new UnitDeclaration(unitMemberDeclList);
-        }
+            ub.AddConstructorDeclaration(new ConstructorDeclaration {
+                Access = AccessMode.Protected
+            });
 
-        /// <summary>
-        /// Construeix la declaracio de la clase base dels estats.
-        /// </summary>
-        /// <param name="machine">La maquina.</param>
-        /// <returns>La declaracio de la clase.</returns>
-        /// 
-        private static ClassDeclaration MakeStateClass(Machine machine) {
-
-            ConstructorDeclarationList constructorList = new ConstructorDeclarationList {
-                new ConstructorDeclaration {
-                    Access = AccessMode.Protected
-                }
-            };
-
-            MemberFunctionDeclarationList functionList = new MemberFunctionDeclarationList();
             foreach (var transitionName in machine.GetTransitionNames()) {
-                MemberFunctionDeclaration function = new MemberFunctionDeclaration {
+                ub.AddMemberFunctionDeclaration(new MemberFunctionDeclaration {
                     Access = AccessMode.Public,
                     Mode = MemberFunctionMode.Virtual,
                     ReturnType = TypeIdentifier.FromName("void"),
@@ -73,57 +38,37 @@
                             ValueType = TypeIdentifier.FromName(String.Format("{0}*", options.ContextClassName))
                         }
                     }
-                };
-
-                functionList.Add(function);
+                });
             }
 
-            return new ClassDeclaration {
-                Name = options.StateClassName,
-                BaseName = options.StateBaseClassName,
-                BaseAccess = AccessMode.Public,
-                Constructors = constructorList,
-                Functions = functionList
-            };
-        }
+            ub.EndClass();
 
-        /// <summary>
-        /// Conmstrueix la clase d'un estat concret.
-        /// </summary>
-        /// <param name="state">El estat.</param>
-        /// <returns>La declaracio de la clase.</returns>
-        /// 
-        private static ClassDeclaration MakeDerivedStateClass(State state) {
+            // Crea les clases d'estat derivades
+            //
+            foreach (var state in machine.States) {
+                ub.BeginClass(String.Format("{0}", state.Name), options.StateBaseClassName, AccessMode.Public);
 
-            ConstructorDeclarationList constructors = new ConstructorDeclarationList {
-                new ConstructorDeclaration {
+                ub.AddConstructorDeclaration(new ConstructorDeclaration {
                     Access = AccessMode.Protected
-                }
-            };
+                });
 
-            MemberFunctionDeclarationList functions = new MemberFunctionDeclarationList();
-            functions.Add(MakeGetInstanceFunction(state));
-            foreach (var transitionName in state.GetTransitionNames())
-                functions.Add(MakeOnTransitionFunction(state, transitionName));
+                ub.AddMemberFunctionDeclaration(MakeGetInstanceFunction(state));
 
-            MemberVariableDeclarationList variables = new MemberVariableDeclarationList {
-                new MemberVariableDeclaration {
+                foreach (var transitionName in state.GetTransitionNames())
+                    ub.AddMemberFunctionDeclaration(MakeOnTransitionFunction(state, transitionName, options.ContextClassName));
+
+                ub.AddMemberVariableDeclaration(new MemberVariableDeclaration {
                     Access = AccessMode.Private,
                     Name = "instance",
                     ValueType = TypeIdentifier.FromName(String.Format("{0}*", state.Name)),
                     Mode = MemberVariableMode.Static,
                     Initializer = new LiteralExpression("nullptr")
-                }
-            };
+                });
 
-            return new ClassDeclaration {
-                Name = String.Format("{0}", state.Name),
-                BaseName = options.StateClassName,
-                BaseAccess = AccessMode.Public,
-                Constructors = constructors,
-                Functions = functions,
-                Variables = variables
-            };
+                ub.EndClass();
+            }
+
+            return ub.ToUnit();
         }
 
         /// <summary>
@@ -154,7 +99,7 @@
         /// <param name="transitionName">El nom de la transicio.</param>
         /// <returns>La funcio.</returns>
         /// 
-        private static MemberFunctionDeclaration MakeOnTransitionFunction(State state, string transitionName) {
+        private static MemberFunctionDeclaration MakeOnTransitionFunction(State state, string transitionName, string contextClassName) {
 
             StatementList bodyStatements = new StatementList();
 
@@ -163,7 +108,7 @@
 
                     StatementList trueBodyStatements = new StatementList();
 
-                    // Accio 'Exit'
+                    // Accio 'Exit' del estat actual.
                     //
                     if (transition.NextState != state)
                         if (state.ExitAction != null)
@@ -174,7 +119,7 @@
                     if (transition.Action != null)
                         trueBodyStatements.AddRange(MakeActionStatements(transition.Action));
 
-                    // Accio 'Enter'
+                    // Accio 'Enter' del nou estat.
                     //
                     if (transition.NextState != state)
                         if (transition.NextState.EnterAction != null)
@@ -190,8 +135,8 @@
 
                     Expression conditionExpr = new InlineExpression(transition.Guard == null ? "true" : transition.Guard.Expression);
                     bodyStatements.Add(new IfThenElseStatement(
-                        conditionExpr, 
-                        new BlockStatement { Statements = trueBodyStatements }, 
+                        conditionExpr,
+                        new BlockStatement { Statements = trueBodyStatements },
                         null));
                 }
             }
@@ -205,7 +150,7 @@
                 Arguments = new ArgumentDeclarationList {
                     new ArgumentDeclaration {
                         Name = "context",
-                        ValueType = TypeIdentifier.FromName(String.Format("{0}*", options.ContextClassName))
+                        ValueType = TypeIdentifier.FromName(String.Format("{0}*", contextClassName))
                     }
                 }
             };

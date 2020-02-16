@@ -2,13 +2,31 @@
 
     public sealed class CPPGeneratorOptions {
 
-        public string OutputPath { get; set; }
-        public string MachineHeaderFileName { get; set; }
-        public string MachineCodeFileName { get; set; }
+        public string NsName { get; set; }
+        public string ContextBaseClassName { get; set; }
+        public string ContextClassName { get; set; }
+        public string ContextHeaderFileName { get; set; }
+        public string ContextCodeFileName { get; set; }
+        public string StateBaseClassName { get; set; }
+        public string StateClassName { get; set; }
         public string StateHeaderFileName { get; set; }
-        public string EventHeaderFileName { get; set; }
-        public int FirstStateNum { get; set; }
-        public int FirstEventNum { get; set; }
-        public bool UseStateNames { get; set; }
+        public string StateCodeFileName { get; set; }
+        public string OutputType { get; set; }
+
+        public CPPGeneratorOptions() {
+
+            NsName = "app";
+
+            ContextBaseClassName = null;
+            ContextClassName = "Context";
+
+            StateBaseClassName = null;
+            StateClassName = "State";
+
+            ContextHeaderFileName = "fsmContext.h";
+            ContextCodeFileName = "fsmContext.cpp";
+            StateHeaderFileName = "fsmState.h";
+            StateCodeFileName = "fsmState.cpp";
+        }
     }
 }

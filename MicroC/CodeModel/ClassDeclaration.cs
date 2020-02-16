@@ -2,7 +2,7 @@
 
     using System;
 
-    public sealed class ClassDeclaration : IVisitable, IUnitMember {
+    public sealed class ClassDeclaration : IVisitable, IDeclarationBlockMember {
 
         /// <summary>
         /// Constructor per defecte.
@@ -24,9 +24,9 @@
         /// <param name="constructors">Llista de constructors.</param>
         /// <param name="destructor">Destructor.</param>
         /// 
-        public ClassDeclaration(string name, string baseName, AccessMode baseAccess, 
+        public ClassDeclaration(string name, string baseName, AccessMode baseAccess,
             MemberVariableDeclarationList variables,
-            MemberFunctionDeclarationList functions, ConstructorDeclarationList constructors, 
+            MemberFunctionDeclarationList functions, ConstructorDeclarationList constructors,
             DestructorDeclaration destructor) {
 
             if (String.IsNullOrEmpty(name))
@@ -48,7 +48,7 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
-            if (visitor == null) 
+            if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);

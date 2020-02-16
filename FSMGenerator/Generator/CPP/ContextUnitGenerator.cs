@@ -1,7 +1,6 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP2 {
+﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP {
 
     using System;
-    using System.Collections.Generic;
     using MicroCompiler.CodeModel;
     using MicroCompiler.CodeModel.Expressions;
     using MicroCompiler.CodeModel.Statements;
@@ -13,8 +12,6 @@
     /// </summary>
     public static class ContextUnitGenerator {
 
-        private static CPPGeneratorOptions options;
-
         /// <summary>
         /// Genera la unitat de compilacio.
         /// </summary>
@@ -23,69 +20,54 @@
         /// 
         public static UnitDeclaration Generate(Machine machine, CPPGeneratorOptions options) {
 
-            ContextUnitGenerator.options = options;
+            UnitBuilder ub = new UnitBuilder();
 
-            return MakeUnitDeclaration(machine);
-        }
-
-        /// <summary>
-        /// Crea la declaracio de la unitat de compilacio.
-        /// </summary>
-        /// <param name="machine">La maquina.</param>
-        /// <returns>La unitat de compilacio.</returns>
-        /// 
-        private static UnitDeclaration MakeUnitDeclaration(Machine machine) {
-
-            UnitMemberDeclarationList declList = new UnitMemberDeclarationList();
-
-            // Construeix la clase de context.
+            // Obre un nou espai de noms, si cal
             //
-            declList.Add(MakeClassDeclaration(machine));
+            if (!String.IsNullOrEmpty(options.NsName))
+                ub.BeginNamespace(options.NsName);
 
-            // Construeix la unitat de compilacio.
+            // Obra la declaracio d'una clase
             //
-            UnitMemberDeclarationList unitMemberDeclList = new UnitMemberDeclarationList();
-            if (String.IsNullOrEmpty(options.NsName))
-                unitMemberDeclList.AddRange(declList);
-            else 
-                unitMemberDeclList.Add(new NamespaceDeclaration(options.NsName, declList));
-            return new UnitDeclaration(unitMemberDeclList);
-        }
+            ub.BeginClass(options.ContextClassName, options.ContextBaseClassName, AccessMode.Public);
 
-        /// <summary>
-        /// Crea la declaracio de la clase de context.
-        /// </summary>
-        /// <param name="machine">La maquina.</param>
-        /// <returns>La declaracio de la clase.</returns>
-        /// 
-        private static ClassDeclaration MakeClassDeclaration(Machine machine) {
-
-            // Crea el constructor
+            // Afegeix el constructor
             //
-            ConstructorDeclaration constructorDecl = new ConstructorDeclaration {
-                Access = AccessMode.Public
-            };
+            ub.AddConstructorDeclaration(MakeConstructor(machine));
 
-            // Crea les funcions membre
+            // Afegeix les funcions membre
             //
-            MemberFunctionDeclarationList memberFunctionDeclList = new MemberFunctionDeclarationList();
-            memberFunctionDeclList.Add(MakeStartFunction(machine));
-            memberFunctionDeclList.Add(MakeEndFunction(machine));
+            ub.AddMemberFunctionDeclaration(MakeStartFunction(machine));
+            ub.AddMemberFunctionDeclaration(MakeEndFunction(machine));
             foreach (var transitionName in machine.GetTransitionNames())
-                memberFunctionDeclList.Add(MakeTransitionFunction(transitionName));
+                ub.AddMemberFunctionDeclaration(MakeTransitionFunction(transitionName, options.StateClassName));
             foreach (var activityName in machine.GetActivityNames())
-                memberFunctionDeclList.Add(MakeActivityFunction(activityName));
+                ub.AddMemberFunctionDeclaration(MakeActivityFunction(activityName));
 
-            // Crea la clase
+            // Tanca la declaracio de la clase
             //
-            return new ClassDeclaration {
-                Name = options.ContextClassName,
-                BaseName = options.ContextBaseClassName,
-                BaseAccess = AccessMode.Public,
-                Constructors = new ConstructorDeclarationList {
-                    constructorDecl
-                },
-                Functions = memberFunctionDeclList
+            ub.EndClass();
+
+            // Tanca la declaracio del espai de noms, si cal.
+            //
+            if (!String.IsNullOrEmpty(options.NsName))
+                ub.EndNamespace();
+
+            // Retorna l'unitat.
+            //
+            return ub.ToUnit();
+        }
+
+        /// <summary>
+        /// Crea la declaracio del constructor.
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// <returns>La declaracio del constructor.</returns>
+        /// 
+        private static ConstructorDeclaration MakeConstructor(Machine machine) {
+
+            return new ConstructorDeclaration {
+                Access = AccessMode.Public
             };
         }
 
@@ -98,10 +80,16 @@
         private static MemberFunctionDeclaration MakeStartFunction(Machine machine) {
 
             StatementList bodyStatements = new StatementList();
-            if (machine.InitializeAction != null)
-                bodyStatements.AddRange(MakeActionStatements(machine.InitializeAction));
-            if (machine.Start.EnterAction != null)
-                bodyStatements.AddRange(MakeActionStatements(machine.Start.EnterAction));
+            if (machine.InitializeAction != null) {
+                var statements = MakeActionStatements(machine.InitializeAction);
+                if (statements != null)
+                    bodyStatements.AddRange(statements);
+            }
+            if (machine.Start.EnterAction != null) {
+                var statements = MakeActionStatements(machine.Start.EnterAction);
+                if (statements != null)
+                    bodyStatements.AddRange(statements);
+            }
             bodyStatements.Add(
                 new InlineStatement(
                     String.Format("setState({0}::getInstance())", machine.Start.FullName)));
@@ -110,9 +98,7 @@
                 Name = "start",
                 ReturnType = TypeIdentifier.FromName("void"),
                 Access = AccessMode.Public,
-                Body = new BlockStatement {
-                    Statements = bodyStatements
-                }
+                Body = new BlockStatement(bodyStatements)
             };
         }
 
@@ -137,7 +123,7 @@
         /// <param name="transitionName">Nom de la transicio.</param>
         /// <returns>La declaracio del metode.</returns>
         /// 
-        private static MemberFunctionDeclaration MakeTransitionFunction(string transitionName) {
+        private static MemberFunctionDeclaration MakeTransitionFunction(string transitionName, string stateClassName) {
 
             return new MemberFunctionDeclaration {
                 Name = String.Format("on{0}", transitionName),
@@ -146,7 +132,7 @@
                 Body = new BlockStatement {
                     Statements = new StatementList {
                         new InlineStatement(
-                            String.Format("static_cast<{0}*>(getState())->on{1}(this)", options.StateClassName, transitionName))
+                            String.Format("static_cast<{0}*>(getState())->on{1}(this)", stateClassName, transitionName))
                     }
                 }
             };
@@ -168,14 +154,14 @@
         }
 
         /// <summary>
-        /// Crea el programa coresponent a una accio.
+        /// Crea les instruccions coresponent a una accio.
         /// </summary>
         /// <param name="action">La accio.</param>
-        /// <returns>El programa.</returns>
+        /// <returns>Llista d'instruccions.</returns>
         /// 
-        private static IEnumerable<Statement> MakeActionStatements(Model.Action action) {
+        private static StatementList MakeActionStatements(Model.Action action) {
 
-            List<Statement> stmtList = null;
+            StatementList stmtList = null;
 
             foreach (var activity in action.Activities) {
                 if (activity is RunActivity callActivity) {
@@ -184,7 +170,7 @@
                             new IdentifierExpression(
                                 String.Format("do{0}", callActivity.ProcessName))));
                     if (stmtList == null)
-                        stmtList = new List<Statement>();
+                        stmtList = new StatementList();
 
                     stmtList.Add(stmt);
                 }

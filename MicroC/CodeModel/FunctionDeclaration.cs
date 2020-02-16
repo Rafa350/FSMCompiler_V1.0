@@ -2,7 +2,7 @@
 
     using System;
 
-    public sealed class FunctionDeclaration : FunctionDeclarationBase, IUnitMember {
+    public sealed class FunctionDeclaration : FunctionDeclarationBase, IDeclarationBlockMember {
 
         /// <summary>
         /// Accepta un visitador.

@@ -16,7 +16,7 @@
 
             MachineUnitGenerator.options = options;
 
-            UnitMemberDeclarationList memberList = new UnitMemberDeclarationList();
+            DeclarationBlockMemberList memberList = new DeclarationBlockMemberList();
 
             // Crea el tipus enumerador pels valors del estat.
             //
