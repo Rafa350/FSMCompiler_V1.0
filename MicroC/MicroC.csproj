@@ -54,7 +54,10 @@
     <Compile Include="CodeGenerator\C\HeaderGenerator.cs" />
     <Compile Include="CodeModel\AccessMode.cs" />
     <Compile Include="CodeModel\ArgumentDeclaration.cs" />
+    <Compile Include="CodeModel\ConstructorInitializer.cs" />
+    <Compile Include="CodeModel\ConstructorInitializerList.cs" />
     <Compile Include="CodeModel\DeclarationBlock.cs" />
+    <Compile Include="CodeModel\ForwardClassDeclaration.cs" />
     <Compile Include="CodeModel\Statements\BlockStatement.cs" />
     <Compile Include="CodeModel\ClassDeclaration.cs" />
     <Compile Include="CodeModel\ConstructorDeclaration.cs" />

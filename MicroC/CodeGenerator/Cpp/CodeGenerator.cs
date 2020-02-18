@@ -19,54 +19,50 @@
                 this.indent = indent;
             }
 
-            public override void Visit(ArgumentDeclaration obj) {
+            public override void Visit(ArgumentDeclaration decl) {
 
                 sb.AppendLine();
                 sb.AppendIndent(indent);
-                sb.Append(obj.ValueType.Name);
+                sb.Append(decl.ValueType.Name);
                 sb.Append(' ');
-                sb.Append(obj.Name);
+                sb.Append(decl.Name);
             }
 
-            public override void Visit(ClassDeclaration obj) {
+            public override void Visit(ClassDeclaration decl) {
 
                 ClassDeclaration oldClass = currentClass;
-                currentClass = obj;
+                currentClass = decl;
 
-                if (obj.Variables != null) {
-                    foreach (var variable in obj.Variables) {
+                if (decl.Variables != null)
+                    foreach (var variable in decl.Variables)
                         variable.AcceptVisitor(this);
-                    }
-                }
 
-                if (obj.Constructors != null) {
-                    foreach (var constructor in obj.Constructors) {
+                if (decl.Constructors != null)
+                    foreach (var constructor in decl.Constructors)
                         constructor.AcceptVisitor(this);
-                    }
-                }
 
-                if (obj.Functions != null) {
-                    foreach (var function in obj.Functions) {
+                if (decl.Functions != null)
+                    foreach (var function in decl.Functions)
                         function.AcceptVisitor(this);
-                    }
-                }
 
                 currentClass = oldClass;
             }
 
-            public override void Visit(ConstructorDeclaration obj) {
+            public override void Visit(ConstructorDeclaration decl) {
 
                 sb.AppendIndent(indent);
                 sb.AppendFormat("{0}::{0}(", currentClass.Name);
 
-                if (obj.Arguments == null) {
+                // Genera la llista d'arguments
+                //
+                if (decl.Arguments == null) {
                     sb.AppendLine(") {");
                     indent++;
                 }
                 else {
                     indent++;
                     bool first = true;
-                    foreach (var argument in obj.Arguments) {
+                    foreach (var argument in decl.Arguments) {
                         if (first) {
                             first = false;
                         }
@@ -79,9 +75,13 @@
                     sb.AppendLine(") {");
                 }
 
-                if (obj.Body != null) {
-                    obj.Body.AcceptVisitor(this);
-                }
+                // Genera la llista de contructors
+                //
+
+                // Genera el cos de la funcio
+                //
+                if (decl.Body != null)
+                    decl.Body.AcceptVisitor(this);
 
                 indent--;
                 sb.AppendIndent(indent);
@@ -90,12 +90,20 @@
                 sb.AppendLine();
             }
 
-            public override void Visit(FunctionCallExpression obj) {
+            public override void Visit(ForwardClassDeclaration decl) {
 
-                obj.Function.AcceptVisitor(this);
+                sb.AppendIndent(indent);
+                sb.AppendFormat("class {0};", decl.Name);
+                sb.AppendLine();
+                sb.AppendLine();
+            }
+
+            public override void Visit(FunctionCallExpression exp) {
+
+                exp.Function.AcceptVisitor(this);
                 sb.Append('(');
-                if (obj.Arguments != null) {
-                    foreach (var argument in obj.Arguments) {
+                if (exp.Arguments != null) {
+                    foreach (var argument in exp.Arguments) {
                         argument.AcceptVisitor(this);
                     }
                 }
@@ -103,10 +111,10 @@
                 sb.Append(')');
             }
 
-            public override void Visit(FunctionCallStatement obj) {
+            public override void Visit(FunctionCallStatement stmt) {
 
                 sb.AppendIndent(indent);
-                base.Visit(obj);
+                base.Visit(stmt);
                 sb.Append(';');
                 sb.AppendLine();
             }
@@ -116,30 +124,28 @@
                 sb.Append(obj.Name);
             }
 
-            public override void Visit(IfThenElseStatement obj) {
+            public override void Visit(IfThenElseStatement stmt) {
 
                 sb.AppendIndent(indent);
                 sb.Append("if (");
-                if (obj.ConditionExpression == null) {
+                if (stmt.ConditionExpression == null)
                     throw new InvalidOperationException("No se especifico la condicion.");
-                }
 
-                obj.ConditionExpression.AcceptVisitor(this);
+                stmt.ConditionExpression.AcceptVisitor(this);
                 sb.AppendLine(") {");
                 indent++;
-                if (obj.TrueStmt == null) {
+                if (stmt.TrueStmt == null)
                     throw new InvalidOperationException("No se especificoel bloque true.");
-                }
 
-                obj.TrueStmt.AcceptVisitor(this);
+                stmt.TrueStmt.AcceptVisitor(this);
                 indent--;
                 sb.AppendIndent(indent);
                 sb.AppendLine("}");
-                if (obj.FalseStmt != null) {
+                if (stmt.FalseStmt != null) {
                     sb.AppendIndent(indent);
                     sb.AppendLine("else {");
                     indent++;
-                    obj.FalseStmt.AcceptVisitor(this);
+                    stmt.FalseStmt.AcceptVisitor(this);
                     indent--;
                     sb.AppendIndent(indent);
                     sb.AppendLine("}");
@@ -151,10 +157,10 @@
                 sb.Append(obj.Code);
             }
 
-            public override void Visit(InlineStatement obj) {
+            public override void Visit(InlineStatement stmt) {
 
                 sb.AppendIndent(indent);
-                sb.Append(obj.Code);
+                sb.Append(stmt.Code);
                 sb.Append(';');
                 sb.AppendLine();
             }
@@ -164,32 +170,32 @@
                 sb.Append(obj.Value);
             }
 
-            public override void Visit(MemberVariableDeclaration obj) {
+            public override void Visit(MemberVariableDeclaration decl) {
 
                 sb.AppendIndent(indent);
-                sb.AppendFormat("{0} {1}::{2}", obj.ValueType.Name, currentClass.Name, obj.Name);
-                if (obj.Initializer != null) {
+                sb.AppendFormat("{0} {1}::{2}", decl.ValueType.Name, currentClass.Name, decl.Name);
+                if (decl.Initializer != null) {
                     sb.Append(" = ");
-                    obj.Initializer.AcceptVisitor(this);
+                    decl.Initializer.AcceptVisitor(this);
                 }
                 sb.Append(';');
                 sb.AppendLine();
                 sb.AppendLine();
             }
 
-            public override void Visit(MemberFunctionDeclaration obj) {
+            public override void Visit(MemberFunctionDeclaration decl) {
 
                 sb.AppendIndent(indent);
-                sb.AppendFormat("{0} {1}::{2}(", obj.ReturnType.Name, currentClass.Name, obj.Name);
+                sb.AppendFormat("{0} {1}::{2}(", decl.ReturnType.Name, currentClass.Name, decl.Name);
 
-                if (obj.Arguments == null) {
+                if (decl.Arguments == null) {
                     sb.AppendLine(") {");
                     indent++;
                 }
                 else {
                     indent++;
                     bool first = true;
-                    foreach (var argument in obj.Arguments) {
+                    foreach (var argument in decl.Arguments) {
                         if (first) {
                             first = false;
                         }
@@ -202,8 +208,8 @@
                     sb.AppendLine(") {");
                 }
 
-                if (obj.Body != null) {
-                    obj.Body.AcceptVisitor(this);
+                if (decl.Body != null) {
+                    decl.Body.AcceptVisitor(this);
                 }
 
                 indent--;
@@ -212,14 +218,14 @@
                 sb.AppendLine();
             }
 
-            public override void Visit(NamespaceDeclaration obj) {
+            public override void Visit(NamespaceDeclaration decl) {
 
                 sb.AppendIndent(indent);
-                sb.AppendLine("namespace {0} {{", obj.Name);
+                sb.AppendLine("namespace {0} {{", decl.Name);
                 sb.AppendLine();
                 indent++;
 
-                base.Visit(obj);
+                base.Visit(decl);
 
                 indent--;
                 sb.AppendIndent(indent);
@@ -227,13 +233,13 @@
                 sb.AppendLine();
             }
 
-            public override void Visit(ReturnStatement obj) {
+            public override void Visit(ReturnStatement stmt) {
 
                 sb.AppendIndent(indent);
                 sb.Append("return");
-                if (obj.Expression != null) {
+                if (stmt.Expression != null) {
                     sb.Append(' ');
-                    obj.Expression.AcceptVisitor(this);
+                    stmt.Expression.AcceptVisitor(this);
                 }
                 sb.Append(';');
                 sb.AppendLine();
@@ -242,9 +248,8 @@
 
         public static string Generate(UnitDeclaration unitDeclaration) {
 
-            if (unitDeclaration == null) {
+            if (unitDeclaration == null)
                 throw new ArgumentNullException(nameof(unitDeclaration));
-            }
 
             StringBuilder sb = new StringBuilder();
             var visitor = new GeneratorVisitor(sb);

@@ -12,13 +12,18 @@
     /// </summary>
     public static class ContextUnitGenerator {
 
+        public enum Variant {
+            Header,
+            Code
+        }
+
         /// <summary>
         /// Genera la unitat de compilacio.
         /// </summary>
         /// <param name="machine">La maquina</param>
         /// <returns>La unitat de compilacio.</returns>
         /// 
-        public static UnitDeclaration Generate(Machine machine, CPPGeneratorOptions options) {
+        public static UnitDeclaration Generate(Machine machine, CPPGeneratorOptions options, Variant variant) {
 
             UnitBuilder ub = new UnitBuilder();
 
@@ -41,8 +46,13 @@
             ub.AddMemberFunctionDeclaration(MakeEndFunction(machine));
             foreach (var transitionName in machine.GetTransitionNames())
                 ub.AddMemberFunctionDeclaration(MakeTransitionFunction(transitionName, options.StateClassName));
-            foreach (var activityName in machine.GetActivityNames())
-                ub.AddMemberFunctionDeclaration(MakeActivityFunction(activityName));
+
+            // Es defineixen en la capcelera, pero no en el codi, per que l'usuari defineixi les funcions en
+            // un altre fitxer.
+            //
+            if (variant == Variant.Header)
+                foreach (var activityName in machine.GetActivityNames())
+                    ub.AddMemberFunctionDeclaration(MakeActivityFunction(activityName));
 
             // Tanca la declaracio de la clase
             //

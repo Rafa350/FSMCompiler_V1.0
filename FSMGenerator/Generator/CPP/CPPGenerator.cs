@@ -29,19 +29,25 @@
 
         public override void Generate(Machine machine) {
 
-            UnitDeclaration contextUnit = ContextUnitGenerator.Generate(machine, options);
-            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextHeader"))
+            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextHeader")) {
+                UnitDeclaration contextUnit = ContextUnitGenerator.Generate(machine, options, ContextUnitGenerator.Variant.Header);
                 GenerateContextHeader(contextUnit);
+            }
 
-            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextCode"))
+            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextCode")) {
+                UnitDeclaration contextUnit = ContextUnitGenerator.Generate(machine, options, ContextUnitGenerator.Variant.Code);
                 GenerateContextCode(contextUnit);
+            }
 
-            UnitDeclaration stateUnit = StateUnitGenerator.Generate(machine, options);
-            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateHeader"))
+            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateHeader")) {
+                UnitDeclaration stateUnit = StateUnitGenerator.Generate(machine, options, StateUnitGenerator.Variant.Header);
                 GenerateStateHeader(stateUnit);
+            }
 
-            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateCode"))
+            if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateCode")) {
+                UnitDeclaration stateUnit = StateUnitGenerator.Generate(machine, options, StateUnitGenerator.Variant.Code);
                 GenerateStateCode(stateUnit);
+            }
         }
 
         private void GenerateContextHeader(UnitDeclaration unitDeclaration) {
@@ -68,8 +74,7 @@
                         .AppendFormat("#define __{0}", guardString).AppendLine()
                         .AppendLine()
                         .AppendLine()
-                        .AppendLine("#include \"eos.h\"")
-                        .AppendLine("#include \"Services/Fsm/eosFsmContextBase.h\"")
+                        .AppendFormat("#include \"{0}\"", options.ConfigHeaderFileName).AppendLine()
                         .AppendLine()
                         .AppendLine()
                         .AppendLine(header)
@@ -88,9 +93,6 @@
 
                     string code = CodeGenerator.Generate(unitDeclaration);
 
-                    string contextHeaderFileName = Path.GetFileName(options.ContextHeaderFileName);
-                    string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
-
                     StringBuilder sb = new StringBuilder();
                     sb
                         .AppendLine("// -----------------------------------------------------------------------")
@@ -102,8 +104,9 @@
                         .AppendLine("//")
                         .AppendLine("// -----------------------------------------------------------------------")
                         .AppendLine()
-                        .AppendFormat("#include \"{0}\"", contextHeaderFileName).AppendLine()
-                        .AppendFormat("#include \"{0}\"", stateHeaderFileName).AppendLine()
+                        .AppendLine()
+                        .AppendFormat("#include \"{0}\"", options.StateHeaderFileName).AppendLine()
+                        .AppendFormat("#include \"{0}\"", options.ContextHeaderFileName).AppendLine()
                         .AppendLine()
                         .AppendLine()
                         .Append(code);
@@ -137,8 +140,7 @@
                         .AppendFormat("#define __{0}", guardString).AppendLine()
                         .AppendLine()
                         .AppendLine()
-                        .AppendLine("#include \"eos.h\"")
-                        .AppendLine("#include \"Services/Fsm/eosFsmStateBase.h\"")
+                        .AppendFormat("#include \"{0}\"", options.ConfigHeaderFileName).AppendLine()
                         .AppendLine()
                         .AppendLine()
                         .AppendLine(header)
@@ -157,9 +159,6 @@
 
                     string code = CodeGenerator.Generate(unitDeclaration);
 
-                    string contextHeaderFileName = Path.GetFileName(options.ContextHeaderFileName);
-                    string stateHeaderFileName = Path.GetFileName(options.StateHeaderFileName);
-
                     StringBuilder sb = new StringBuilder();
                     sb
                         .AppendLine("// -----------------------------------------------------------------------")
@@ -171,8 +170,9 @@
                         .AppendLine("//")
                         .AppendLine("// -----------------------------------------------------------------------")
                         .AppendLine()
-                        .AppendFormat("#include \"{0}\"", contextHeaderFileName).AppendLine()
-                        .AppendFormat("#include \"{0}\"", stateHeaderFileName).AppendLine()
+                        .AppendLine()
+                        .AppendFormat("#include \"{0}\"", options.StateHeaderFileName).AppendLine()
+                        .AppendFormat("#include \"{0}\"", options.ContextHeaderFileName).AppendLine()
                         .AppendLine()
                         .AppendLine()
                         .Append(code);

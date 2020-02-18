@@ -11,6 +11,7 @@
         public string StateClassName { get; set; }
         public string StateHeaderFileName { get; set; }
         public string StateCodeFileName { get; set; }
+        public string ConfigHeaderFileName { get; set; }
         public string OutputType { get; set; }
 
         public CPPGeneratorOptions() {
@@ -22,6 +23,8 @@
 
             StateBaseClassName = null;
             StateClassName = "State";
+
+            ConfigHeaderFileName = null;
 
             ContextHeaderFileName = "fsmContext.h";
             ContextCodeFileName = "fsmContext.cpp";

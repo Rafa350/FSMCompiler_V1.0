@@ -12,8 +12,10 @@
         void Visit(ClassDeclaration decl);
         void Visit(ConditionalExpression exp);
         void Visit(ConstructorDeclaration decl);
+        void Visit(ConstructorInitializer initializer);
         void Visit(DestructorDeclaration decl);
         void Visit(EnumeratorDeclaration decl);
+        void Visit(ForwardClassDeclaration decl);
         void Visit(FunctionCallExpression exp);
         void Visit(FunctionCallStatement stmt);
         void Visit(FunctionDeclaration dell);

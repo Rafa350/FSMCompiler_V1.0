@@ -45,12 +45,19 @@
         public virtual void Visit(ConstructorDeclaration decl) {
         }
 
+        public virtual void Visit(ConstructorInitializer initializer) {
+
+        }
+
         public virtual void Visit(DestructorDeclaration decl) {
         }
 
         public virtual void Visit(EnumeratorDeclaration decl) {
         }
 
+        public virtual void Visit(ForwardClassDeclaration decl) {
+        }
+            
         public virtual void Visit(FunctionCallExpression exp) {
 
             exp.Function.AcceptVisitor(this);

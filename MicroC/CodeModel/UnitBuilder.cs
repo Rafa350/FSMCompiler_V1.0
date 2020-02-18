@@ -101,6 +101,13 @@
             return this;
         }
 
+        public UnitBuilder AddForwardClassDeclaration(string name) {
+
+            unitMemberStack.Peek().Add(new ForwardClassDeclaration(name));
+
+            return this;
+        }
+
         public UnitBuilder AddConstructorDeclaration(ConstructorDeclaration constructorDecl) {
 
             if (classDeclStack.Count == 0)

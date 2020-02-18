@@ -9,7 +9,12 @@
 
     public static class StateUnitGenerator {
 
-        public static UnitDeclaration Generate(Machine machine, CPPGeneratorOptions options) {
+        public enum Variant {
+            Header,
+            Code
+        }
+
+        public static UnitDeclaration Generate(Machine machine, CPPGeneratorOptions options, Variant variant) {
 
             UnitBuilder ub = new UnitBuilder();
 
@@ -17,6 +22,11 @@
             //
             if (!String.IsNullOrEmpty(options.NsName))
                 ub.BeginNamespace(options.NsName);
+
+            // Declara la clase de context
+            //
+            if (variant == Variant.Header)
+                ub.AddForwardClassDeclaration(options.ContextClassName);
 
             // Declara la clase d'estat base
             //
@@ -46,7 +56,7 @@
             // Crea les clases d'estat derivades
             //
             foreach (var state in machine.States) {
-                ub.BeginClass(String.Format("{0}", state.Name), options.StateBaseClassName, AccessMode.Public);
+                ub.BeginClass(String.Format("{0}", state.Name), options.StateClassName, AccessMode.Public);
 
                 ub.AddConstructorDeclaration(new ConstructorDeclaration {
                     Access = AccessMode.Protected

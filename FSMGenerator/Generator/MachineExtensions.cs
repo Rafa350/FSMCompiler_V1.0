@@ -21,11 +21,9 @@
             List<string> names = new List<string>();
 
             foreach (var state in machine.States) {
-                foreach (string name in state.GetTransitionNames()) {
-                    if (!names.Contains(name)) {
+                foreach (string name in state.GetTransitionNames())
+                    if (!names.Contains(name))
                         names.Add(name);
-                    }
-                }
             }
 
             return names;
@@ -49,19 +47,15 @@
 
             foreach (var state in machine.States) {
                 if (state.HasTransitions) {
-                    foreach (var transition in state.Transitions) {
-                        if (transition.Action != null) {
+                    foreach (var transition in state.Transitions)
+                        if (transition.Action != null)
                             PopulateList(transition.Action);
-                        }
-                    }
                 }
-                if (state.EnterAction != null) {
+                if (state.EnterAction != null)
                     PopulateList(state.EnterAction);
-                }
 
-                if (state.ExitAction != null) {
+                if (state.ExitAction != null)
                     PopulateList(state.ExitAction);
-                }
             }
 
             return names;

@@ -44,9 +44,8 @@
                 sb.AppendIndent(indent);
                 sb.Append("class ");
                 sb.Append(obj.Name);
-                if (!String.IsNullOrEmpty(obj.BaseName)) {
+                if (!String.IsNullOrEmpty(obj.BaseName))
                     sb.AppendFormat(": {0} {1}", ToString(obj.BaseAccess), obj.BaseName);
-                }
 
                 sb.Append(" {");
                 sb.AppendLine();
@@ -155,6 +154,14 @@
                 }
 
                 sb.Append(");");
+                sb.AppendLine();
+            }
+            
+            public override void Visit(ForwardClassDeclaration decl) {
+
+                sb.AppendIndent(indent);
+                sb.AppendFormat("class {0};", decl.Name);
+                sb.AppendLine();
                 sb.AppendLine();
             }
 

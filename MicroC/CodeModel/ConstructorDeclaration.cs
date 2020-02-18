@@ -74,6 +74,12 @@
         public ArgumentDeclarationList Arguments { get; set; }
 
         /// <summary>
+        /// Obte o asigna la llista d'inicialitzadors.
+        /// </summary>
+        /// 
+        public ConstructorInitializerList Initializers { get; set; }
+
+        /// <summary>
         /// Obte o asigna el bloc de codi.
         /// </summary>
         /// 
