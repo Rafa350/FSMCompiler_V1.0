@@ -8,6 +8,8 @@
     /// 
     public sealed class BlockStatement : Statement {
 
+        private StatementList statements;
+
         /// <summary>
         /// Constructor per defecte.
         /// </summary>
@@ -23,7 +25,7 @@
         /// 
         public BlockStatement(StatementList statements) {
 
-            Statements = statements;
+            this.statements = statements;
         }
 
         /// <summary>
@@ -40,9 +42,24 @@
         }
 
         /// <summary>
+        /// Indica si conte instruccions.
+        /// </summary>
+        /// 
+        public bool HasStatements => statements != null;
+
+        /// <summary>
         /// Obte o asigna la llista d'instruccions.
         /// </summary>
         /// 
-        public StatementList Statements { get; set; }
+        public StatementList Statements {
+            get {
+                if (statements == null)
+                    statements = new StatementList();
+                return statements;
+            }
+            set {
+                statements = value;
+            }
+        }
     }
 }

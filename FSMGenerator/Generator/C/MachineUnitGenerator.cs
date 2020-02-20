@@ -16,7 +16,7 @@
 
             MachineUnitGenerator.options = options;
 
-            DeclarationBlockMemberList memberList = new DeclarationBlockMemberList();
+            NamespaceMemberList memberList = new NamespaceMemberList();
 
             // Crea el tipus enumerador pels valors del estat.
             //
@@ -24,7 +24,7 @@
             foreach (var state in machine.States)
                 stateList.Add(String.Format("State_{0}", state.Name));
 
-            EnumeratorDeclaration stateType = new EnumeratorDeclaration("State", stateList);
+            EnumerationDeclaration stateType = new EnumerationDeclaration("State", AccessSpecifier.Public, stateList);
             memberList.Add(stateType);
 
             // Crea la variabe 'state'
@@ -49,7 +49,10 @@
                 foreach (var transitionName in state.GetTransitionNames())
                     memberList.Add(MakeStateTransitionFunction(machine, state, transitionName));
 
-            return new UnitDeclaration(memberList);
+            return new UnitDeclaration(new NamespaceDeclaration {
+                Name = "",
+                Members = memberList
+            }); ;
         }
 
         /// <summary>

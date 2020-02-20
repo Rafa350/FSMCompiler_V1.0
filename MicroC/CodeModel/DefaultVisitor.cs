@@ -16,27 +16,16 @@
 
         public virtual void Visit(BlockStatement block) {
 
-            if (block.Statements != null)
+            if (block.HasStatements)
                 foreach (var statements in block.Statements)
                     statements.AcceptVisitor(this);
         }
 
         public virtual void Visit(ClassDeclaration decl) {
 
-            if (decl.Variables != null)
-                foreach (var variables in decl.Variables)
-                    variables.AcceptVisitor(this);
-
-            if (decl.Constructors != null)
-                foreach (var constructor in decl.Constructors)
-                    constructor.AcceptVisitor(this);
-
-            if (decl.Destructor != null)
-                decl.Destructor.AcceptVisitor(this);
-
-            if (decl.Functions != null)
-                foreach (var function in decl.Functions)
-                    function.AcceptVisitor(this);
+            if (decl.HasMembers)
+                foreach (var member in decl.Members)
+                    member.AcceptVisitor(this);
         }
 
         public virtual void Visit(ConditionalExpression exp) {
@@ -46,23 +35,22 @@
         }
 
         public virtual void Visit(ConstructorInitializer initializer) {
-
         }
 
         public virtual void Visit(DestructorDeclaration decl) {
         }
 
-        public virtual void Visit(EnumeratorDeclaration decl) {
+        public virtual void Visit(EnumerationDeclaration decl) {
         }
 
         public virtual void Visit(ForwardClassDeclaration decl) {
         }
-            
+
         public virtual void Visit(FunctionCallExpression exp) {
 
             exp.Function.AcceptVisitor(this);
 
-            if (exp.Arguments != null)
+            if (exp.HasArguments)
                 foreach (var argument in exp.Arguments)
                     argument.AcceptVisitor(this);
         }
@@ -94,17 +82,22 @@
         public virtual void Visit(LoopStatement stmt) {
         }
 
-        public virtual void Visit(MemberFunctionDeclaration decl) {
-        }
-
-        public virtual void Visit(MemberVariableDeclaration decl) {
-        }
-
         public virtual void Visit(NamespaceDeclaration decl) {
 
-            if (decl.Members != null)
+            if (decl.HasImports)
+                foreach (var import in decl.Imports)
+                    import.AcceptVisitor(this);
+
+            if (decl.HasNamespaces)
+                foreach (var ns in decl.Namespaces)
+                    ns.AcceptVisitor(this);
+
+            if (decl.HasMembers)
                 foreach (var member in decl.Members)
                     member.AcceptVisitor(this);
+        }
+
+        public virtual void Visit(NamespaceImport import) {
         }
 
         public virtual void Visit(ReturnStatement stmt) {
@@ -143,9 +136,8 @@
 
         public virtual void Visit(UnitDeclaration decl) {
 
-            if (decl.Members != null)
-                foreach (var member in decl.Members)
-                    member.AcceptVisitor(this);
+            if (decl.Namespace != null)
+                decl.Namespace.AcceptVisitor(this);
         }
 
         public virtual void Visit(VariableDeclaration decl) {

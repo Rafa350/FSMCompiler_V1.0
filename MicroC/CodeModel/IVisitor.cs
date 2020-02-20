@@ -14,7 +14,7 @@
         void Visit(ConstructorDeclaration decl);
         void Visit(ConstructorInitializer initializer);
         void Visit(DestructorDeclaration decl);
-        void Visit(EnumeratorDeclaration decl);
+        void Visit(EnumerationDeclaration decl);
         void Visit(ForwardClassDeclaration decl);
         void Visit(FunctionCallExpression exp);
         void Visit(FunctionCallStatement stmt);
@@ -25,9 +25,8 @@
         void Visit(InlineStatement stmt);
         void Visit(LiteralExpression exp);
         void Visit(LoopStatement stmt);
-        void Visit(MemberFunctionDeclaration decl);
-        void Visit(MemberVariableDeclaration decl);
         void Visit(NamespaceDeclaration decl);
+        void Visit(NamespaceImport import);
         void Visit(ReturnStatement stmt);
         void Visit(SubscriptExpression exp);
         void Visit(SwitchCaseStatement stmt);

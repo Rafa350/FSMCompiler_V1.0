@@ -18,6 +18,10 @@
 
             UnitBuilder ub = new UnitBuilder();
 
+            TypeIdentifier voidTypeIdentifier = TypeIdentifier.FromName("void");
+            TypeIdentifier contextTypeIdentifier = TypeIdentifier.FromName(options.ContextClassName);
+            TypeIdentifier contextTypePtrIdentifier = TypeIdentifier.FromName(String.Format("{0}*", options.ContextClassName));
+
             // Obra un espai de noms si cal.
             //
             if (!String.IsNullOrEmpty(options.NsName))
@@ -30,50 +34,87 @@
 
             // Declara la clase d'estat base
             //
-            ub.BeginClass(options.StateClassName, options.StateBaseClassName, AccessMode.Public);
+            ub.BeginClass(options.StateClassName, options.StateBaseClassName, AccessSpecifier.Public);
 
-            ub.AddConstructorDeclaration(new ConstructorDeclaration {
-                Access = AccessMode.Protected
+            // Declara el constructor
+            //
+            ub.AddMemberDeclaration(new ConstructorDeclaration {
+                Access = AccessSpecifier.Protected,
+                Arguments = new ArgumentDeclarationList {
+                    new ArgumentDeclaration("context", contextTypePtrIdentifier)
+                },
+                Initializers = new ConstructorInitializerList {
+                    new ConstructorInitializer(
+                        options.StateBaseClassName,
+                        new IdentifierExpression("context"))
+                }
+            });
+
+            // Declara la functio 'enter'
+            //
+            ub.AddMemberDeclaration(new FunctionDeclaration {
+                Access = AccessSpecifier.Public,
+                Implementation = ImplementationSpecifier.Virtual,
+                ReturnType = voidTypeIdentifier,
+                Name = "enter"
+            });
+
+            // Declara la fuincio 'exit'
+            //
+            ub.AddMemberDeclaration(new FunctionDeclaration {
+                Access = AccessSpecifier.Public,
+                Implementation = ImplementationSpecifier.Virtual,
+                ReturnType = voidTypeIdentifier,
+                Name = "exit"
             });
 
             foreach (var transitionName in machine.GetTransitionNames()) {
-                ub.AddMemberFunctionDeclaration(new MemberFunctionDeclaration {
-                    Access = AccessMode.Public,
-                    Mode = MemberFunctionMode.Virtual,
-                    ReturnType = TypeIdentifier.FromName("void"),
-                    Name = String.Format("on{0}", transitionName),
-                    Arguments = new ArgumentDeclarationList {
-                        new ArgumentDeclaration {
-                            Name = "context",
-                            ValueType = TypeIdentifier.FromName(String.Format("{0}*", options.ContextClassName))
-                        }
-                    }
+                ub.AddMemberDeclaration(new FunctionDeclaration {
+                    Access = AccessSpecifier.Public,
+                    Implementation = ImplementationSpecifier.Virtual,
+                    ReturnType = voidTypeIdentifier,
+                    Name = String.Format("transition_{0}", transitionName)
                 });
             }
 
+            // Finalitza la clase 
+            //
             ub.EndClass();
 
             // Crea les clases d'estat derivades
             //
             foreach (var state in machine.States) {
-                ub.BeginClass(String.Format("{0}", state.Name), options.StateClassName, AccessMode.Public);
 
-                ub.AddConstructorDeclaration(new ConstructorDeclaration {
-                    Access = AccessMode.Protected
+                ub.BeginClass(String.Format("{0}", state.Name), options.StateClassName, AccessSpecifier.Public);
+
+                // Declara el constructor.
+                //
+                ub.AddMemberDeclaration(new ConstructorDeclaration {
+                    Access = AccessSpecifier.Public,
+                    Arguments = new ArgumentDeclarationList {
+                        new ArgumentDeclaration("context", contextTypePtrIdentifier)
+                    },
+                    Initializers = new ConstructorInitializerList {
+                        new ConstructorInitializer(
+                            options.StateClassName,
+                            new IdentifierExpression("context"))
+                    }
                 });
 
-                ub.AddMemberFunctionDeclaration(MakeGetInstanceFunction(state));
+                // Declara la fuincio 'enter'.
+                //
+                if (state.EnterAction != null)
+                    ub.AddMemberDeclaration(MakeOnEnterFunction(state, options.ContextClassName));
 
+                // Declara la funcio 'exit'
+                //
+                if (state.ExitAction != null)
+                    ub.AddMemberDeclaration(MakeOnExitFunction(state, options.ContextClassName));
+
+                // Declara les funcions de transicio
+                //
                 foreach (var transitionName in state.GetTransitionNames())
-                    ub.AddMemberFunctionDeclaration(MakeOnTransitionFunction(state, transitionName, options.ContextClassName));
-
-                ub.AddMemberVariableDeclaration(new MemberVariableDeclaration {
-                    Access = AccessMode.Private,
-                    Name = "instance",
-                    ValueType = TypeIdentifier.FromName(String.Format("{0}*", state.Name)),
-                    Mode = MemberVariableMode.Static,
-                    Initializer = new LiteralExpression("nullptr")
-                });
+                    ub.AddMemberDeclaration(MakeOnTransitionFunction(state, transitionName, options.ContextClassName));
 
                 ub.EndClass();
             }
@@ -82,66 +123,92 @@
         }
 
         /// <summary>
-        /// Construeix la funcio 'getInstance'
+        /// Genera la funcio 'enter'
         /// </summary>
-        /// <param name="state">El estat.</param>
+        /// <param name="state">L'estat.</param>
         /// <returns>La funcio.</returns>
         /// 
-        private static MemberFunctionDeclaration MakeGetInstanceFunction(State state) {
+        private static FunctionDeclaration MakeOnEnterFunction(State state, string contextClassName) {
 
-            return new MemberFunctionDeclaration {
-                Name = "getInstance",
-                Access = AccessMode.Public,
-                Mode = MemberFunctionMode.Static,
-                ReturnType = TypeIdentifier.FromName(String.Format("{0}*", state.Name)),
-                Body = new BlockStatement(new StatementList {
-                        new InlineStatement(String.Format("if (instance == nullptr) instance = new {0}()", state.Name)),
-                        new ReturnStatement(
-                            new IdentifierExpression("instance"))
-                    })
+            BlockStatement body = new BlockStatement();
+            body.Statements.Add(
+                new InlineStatement(
+                    String.Format("{0}* ctx = static_cast<{0}*>(getContext())", contextClassName)));
+            body.Statements.AddRange(
+                MakeActionStatements(state.EnterAction));
+
+            return new FunctionDeclaration {
+                Access = AccessSpecifier.Public,
+                Implementation = ImplementationSpecifier.Override,
+                ReturnType = TypeIdentifier.FromName("void"),
+                Name = "enter",
+                Body = body
             };
         }
 
         /// <summary>
-        /// Construeix la funcio de les transicions.
+        /// Genera la funcio 'exit'
+        /// </summary>
+        /// <param name="state">L'estat.</param>
+        /// <returns>La funcio.</returns>
+        /// 
+        private static FunctionDeclaration MakeOnExitFunction(State state, string contextClassName) {
+
+            BlockStatement body = new BlockStatement();
+
+            body.Statements.Add(
+                new InlineStatement(
+                    String.Format("{0}* ctx = static_cast<{0}*>(getContext())", contextClassName)));
+            body.Statements.AddRange(
+                MakeActionStatements(state.ExitAction));
+
+            return new FunctionDeclaration {
+                Access = AccessSpecifier.Public,
+                Implementation = ImplementationSpecifier.Override,
+                ReturnType = TypeIdentifier.FromName("void"),
+                Name = "exit",
+                Body = body
+            };
+        }
+
+        /// <summary>
+        /// Construeix la funcio de transicio.
         /// </summary>
         /// <param name="state">El estat.</param>
         /// <param name="transitionName">El nom de la transicio.</param>
         /// <returns>La funcio.</returns>
         /// 
-        private static MemberFunctionDeclaration MakeOnTransitionFunction(State state, string transitionName, string contextClassName) {
+        private static FunctionDeclaration MakeOnTransitionFunction(State state, string transitionName, string contextClassName) {
 
             StatementList bodyStatements = new StatementList();
+
+            // Intruccio per recuperar el context.
+            //
+            bodyStatements.Add(
+                new InlineStatement(
+                    String.Format("{0}* ctx = static_cast<{0}*>(getContext())", contextClassName)));
 
             foreach (Transition transition in state.Transitions) {
                 if (transition.Name == transitionName) {
 
                     StatementList trueBodyStatements = new StatementList();
 
-                    // Accio 'Exit' del estat actual.
-                    //
-                    if (transition.NextState != state)
-                        if (state.ExitAction != null)
-                            trueBodyStatements.AddRange(MakeActionStatements(state.ExitAction));
+                    trueBodyStatements.Add(new FunctionCallStatement(
+                        new FunctionCallExpression(
+                            new IdentifierExpression("ctx->clearState"))));
 
                     // Accio de transicio.
                     //
                     if (transition.Action != null)
                         trueBodyStatements.AddRange(MakeActionStatements(transition.Action));
 
-                    // Accio 'Enter' del nou estat.
-                    //
-                    if (transition.NextState != state)
-                        if (transition.NextState.EnterAction != null)
-                            trueBodyStatements.AddRange(MakeActionStatements(transition.NextState.EnterAction));
-
-                    if (transition.NextState != null) {
-                        trueBodyStatements.Add(new FunctionCallStatement(
+                    trueBodyStatements.Add(new FunctionCallStatement(
+                        new FunctionCallExpression(
+                            new IdentifierExpression("ctx->setState"),
                             new FunctionCallExpression(
-                                new IdentifierExpression("context->setState"),
-                                new FunctionCallExpression(
-                                    new IdentifierExpression(String.Format("{0}::getInstance", transition.NextState.Name))))));
-                    }
+                                new IdentifierExpression("ctx->getStateInstance"),
+                                new IdentifierExpression(
+                                    String.Format("Context::StateID::{0}", transition.NextState.Name))))));
 
                     Expression conditionExpr = new InlineExpression(transition.Guard == null ? "true" : transition.Guard.Expression);
                     bodyStatements.Add(new IfThenElseStatement(
@@ -151,18 +218,12 @@
                 }
             }
 
-            return new MemberFunctionDeclaration {
-                Access = AccessMode.Public,
-                Mode = MemberFunctionMode.Override,
+            return new FunctionDeclaration {
+                Access = AccessSpecifier.Public,
+                Implementation = ImplementationSpecifier.Override,
                 ReturnType = TypeIdentifier.FromName("void"),
-                Name = String.Format("on{0}", transitionName),
+                Name = String.Format("transition_{0}", transitionName),
                 Body = new BlockStatement(bodyStatements),
-                Arguments = new ArgumentDeclarationList {
-                    new ArgumentDeclaration {
-                        Name = "context",
-                        ValueType = TypeIdentifier.FromName(String.Format("{0}*", contextClassName))
-                    }
-                }
             };
         }
 
@@ -183,7 +244,7 @@
                     if (activity is RunActivity callActivity) {
                         Statement statement = new FunctionCallStatement(
                             new FunctionCallExpression(
-                                new IdentifierExpression(String.Format("context->do{0}", callActivity.ProcessName))));
+                                new IdentifierExpression(String.Format("ctx->do{0}", callActivity.ProcessName))));
                         statements.Add(statement);
                     }
                 }

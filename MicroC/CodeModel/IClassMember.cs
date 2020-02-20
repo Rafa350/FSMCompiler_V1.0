@@ -2,7 +2,6 @@
 
     public interface IClassMember : IVisitable {
 
-        string Name { get; set; }
-        AccessMode Access { get; set; }
+        AccessSpecifier Access { get; set; }
     }
 }

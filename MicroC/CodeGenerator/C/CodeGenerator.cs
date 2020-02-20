@@ -29,13 +29,13 @@
                 sb.AppendLine(";");
             }
 
-            public override void Visit(EnumeratorDeclaration decl) {
+            public override void Visit(EnumerationDeclaration decl) {
 
                 sb.AppendIndent(indent);
                 sb.Append("typedef enum {");
                 indent++;
                 bool first = true;
-                foreach (var element in decl.Eements) {
+                foreach (var element in decl.Elements) {
                     if (first)
                         first = false;
                     else

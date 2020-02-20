@@ -2,7 +2,7 @@
 
     using System;
 
-    public sealed class ForwardClassDeclaration : IDeclarationBlockMember {
+    public sealed class ForwardClassDeclaration : INamespaceMember {
 
         public ForwardClassDeclaration() {
 

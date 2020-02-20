@@ -33,17 +33,9 @@
                 ClassDeclaration oldClass = currentClass;
                 currentClass = decl;
 
-                if (decl.Variables != null)
-                    foreach (var variable in decl.Variables)
-                        variable.AcceptVisitor(this);
-
-                if (decl.Constructors != null)
-                    foreach (var constructor in decl.Constructors)
-                        constructor.AcceptVisitor(this);
-
-                if (decl.Functions != null)
-                    foreach (var function in decl.Functions)
-                        function.AcceptVisitor(this);
+                if (decl.HasMembers)
+                    foreach (var member in decl.Members)
+                        member.AcceptVisitor(this);
 
                 currentClass = oldClass;
             }
@@ -55,28 +47,41 @@
 
                 // Genera la llista d'arguments
                 //
-                if (decl.Arguments == null) {
-                    sb.AppendLine(") {");
-                    indent++;
-                }
-                else {
+                if (decl.HasArguments) {
                     indent++;
                     bool first = true;
                     foreach (var argument in decl.Arguments) {
-                        if (first) {
+                        if (first)
                             first = false;
-                        }
-                        else {
+                        else
                             sb.Append(", ");
-                        }
-
                         argument.AcceptVisitor(this);
                     }
-                    sb.AppendLine(") {");
+                    sb.Append(')');
                 }
+                else {
+                    sb.Append(')');
+                    indent++;
+                }
+                if (decl.HasInitializers)
+                    sb.AppendLine(" :");
+                else
+                    sb.AppendLine(" {");
 
-                // Genera la llista de contructors
+                // Genera la llistad'inicialitzadors
                 //
+                if (decl.HasInitializers) {
+                    bool first = true;
+                    foreach (var initializer in decl.Initializers) {
+                        if (first)
+                            first = false;
+                        else
+                            sb.AppendLine(", ");
+                        sb.AppendIndent(indent);
+                        initializer.AcceptVisitor(this);
+                    }
+                    sb.AppendLine(" {");
+                }
 
                 // Genera el cos de la funcio
                 //
@@ -88,6 +93,13 @@
                 sb.Append('}');
                 sb.AppendLine();
                 sb.AppendLine();
+            }
+
+            public override void Visit(ConstructorInitializer initializer) {
+
+                sb.AppendFormat("{0}(", initializer.Name);
+                initializer.Expression.AcceptVisitor(this);
+                sb.Append(')');
             }
 
             public override void Visit(ForwardClassDeclaration decl) {
@@ -102,11 +114,9 @@
 
                 exp.Function.AcceptVisitor(this);
                 sb.Append('(');
-                if (exp.Arguments != null) {
-                    foreach (var argument in exp.Arguments) {
+                if (exp.Arguments != null)
+                    foreach (var argument in exp.Arguments)
                         argument.AcceptVisitor(this);
-                    }
-                }
 
                 sb.Append(')');
             }
@@ -170,20 +180,22 @@
                 sb.Append(obj.Value);
             }
 
-            public override void Visit(MemberVariableDeclaration decl) {
+            public override void Visit(VariableDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("{0} {1}::{2}", decl.ValueType.Name, currentClass.Name, decl.Name);
-                if (decl.Initializer != null) {
-                    sb.Append(" = ");
-                    decl.Initializer.AcceptVisitor(this);
+                if (decl.Implementation == ImplementationSpecifier.Static) {
+                    sb.AppendIndent(indent);
+                    sb.AppendFormat("{0} {1}::{2}", decl.ValueType.Name, currentClass.Name, decl.Name);
+                    if (decl.Initializer != null) {
+                        sb.Append(" = ");
+                        decl.Initializer.AcceptVisitor(this);
+                    }
+                    sb.Append(';');
+                    sb.AppendLine();
+                    sb.AppendLine();
                 }
-                sb.Append(';');
-                sb.AppendLine();
-                sb.AppendLine();
             }
 
-            public override void Visit(MemberFunctionDeclaration decl) {
+            public override void Visit(FunctionDeclaration decl) {
 
                 sb.AppendIndent(indent);
                 sb.AppendFormat("{0} {1}::{2}(", decl.ReturnType.Name, currentClass.Name, decl.Name);
@@ -220,17 +232,23 @@
 
             public override void Visit(NamespaceDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendLine("namespace {0} {{", decl.Name);
-                sb.AppendLine();
-                indent++;
+                bool global = decl.Name == "::";
+
+                if (!global) {
+                    sb.AppendIndent(indent);
+                    sb.AppendLine("namespace {0} {{", decl.Name);
+                    sb.AppendLine();
+                    indent++;
+                }
 
                 base.Visit(decl);
 
-                indent--;
-                sb.AppendIndent(indent);
-                sb.Append('}');
-                sb.AppendLine();
+                if (!global) {
+                    indent--;
+                    sb.AppendIndent(indent);
+                    sb.Append('}');
+                    sb.AppendLine();
+                }
             }
 
             public override void Visit(ReturnStatement stmt) {

@@ -3,7 +3,7 @@
     using System;
     using MicroCompiler.CodeModel.Statements;
 
-    public sealed class DestructorDeclaration : IVisitable {
+    public sealed class DestructorDeclaration : IClassMember {
 
         /// <summary>
         /// Constructor per defecte.
@@ -11,7 +11,7 @@
         /// 
         public DestructorDeclaration() {
 
-            Access = AccessMode.Public;
+            Access = AccessSpecifier.Public;
             VirtualMode = DestructorVirtualMode.None;
         }
 
@@ -22,7 +22,7 @@
         /// <param name="isVirtual">Indica si es virtual.</param>
         /// <param name="body">El bloc d'instruccions.</param>
         /// 
-        public DestructorDeclaration(AccessMode access, bool isVirtual, BlockStatement body) {
+        public DestructorDeclaration(AccessSpecifier access, bool isVirtual, BlockStatement body) {
 
             Access = access;
             VirtualMode = isVirtual ? DestructorVirtualMode.Virtual : DestructorVirtualMode.None;
@@ -36,7 +36,7 @@
         /// <param name="isVirtual">Indica si es virtual.</param>
         /// <param name="statements">La llista d'instruccions.</param>
         /// 
-        public DestructorDeclaration(AccessMode access, bool isVirtual, StatementList statements) :
+        public DestructorDeclaration(AccessSpecifier access, bool isVirtual, StatementList statements) :
             this(access, isVirtual, new BlockStatement(statements)) {
         }
 
@@ -57,7 +57,7 @@
         /// Obte o asigna el modus d'acces.
         /// </summary>
         /// 
-        public AccessMode Access { get; set; }
+        public AccessSpecifier Access { get; set; }
 
         /// <summary>
         /// Obte o asigna el indicador de virtual.

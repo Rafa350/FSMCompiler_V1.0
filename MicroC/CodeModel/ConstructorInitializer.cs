@@ -2,19 +2,19 @@
 
     using System;
 
-    public sealed class ConstructorInitializer: IVisitable {
+    public sealed class ConstructorInitializer : IVisitable {
 
         public ConstructorInitializer() {
 
         }
 
-        public ConstructorInitializer(string name, Expression initializer) {
+        public ConstructorInitializer(string name, Expression expression) {
 
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
             Name = name;
-            Initializer = initializer ?? throw new ArgumentNullException(nameof(initializer));
+            Expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
         public void AcceptVisitor(IVisitor visitor) {
@@ -27,6 +27,6 @@
 
         public string Name { get; set; }
 
-        public Expression Initializer { get; set; }
+        public Expression Expression { get; set; }
     }
 }

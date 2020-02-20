@@ -2,7 +2,9 @@
 
     using System;
 
-    public sealed class ClassDeclaration : IVisitable, IDeclarationBlockMember {
+    public sealed class ClassDeclaration : IVisitable, INamespaceMember {
+
+        private ClassMemberList members;
 
         /// <summary>
         /// Constructor per defecte.
@@ -10,7 +12,7 @@
         /// 
         public ClassDeclaration() {
 
-            BaseAccess = AccessMode.Public;
+            BaseAccess = AccessSpecifier.Public;
         }
 
         /// <summary>
@@ -19,15 +21,8 @@
         /// <param name="name">El nom.</param>
         /// <param name="baseName">En nom de la clase base.</param>
         /// <param name="baseAccess">Modus d'access de la clase base.</param>
-        /// <param name="variables">Llista de variables.</param>
-        /// <param name="functions">Llista de funcions.</param>
-        /// <param name="constructors">Llista de constructors.</param>
-        /// <param name="destructor">Destructor.</param>
         /// 
-        public ClassDeclaration(string name, string baseName, AccessMode baseAccess,
-            MemberVariableDeclarationList variables,
-            MemberFunctionDeclarationList functions, ConstructorDeclarationList constructors,
-            DestructorDeclaration destructor) {
+        public ClassDeclaration(string name, string baseName, AccessSpecifier baseAccess, ClassMemberList members) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -35,10 +30,7 @@
             Name = name;
             BaseName = baseName;
             BaseAccess = baseAccess;
-            Variables = variables;
-            Functions = functions;
-            Constructors = constructors;
-            Destructor = destructor;
+            this.members = members;
         }
 
         /// <summary>
@@ -70,30 +62,27 @@
         /// Obte o asigna el especificador d'acces de la clase base.
         /// </summary>
         /// 
-        public AccessMode BaseAccess { get; set; }
+        public AccessSpecifier BaseAccess { get; set; }
 
         /// <summary>
-        /// Obte o asigna la llista de functions membre.
+        /// Indica si conmte membres.
         /// </summary>
         /// 
-        public MemberFunctionDeclarationList Functions { get; set; }
+        public bool HasMembers => members != null;
 
         /// <summary>
-        /// Obte o asigna le llista de variables membre.
+        /// Obte o asigna la llista de membres.
         /// </summary>
         /// 
-        public MemberVariableDeclarationList Variables { get; set; }
-
-        /// <summary>
-        /// Obte o asigna la llista de constructors.
-        /// </summary>
-        /// 
-        public ConstructorDeclarationList Constructors { get; set; }
-
-        /// <summary>
-        /// Obte o asigna el destructor.
-        /// </summary>
-        /// 
-        public DestructorDeclaration Destructor { get; set; }
+        public ClassMemberList Members {
+            get {
+                if (members == null)
+                    members = new ClassMemberList();
+                return members;
+            }
+            set {
+                members = value;
+            }
+        }
     }
 }

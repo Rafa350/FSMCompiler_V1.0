@@ -1,6 +1,7 @@
 ﻿namespace MicroCompiler.CodeModel {
 
-    public enum MemberFunctionMode {
+    public enum ImplementationSpecifier {
+        Default,
         Static,
         Instance,
         Virtual,

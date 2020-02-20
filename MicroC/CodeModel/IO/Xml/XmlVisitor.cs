@@ -40,23 +40,23 @@
             EndElement();
         }
 
-        public override void Visit(MemberFunctionDeclaration obj) {
+        public override void Visit(FunctionDeclaration decl) {
 
             StartElement("functionDeclaration");
-            Attribute("name", obj.Name);
-            Attribute("type", obj.ReturnType.Name);
+            Attribute("name", decl.Name);
+            Attribute("type", decl.ReturnType.Name);
 
-            if (obj.Arguments != null) {
+            if (decl.Arguments != null) {
                 StartElement("parameterDeclarations");
-                foreach (var argument in obj.Arguments) {
+                foreach (var argument in decl.Arguments) {
                     argument.AcceptVisitor(this);
                 }
 
                 EndElement();
             }
 
-            if (obj.Body != null) {
-                obj.Body.AcceptVisitor(this);
+            if (decl.Body != null) {
+                decl.Body.AcceptVisitor(this);
             }
 
             EndElement();
@@ -70,7 +70,7 @@
             EndElement();
         }
 
-        public override void Visit(MemberVariableDeclaration obj) {
+        public override void Visit(VariableDeclaration obj) {
 
             StartElement("memberVariableDeclaration");
             Attribute("name", obj.Name);

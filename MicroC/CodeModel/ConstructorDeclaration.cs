@@ -3,7 +3,11 @@
     using System;
     using MicroCompiler.CodeModel.Statements;
 
-    public sealed class ConstructorDeclaration : IVisitable {
+    public sealed class ConstructorDeclaration : IClassMember {
+
+
+        private ArgumentDeclarationList arguments;
+        private ConstructorInitializerList initializers;
 
         /// <summary>
         /// Constructor per defecte.
@@ -18,7 +22,7 @@
         /// </summary>
         /// <param name="access">Modus d'acces.</param>
         /// 
-        public ConstructorDeclaration(AccessMode access) {
+        public ConstructorDeclaration(AccessSpecifier access) {
 
             Access = access;
         }
@@ -28,12 +32,14 @@
         /// </summary>
         /// <param name="access">Modus d'acces.</param>
         /// <param name="arguments">Llista d'argument.</param>
+        /// <param name="initializers">llista d'inicialitzadors.</param>
         /// <param name="body">El bloc de codi.</param>
         /// 
-        public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, BlockStatement body) {
+        public ConstructorDeclaration(AccessSpecifier access, ArgumentDeclarationList arguments, ConstructorInitializerList initializers, BlockStatement body) {
 
             Access = access;
-            Arguments = arguments;
+            this.arguments = arguments;
+            this.initializers = initializers;
             Body = body;
         }
 
@@ -42,10 +48,11 @@
         /// </summary>
         /// <param name="access">Modus d'acces.</param>
         /// <param name="arguments">Llista d'argument.</param>
+        /// <param name="initializers">llista d'inicialitzadors.</param>
         /// <param name="statements">Llista d'instruccions.</param>
         /// 
-        public ConstructorDeclaration(AccessMode access, ArgumentDeclarationList arguments, StatementList statements) :
-            this(access, arguments, new BlockStatement(statements)) {
+        public ConstructorDeclaration(AccessSpecifier access, ArgumentDeclarationList arguments, ConstructorInitializerList initializers, StatementList statements) :
+            this(access, arguments, initializers, new BlockStatement(statements)) {
         }
 
         /// <summary>
@@ -65,19 +72,49 @@
         /// Obte o asigna el modus d'acces.
         /// </summary>
         /// 
-        public AccessMode Access { get; set; }
+        public AccessSpecifier Access { get; set; }
+
+        /// <summary>
+        /// Indica si conte arguments.
+        /// </summary>
+        /// 
+        public bool HasArguments => arguments != null;
+
+        /// <summary>
+        /// Indica si conte inicialitzadors.
+        /// </summary>
+        /// 
+        public bool HasInitializers => initializers != null;
 
         /// <summary>
         /// Obte o asigna la llista d'arguments.
         /// </summary>
         /// 
-        public ArgumentDeclarationList Arguments { get; set; }
+        public ArgumentDeclarationList Arguments {
+            get {
+                if (arguments == null)
+                    arguments = new ArgumentDeclarationList();
+                return arguments;
+            }
+            set {
+                arguments = value;
+            }
+        }
 
         /// <summary>
         /// Obte o asigna la llista d'inicialitzadors.
         /// </summary>
         /// 
-        public ConstructorInitializerList Initializers { get; set; }
+        public ConstructorInitializerList Initializers {
+            get {
+                if (initializers == null)
+                    initializers = new ConstructorInitializerList();
+                return initializers;
+            }
+            set {
+                initializers = value;
+            }
+        }
 
         /// <summary>
         /// Obte o asigna el bloc de codi.

@@ -2,7 +2,7 @@
 
     using System;
 
-    public sealed class UnitDeclaration : DeclarationBlock {
+    public sealed class UnitDeclaration : IVisitable {
 
         /// <summary>
         /// Constructor per defecte.
@@ -16,8 +16,9 @@
         /// </summary>
         /// <param name="members">Llista de membres.</param>
         /// 
-        public UnitDeclaration(DeclarationBlockMemberList members) :
-            base(members) {
+        public UnitDeclaration(NamespaceDeclaration ns) {
+
+            Namespace = ns;
         }
 
         /// <summary>
@@ -25,12 +26,14 @@
         /// </summary>
         /// <param name="visitor">El visitador.</param>
         /// 
-        public override void AcceptVisitor(IVisitor visitor) {
+        public void AcceptVisitor(IVisitor visitor) {
 
             if (visitor == null)
                 throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
         }
+
+        public NamespaceDeclaration Namespace { get; set; }
     }
 }

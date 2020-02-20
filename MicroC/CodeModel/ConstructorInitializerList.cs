@@ -2,7 +2,7 @@
 
     using System.Collections.Generic;
 
-    public sealed class ConstructorInitializerList: List<ConstructorInitializer> {
+    public sealed class ConstructorInitializerList : List<ConstructorInitializer> {
 
         public ConstructorInitializerList() {
         }

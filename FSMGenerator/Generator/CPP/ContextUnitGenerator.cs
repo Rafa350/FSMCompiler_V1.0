@@ -1,6 +1,7 @@
 ﻿namespace MikroPicDesigns.FSMCompiler.v1.Generator.CPP {
 
     using System;
+    using System.Collections.Generic;
     using MicroCompiler.CodeModel;
     using MicroCompiler.CodeModel.Expressions;
     using MicroCompiler.CodeModel.Statements;
@@ -27,40 +28,60 @@
 
             UnitBuilder ub = new UnitBuilder();
 
+            bool useNamespace = !String.IsNullOrEmpty(options.NsName);
+
             // Obre un nou espai de noms, si cal
             //
-            if (!String.IsNullOrEmpty(options.NsName))
+            if (useNamespace)
                 ub.BeginNamespace(options.NsName);
 
-            // Obra la declaracio d'una clase
+            ub.AddForwardClassDeclaration(options.StateClassName);
+
+            // Obra la declaracio de clase 'Context'
             //
-            ub.BeginClass(options.ContextClassName, options.ContextBaseClassName, AccessMode.Public);
+            ub.BeginClass(options.ContextClassName, options.ContextBaseClassName, AccessSpecifier.Public);
+
+            // Declara un enumerador pels estats
+            //
+            List<string> elements = new List<string>(machine.GetStateNames());
+            ub.AddMemberDeclaration(new EnumerationDeclaration {
+                Name = "StateID",
+                Elements = elements
+            });
+
+            // Declara la variable per les instancies dels estats.
+            //
+            ub.AddMemberDeclaration(new VariableDeclaration {
+                Name = String.Format("states[{0}]", elements.Count),
+                ValueType = TypeIdentifier.FromName("State*")
+            }); ;
 
             // Afegeix el constructor
             //
-            ub.AddConstructorDeclaration(MakeConstructor(machine));
+            ub.AddMemberDeclaration(MakeConstructor(machine));
 
             // Afegeix les funcions membre
             //
-            ub.AddMemberFunctionDeclaration(MakeStartFunction(machine));
-            ub.AddMemberFunctionDeclaration(MakeEndFunction(machine));
+            ub.AddMemberDeclaration(MakeGetStateInstanceFunction(machine));
+            ub.AddMemberDeclaration(MakeStartFunction(machine));
+            ub.AddMemberDeclaration(MakeEndFunction(machine));
             foreach (var transitionName in machine.GetTransitionNames())
-                ub.AddMemberFunctionDeclaration(MakeTransitionFunction(transitionName, options.StateClassName));
+                ub.AddMemberDeclaration(MakeTransitionFunction(transitionName, options.StateClassName));
 
             // Es defineixen en la capcelera, pero no en el codi, per que l'usuari defineixi les funcions en
             // un altre fitxer.
             //
             if (variant == Variant.Header)
                 foreach (var activityName in machine.GetActivityNames())
-                    ub.AddMemberFunctionDeclaration(MakeActivityFunction(activityName));
+                    ub.AddMemberDeclaration(MakeActivityFunction(activityName));
 
-            // Tanca la declaracio de la clase
+            // Tanca la declaracio de la clase 'Context'
             //
             ub.EndClass();
 
             // Tanca la declaracio del espai de noms, si cal.
             //
-            if (!String.IsNullOrEmpty(options.NsName))
+            if (useNamespace)
                 ub.EndNamespace();
 
             // Retorna l'unitat.
@@ -76,8 +97,34 @@
         /// 
         private static ConstructorDeclaration MakeConstructor(Machine machine) {
 
+            StatementList statements = new StatementList();
+            foreach (var stateName in machine.GetStateNames())
+                statements.Add(new InlineStatement(
+                    String.Format("states[(int)StateID::{0}] = new {0}(this)", stateName)));
+
             return new ConstructorDeclaration {
-                Access = AccessMode.Public
+                Access = AccessSpecifier.Public,
+                Body = new BlockStatement(statements)
+            };
+        }
+
+        private static FunctionDeclaration MakeGetStateInstanceFunction(Machine machine) {
+
+            BlockStatement body = new BlockStatement();
+            body.Statements.Add(
+                new InlineStatement("return states[(int)id]"));
+
+            return new FunctionDeclaration {
+                Name = "getStateInstance",
+                ReturnType = TypeIdentifier.FromName("State*"),
+                Access = AccessSpecifier.Public,
+                Arguments = new ArgumentDeclarationList {
+                    new ArgumentDeclaration {
+                        Name = "id",
+                        ValueType = TypeIdentifier.FromName("StateID")
+                    }
+                },
+                Body = body
             };
         }
 
@@ -87,7 +134,7 @@
         /// <param name="machine">La maquina.</param>
         /// <returns>La declaracio del metode.</returns>
         /// 
-        private static MemberFunctionDeclaration MakeStartFunction(Machine machine) {
+        private static FunctionDeclaration MakeStartFunction(Machine machine) {
 
             StatementList bodyStatements = new StatementList();
             if (machine.InitializeAction != null) {
@@ -101,13 +148,18 @@
                     bodyStatements.AddRange(statements);
             }
             bodyStatements.Add(
-                new InlineStatement(
-                    String.Format("setState({0}::getInstance())", machine.Start.FullName)));
+                new FunctionCallStatement(
+                    new FunctionCallExpression(
+                        new IdentifierExpression("setState"),
+                        new FunctionCallExpression(
+                            new IdentifierExpression("getStateInstance"),
+                            new IdentifierExpression(
+                                String.Format("StateID::{0}", machine.Start.FullName))))));
 
-            return new MemberFunctionDeclaration {
+            return new FunctionDeclaration {
                 Name = "start",
                 ReturnType = TypeIdentifier.FromName("void"),
-                Access = AccessMode.Public,
+                Access = AccessSpecifier.Public,
                 Body = new BlockStatement(bodyStatements)
             };
         }
@@ -118,12 +170,12 @@
         /// <param name="machine">La maquina.</param>
         /// <returns>La declaracio del metode.</returns>
         /// 
-        private static MemberFunctionDeclaration MakeEndFunction(Machine machine) {
+        private static FunctionDeclaration MakeEndFunction(Machine machine) {
 
-            return new MemberFunctionDeclaration {
+            return new FunctionDeclaration {
                 Name = "end",
                 ReturnType = TypeIdentifier.FromName("void"),
-                Access = AccessMode.Public
+                Access = AccessSpecifier.Public
             };
         }
 
@@ -133,16 +185,16 @@
         /// <param name="transitionName">Nom de la transicio.</param>
         /// <returns>La declaracio del metode.</returns>
         /// 
-        private static MemberFunctionDeclaration MakeTransitionFunction(string transitionName, string stateClassName) {
+        private static FunctionDeclaration MakeTransitionFunction(string transitionName, string stateClassName) {
 
-            return new MemberFunctionDeclaration {
-                Name = String.Format("on{0}", transitionName),
+            return new FunctionDeclaration {
+                Name = String.Format("transition_{0}", transitionName),
                 ReturnType = TypeIdentifier.FromName("void"),
-                Access = AccessMode.Public,
+                Access = AccessSpecifier.Public,
                 Body = new BlockStatement {
                     Statements = new StatementList {
                         new InlineStatement(
-                            String.Format("static_cast<{0}*>(getState())->on{1}(this)", stateClassName, transitionName))
+                            String.Format("static_cast<{0}*>(getState())->transition_{1}()", stateClassName, transitionName))
                     }
                 }
             };
@@ -154,12 +206,12 @@
         /// <param name="activityName">El nom de l'activitat.</param>
         /// <returns>La declaracio del metode.</returns>
         /// 
-        private static MemberFunctionDeclaration MakeActivityFunction(string activityName) {
+        private static FunctionDeclaration MakeActivityFunction(string activityName) {
 
-            return new MemberFunctionDeclaration {
+            return new FunctionDeclaration {
                 Name = String.Format("do{0}", activityName),
                 ReturnType = TypeIdentifier.FromName("void"),
-                Access = AccessMode.Public
+                Access = AccessSpecifier.Public
             };
         }
 

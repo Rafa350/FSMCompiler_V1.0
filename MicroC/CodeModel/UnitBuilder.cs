@@ -5,9 +5,8 @@
 
     public sealed class UnitBuilder {
 
-        private readonly Stack<DeclarationBlockMemberList> unitMemberStack = new Stack<DeclarationBlockMemberList>();
+        private readonly Stack<NamespaceDeclaration> namespaceDeclStack = new Stack<NamespaceDeclaration>();
         private readonly Stack<ClassDeclaration> classDeclStack = new Stack<ClassDeclaration>();
-        private readonly UnitDeclaration unitDecl;
 
         /// <summary>
         /// Constructor.
@@ -15,8 +14,9 @@
         /// 
         public UnitBuilder() {
 
-            unitDecl = new UnitDeclaration(new DeclarationBlockMemberList());
-            unitMemberStack.Push(unitDecl.Members);
+            // Crea l'espai de noms global.
+            //
+            namespaceDeclStack.Push(new NamespaceDeclaration("::", null, null, new NamespaceMemberList()));
         }
 
         /// <summary>
@@ -27,9 +27,9 @@
         /// 
         public UnitBuilder BeginNamespace(string name) {
 
-            NamespaceDeclaration namespaceDecl = new NamespaceDeclaration(name, new DeclarationBlockMemberList());
-            unitMemberStack.Peek().Add(namespaceDecl);
-            unitMemberStack.Push(namespaceDecl.Members);
+            NamespaceDeclaration namespaceDecl = new NamespaceDeclaration(name, null, null, new NamespaceMemberList());
+            namespaceDeclStack.Peek().Namespaces.Add(namespaceDecl);
+            namespaceDeclStack.Push(namespaceDecl);
 
             return this;
         }
@@ -41,10 +41,12 @@
         /// 
         public UnitBuilder EndNamespace() {
 
-            if (unitMemberStack.Count < 2)
+            // No permet tancar l'espai de noms global.
+            //
+            if (namespaceDeclStack.Count < 2)
                 throw new InvalidOperationException("No hay ningun espacio de nombres abierto.");
 
-            unitMemberStack.Pop();
+            namespaceDeclStack.Pop();
 
             return this;
         }
@@ -61,7 +63,7 @@
                 Name = name,
             };
 
-            unitMemberStack.Peek().Add(classDecl);
+            namespaceDeclStack.Peek().Members.Add(classDecl);
             classDeclStack.Push(classDecl);
 
             return this;
@@ -73,7 +75,7 @@
         /// <param name="name">El nom de la clase.</param>
         /// <returns>L'objecte this.</returns>
         /// 
-        public UnitBuilder BeginClass(string name, string baseName, AccessMode baseAccess) {
+        public UnitBuilder BeginClass(string name, string baseName, AccessSpecifier baseAccess) {
 
             ClassDeclaration classDecl = new ClassDeclaration {
                 Name = name,
@@ -81,7 +83,7 @@
                 BaseAccess = baseAccess
             };
 
-            unitMemberStack.Peek().Add(classDecl);
+            namespaceDeclStack.Peek().Members.Add(classDecl);
             classDeclStack.Push(classDecl);
 
             return this;
@@ -103,58 +105,18 @@
 
         public UnitBuilder AddForwardClassDeclaration(string name) {
 
-            unitMemberStack.Peek().Add(new ForwardClassDeclaration(name));
+            namespaceDeclStack.Peek().Members.Add(new ForwardClassDeclaration(name));
 
             return this;
         }
 
-        public UnitBuilder AddConstructorDeclaration(ConstructorDeclaration constructorDecl) {
+        public UnitBuilder AddMemberDeclaration(IClassMember memberDecl) {
 
             if (classDeclStack.Count == 0)
                 throw new InvalidOperationException("No hay ninguna declaracion de clase abierta.");
 
             ClassDeclaration classDecl = classDeclStack.Peek();
-            if (classDecl.Constructors == null)
-                classDecl.Constructors = new ConstructorDeclarationList();
-            classDecl.Constructors.Add(constructorDecl);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Afegeix una declaracio de funcio a la clase oberta.
-        /// </summary>
-        /// <param name="functionDecl">La declaracio de la funcio.</param>
-        /// <returns>L'objecte this.</returns>
-        /// 
-        public UnitBuilder AddMemberFunctionDeclaration(MemberFunctionDeclaration functionDecl) {
-
-            if (classDeclStack.Count == 0)
-                throw new InvalidOperationException("No hay ninguna declaracion de clase abierta.");
-
-            ClassDeclaration classDecl = classDeclStack.Peek();
-            if (classDecl.Functions == null)
-                classDecl.Functions = new MemberFunctionDeclarationList();
-            classDecl.Functions.Add(functionDecl);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Afegeix una declaracio de variable a la clase oberta.
-        /// </summary>
-        /// <param name="variableDecl">La declaracio de la variable.</param>
-        /// <returns>L'objecte this.</returns>
-        /// 
-        public UnitBuilder AddMemberVariableDeclaration(MemberVariableDeclaration variableDecl) {
-
-            if (classDeclStack.Count == 0)
-                throw new InvalidOperationException("No hay ninguna declaracion de clase abierta.");
-
-            ClassDeclaration classDecl = classDeclStack.Peek();
-            if (classDecl.Variables == null)
-                classDecl.Variables = new MemberVariableDeclarationList();
-            classDecl.Variables.Add(variableDecl);
+            classDecl.Members.Add(memberDecl);
 
             return this;
         }
@@ -167,7 +129,7 @@
         /// 
         public UnitBuilder AddVariableDeclaration(VariableDeclaration variableDecl) {
 
-            unitMemberStack.Peek().Add(variableDecl);
+            namespaceDeclStack.Peek().Members.Add(variableDecl);
 
             return this;
         }
@@ -180,7 +142,7 @@
         /// 
         public UnitBuilder AddFunctionDeclaration(FunctionDeclaration functionDecl) {
 
-            unitMemberStack.Peek().Add(functionDecl);
+            namespaceDeclStack.Peek().Members.Add(functionDecl);
 
             return this;
         }
@@ -192,7 +154,7 @@
         /// 
         public UnitDeclaration ToUnit() {
 
-            return unitDecl;
+            return new UnitDeclaration(namespaceDeclStack.Peek());
         }
     }
 }
