@@ -78,13 +78,13 @@
         /// Indica si conte arguments.
         /// </summary>
         /// 
-        public bool HasArguments => arguments != null;
+        public bool HasArguments => (arguments != null) && (arguments.Count > 0);
 
         /// <summary>
         /// Indica si conte inicialitzadors.
         /// </summary>
         /// 
-        public bool HasInitializers => initializers != null;
+        public bool HasInitializers => (initializers != null) && (initializers.Count > 0);
 
         /// <summary>
         /// Obte o asigna la llista d'arguments.

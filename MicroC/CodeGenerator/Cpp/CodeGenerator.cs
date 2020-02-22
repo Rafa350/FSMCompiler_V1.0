@@ -1,7 +1,6 @@
 ﻿namespace MicroCompiler.CodeGenerator.Cpp {
 
     using System;
-    using System.Text;
     using MicroCompiler.CodeModel;
     using MicroCompiler.CodeModel.Expressions;
     using MicroCompiler.CodeModel.Statements;
@@ -10,22 +9,21 @@
 
         private sealed class GeneratorVisitor : DefaultVisitor {
 
-            private readonly StringBuilder sb;
-            private int indent;
+            private readonly CodeBuilder cb;
             private ClassDeclaration currentClass;
 
-            public GeneratorVisitor(StringBuilder sb, int indent = 0) {
-                this.sb = sb ?? throw new ArgumentNullException(nameof(sb));
-                this.indent = indent;
+            public GeneratorVisitor(CodeBuilder cb) {
+
+                this.cb = cb ?? throw new ArgumentNullException(nameof(cb));
             }
 
             public override void Visit(ArgumentDeclaration decl) {
 
-                sb.AppendLine();
-                sb.AppendIndent(indent);
-                sb.Append(decl.ValueType.Name);
-                sb.Append(' ');
-                sb.Append(decl.Name);
+                cb.WriteLine();
+                cb.WriteIndent();
+                cb.Write(decl.ValueType.Name);
+                cb.Write(' ');
+                cb.Write(decl.Name);
             }
 
             public override void Visit(ClassDeclaration decl) {
@@ -42,31 +40,32 @@
 
             public override void Visit(ConstructorDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("{0}::{0}(", currentClass.Name);
+                cb.WriteIndent();
+                cb.Write("{0}::{0}(", currentClass.Name);
 
                 // Genera la llista d'arguments
                 //
                 if (decl.HasArguments) {
-                    indent++;
+                    cb.Indent();
                     bool first = true;
                     foreach (var argument in decl.Arguments) {
                         if (first)
                             first = false;
                         else
-                            sb.Append(", ");
+                            cb.Write(", ");
                         argument.AcceptVisitor(this);
                     }
-                    sb.Append(')');
+                    cb.Write(')');
                 }
                 else {
-                    sb.Append(')');
-                    indent++;
+                    cb.Write(')');
+                    cb.Indent();
                 }
                 if (decl.HasInitializers)
-                    sb.AppendLine(" :");
+                    cb.Write(" :");
                 else
-                    sb.AppendLine(" {");
+                    cb.Write(" {");
+                cb.WriteLine();
 
                 // Genera la llistad'inicialitzadors
                 //
@@ -76,11 +75,12 @@
                         if (first)
                             first = false;
                         else
-                            sb.AppendLine(", ");
-                        sb.AppendIndent(indent);
+                            cb.WriteLine(", ");
+                        cb.WriteIndent();
                         initializer.AcceptVisitor(this);
                     }
-                    sb.AppendLine(" {");
+                    cb.Write(" {");
+                    cb.WriteLine();
                 }
 
                 // Genera el cos de la funcio
@@ -88,146 +88,144 @@
                 if (decl.Body != null)
                     decl.Body.AcceptVisitor(this);
 
-                indent--;
-                sb.AppendIndent(indent);
-                sb.Append('}');
-                sb.AppendLine();
-                sb.AppendLine();
+                cb.Unindent();
+                cb.WriteIndent();
+                cb.Write('}');
+                cb.WriteLine();
+                cb.WriteLine();
             }
 
             public override void Visit(ConstructorInitializer initializer) {
 
-                sb.AppendFormat("{0}(", initializer.Name);
+                cb.Write("{0}(", initializer.Name);
                 initializer.Expression.AcceptVisitor(this);
-                sb.Append(')');
+                cb.Write(')');
             }
 
             public override void Visit(ForwardClassDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("class {0};", decl.Name);
-                sb.AppendLine();
-                sb.AppendLine();
+                cb.WriteLine("class {0};", decl.Name);
+                cb.WriteLine();
             }
 
             public override void Visit(FunctionCallExpression exp) {
 
                 exp.Function.AcceptVisitor(this);
-                sb.Append('(');
-                if (exp.Arguments != null)
+                cb.Write('(');
+                if (exp.HasArguments)
                     foreach (var argument in exp.Arguments)
                         argument.AcceptVisitor(this);
 
-                sb.Append(')');
+                cb.Write(')');
             }
 
             public override void Visit(FunctionCallStatement stmt) {
 
-                sb.AppendIndent(indent);
+                cb.WriteIndent();
                 base.Visit(stmt);
-                sb.Append(';');
-                sb.AppendLine();
+                cb.Write(';');
+                cb.WriteLine();
             }
 
             public override void Visit(IdentifierExpression obj) {
 
-                sb.Append(obj.Name);
+                cb.Write(obj.Name);
             }
 
             public override void Visit(IfThenElseStatement stmt) {
 
-                sb.AppendIndent(indent);
-                sb.Append("if (");
+                cb.WriteIndent();
+                cb.Write("if (");
                 if (stmt.ConditionExpression == null)
                     throw new InvalidOperationException("No se especifico la condicion.");
 
                 stmt.ConditionExpression.AcceptVisitor(this);
-                sb.AppendLine(") {");
-                indent++;
+                cb.Write(") {");
+                cb.WriteLine();
+                cb.Indent();
                 if (stmt.TrueStmt == null)
-                    throw new InvalidOperationException("No se especificoel bloque true.");
+                    throw new InvalidOperationException("No se especifico el bloque true.");
 
                 stmt.TrueStmt.AcceptVisitor(this);
-                indent--;
-                sb.AppendIndent(indent);
-                sb.AppendLine("}");
+                cb.Unindent();
+                cb.WriteIndent();
+                cb.Write("}");
+                cb.WriteLine();
                 if (stmt.FalseStmt != null) {
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("else {");
-                    indent++;
+                    cb.WriteIndent();
+                    cb.WriteLine("else {");
+                    cb.Indent();
                     stmt.FalseStmt.AcceptVisitor(this);
-                    indent--;
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("}");
+                    cb.Unindent();
+                    cb.WriteIndent();
+                    cb.Write('}');
+                    cb.WriteLine();
                 }
             }
 
             public override void Visit(InlineExpression obj) {
 
-                sb.Append(obj.Code);
+                cb.Write(obj.Code);
             }
 
             public override void Visit(InlineStatement stmt) {
 
-                sb.AppendIndent(indent);
-                sb.Append(stmt.Code);
-                sb.Append(';');
-                sb.AppendLine();
+                cb.WriteLine("{0};", stmt.Code);
             }
 
             public override void Visit(LiteralExpression obj) {
 
-                sb.Append(obj.Value);
+                cb.Write(obj.Value.ToString());
             }
 
             public override void Visit(VariableDeclaration decl) {
 
                 if (decl.Implementation == ImplementationSpecifier.Static) {
-                    sb.AppendIndent(indent);
-                    sb.AppendFormat("{0} {1}::{2}", decl.ValueType.Name, currentClass.Name, decl.Name);
+                    cb.WriteIndent();
+                    cb.Write("{0} {1}::{2}", decl.ValueType.Name, currentClass.Name, decl.Name);
                     if (decl.Initializer != null) {
-                        sb.Append(" = ");
+                        cb.Write(" = ");
                         decl.Initializer.AcceptVisitor(this);
                     }
-                    sb.Append(';');
-                    sb.AppendLine();
-                    sb.AppendLine();
+                    cb.Write(';');
+                    cb.WriteLine();
+                    cb.WriteLine();
                 }
             }
 
             public override void Visit(FunctionDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("{0} {1}::{2}(", decl.ReturnType.Name, currentClass.Name, decl.Name);
+                cb.WriteIndent();
+                cb.Write("{0} {1}::{2}(", decl.ReturnType.Name, currentClass.Name, decl.Name);
 
-                if (decl.Arguments == null) {
-                    sb.AppendLine(") {");
-                    indent++;
+                if (!decl.HasArguments) {
+                    cb.Write(") {");
+                    cb.WriteLine();
+                    cb.Indent();
                 }
                 else {
-                    indent++;
+                    cb.Indent();
                     bool first = true;
                     foreach (var argument in decl.Arguments) {
-                        if (first) {
+                        if (first)
                             first = false;
-                        }
-                        else {
-                            sb.Append(", ");
-                        }
+                        else
+                            cb.Write(", ");
 
                         argument.AcceptVisitor(this);
                     }
-                    sb.AppendLine(") {");
+                    cb.Write(") {");
+                    cb.WriteLine();
                 }
 
-                if (decl.Body != null) {
+                if (decl.Body != null)
                     decl.Body.AcceptVisitor(this);
-                }
 
-                indent--;
-                sb.AppendIndent(indent);
-                sb.AppendLine("}");
-                sb.AppendLine();
+                cb.Unindent();
+                cb.WriteIndent();
+                cb.Write('}');
+                cb.WriteLine();
+                cb.WriteLine();
             }
 
             public override void Visit(NamespaceDeclaration decl) {
@@ -235,46 +233,45 @@
                 bool global = decl.Name == "::";
 
                 if (!global) {
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("namespace {0} {{", decl.Name);
-                    sb.AppendLine();
-                    indent++;
+                    cb.WriteLine("namespace {0} {{", decl.Name);
+                    cb.WriteLine();
+                    cb.Indent();
                 }
 
                 base.Visit(decl);
 
                 if (!global) {
-                    indent--;
-                    sb.AppendIndent(indent);
-                    sb.Append('}');
-                    sb.AppendLine();
+                    cb.Unindent();
+                    cb.WriteIndent();
+                    cb.Write('}');
+                    cb.WriteLine();
                 }
             }
 
             public override void Visit(ReturnStatement stmt) {
 
-                sb.AppendIndent(indent);
-                sb.Append("return");
+                cb.WriteIndent();
+                cb.Write("return");
                 if (stmt.Expression != null) {
-                    sb.Append(' ');
+                    cb.Write(' ');
                     stmt.Expression.AcceptVisitor(this);
                 }
-                sb.Append(';');
-                sb.AppendLine();
+                cb.Write(';');
+                cb.WriteLine();
             }
         }
 
-        public static string Generate(UnitDeclaration unitDeclaration) {
+        public static string Generate(UnitDeclaration unitDecl) {
 
-            if (unitDeclaration == null)
-                throw new ArgumentNullException(nameof(unitDeclaration));
+            if (unitDecl == null)
+                throw new ArgumentNullException(nameof(unitDecl));
 
-            StringBuilder sb = new StringBuilder();
-            var visitor = new GeneratorVisitor(sb);
+            var cb = new CodeBuilder();
+            var visitor = new GeneratorVisitor(cb);
 
-            visitor.Visit(unitDeclaration);
+            visitor.Visit(unitDecl);
 
-            return sb.ToString();
+            return cb.ToString();
         }
     }
 }

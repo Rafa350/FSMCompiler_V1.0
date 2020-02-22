@@ -1,47 +1,44 @@
 ﻿namespace MicroCompiler.CodeGenerator.C {
 
     using System;
-    using System.Text;
     using MicroCompiler.CodeModel;
 
     public static class HeaderGenerator {
 
         private sealed class GeneratorVisitor : DefaultVisitor {
 
-            private readonly StringBuilder sb;
-            private readonly int indent = 0;
+            private readonly CodeBuilder cb;
 
-            public GeneratorVisitor(StringBuilder sb, int indent) {
+            public GeneratorVisitor(CodeBuilder cb) {
 
-                this.sb = sb;
-                this.indent = indent;
+                this.cb = cb ?? throw new ArgumentNullException(nameof(cb));
             }
 
             public override void Visit(FunctionDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("{0} {1}(", decl.ReturnType.Name, decl.Name);
-                if (decl.Arguments == null)
-                    sb.Append("void");
-                sb.AppendLine(");");
+                cb.WriteIndent();
+                cb.Write("{0} {1}(", decl.ReturnType.Name, decl.Name);
+                if (!decl.HasArguments)
+                    cb.Write("void");
+                cb.Write(");");
+                cb.WriteLine();
 
                 base.Visit(decl);
             }
 
         }
 
-        public static string Generate(UnitDeclaration unitDeclaration) {
+        public static string Generate(UnitDeclaration unitDecl) {
 
-            if (unitDeclaration == null) {
-                throw new ArgumentNullException(nameof(unitDeclaration));
-            }
+            if (unitDecl == null)
+                throw new ArgumentNullException(nameof(unitDecl));
 
-            StringBuilder sb = new StringBuilder();
+            var cb = new CodeBuilder();
+            var visitor = new GeneratorVisitor(cb);
 
-            var visitor = new GeneratorVisitor(sb, 0);
-            visitor.Visit(unitDeclaration);
+            visitor.Visit(unitDecl);
 
-            return sb.ToString();
+            return cb.ToString();
         }
     }
 }

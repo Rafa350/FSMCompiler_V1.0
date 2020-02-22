@@ -195,7 +195,7 @@
 
                     trueBodyStatements.Add(new FunctionCallStatement(
                         new FunctionCallExpression(
-                            new IdentifierExpression("ctx->clearState"))));
+                            new IdentifierExpression("ctx->beginTransition"))));
 
                     // Accio de transicio.
                     //
@@ -204,7 +204,7 @@
 
                     trueBodyStatements.Add(new FunctionCallStatement(
                         new FunctionCallExpression(
-                            new IdentifierExpression("ctx->setState"),
+                            new IdentifierExpression("ctx->endTransition"),
                             new FunctionCallExpression(
                                 new IdentifierExpression("ctx->getStateInstance"),
                                 new IdentifierExpression(

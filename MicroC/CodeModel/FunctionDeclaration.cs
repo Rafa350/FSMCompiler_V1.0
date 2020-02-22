@@ -5,6 +5,8 @@
 
     public sealed class FunctionDeclaration : INamespaceMember, IClassMember {
 
+        private ArgumentDeclarationList arguments;
+
         /// <summary>
         /// Constructor per defecte.
         /// </summary>
@@ -34,7 +36,7 @@
             Name = name;
             Access = access;
             ReturnType = returnType;
-            Arguments = arguments;
+            this.arguments = arguments;
             Body = body;
         }
 
@@ -91,10 +93,25 @@
         public TypeIdentifier ReturnType { get; set; }
 
         /// <summary>
+        /// Indica si te arguments.
+        /// </summary>
+        /// 
+        public bool HasArguments => (arguments != null) && (arguments.Count > 0);
+
+        /// <summary>
         /// Obte o asigna la llista d'arguments.
         /// </summary>
         /// 
-        public ArgumentDeclarationList Arguments { get; set; }
+        public ArgumentDeclarationList Arguments { 
+            get {
+                if (arguments == null)
+                    arguments = new ArgumentDeclarationList();
+                return arguments;
+            }
+            set {
+                arguments = value;
+            }
+        }
 
         /// <summary>
         /// Obte o asigna les instruccions.

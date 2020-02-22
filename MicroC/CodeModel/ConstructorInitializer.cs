@@ -5,7 +5,6 @@
     public sealed class ConstructorInitializer : IVisitable {
 
         public ConstructorInitializer() {
-
         }
 
         public ConstructorInitializer(string name, Expression expression) {

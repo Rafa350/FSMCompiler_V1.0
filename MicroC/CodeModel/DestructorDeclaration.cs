@@ -11,21 +11,21 @@
         /// 
         public DestructorDeclaration() {
 
-            Access = AccessSpecifier.Public;
-            VirtualMode = DestructorVirtualMode.None;
+            Access = AccessSpecifier.Default;
+            Implemetation = ImplementationSpecifier.Default;
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="access">Modus d'acces.</param>
-        /// <param name="isVirtual">Indica si es virtual.</param>
+        /// <param name="implementation">Tipus d'implementacio.</param>
         /// <param name="body">El bloc d'instruccions.</param>
         /// 
-        public DestructorDeclaration(AccessSpecifier access, bool isVirtual, BlockStatement body) {
+        public DestructorDeclaration(AccessSpecifier access, ImplementationSpecifier implementation, BlockStatement body) {
 
             Access = access;
-            VirtualMode = isVirtual ? DestructorVirtualMode.Virtual : DestructorVirtualMode.None;
+            Implemetation = implementation;
             Body = body;
         }
 
@@ -33,11 +33,11 @@
         /// Constructor.
         /// </summary>
         /// <param name="access">El modus d'acces.</param>
-        /// <param name="isVirtual">Indica si es virtual.</param>
+        /// <param name="implementation">Tipus d'implementacio.</param>
         /// <param name="statements">La llista d'instruccions.</param>
         /// 
-        public DestructorDeclaration(AccessSpecifier access, bool isVirtual, StatementList statements) :
-            this(access, isVirtual, new BlockStatement(statements)) {
+        public DestructorDeclaration(AccessSpecifier access, ImplementationSpecifier implementation, StatementList statements) :
+            this(access, implementation, new BlockStatement(statements)) {
         }
 
         /// <summary>
@@ -63,7 +63,7 @@
         /// Obte o asigna el indicador de virtual.
         /// </summary>
         /// 
-        public DestructorVirtualMode VirtualMode { get; }
+        public ImplementationSpecifier Implemetation { get; set; }
 
         /// <summary>
         /// Obte asigna el bloc de codi.

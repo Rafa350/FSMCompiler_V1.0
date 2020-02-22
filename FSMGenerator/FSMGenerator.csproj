@@ -45,14 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Generator\CodeBuilder.cs" />
     <Compile Include="Generator\CPP\ContextUnitGenerator.cs" />
     <Compile Include="Generator\CPP\CPPGenerator.cs" />
     <Compile Include="Generator\CPP\CPPGeneratorOptions.cs" />
     <Compile Include="Generator\MachineExtensions.cs" />
     <Compile Include="Generator\StateExtensions.cs" />
     <Compile Include="Generator\CPP\StateUnitGenerator.cs" />
-    <Compile Include="Generator\CppCodeBuilder.cs" />
     <Compile Include="Generator\C\CGenerator.cs" />
     <Compile Include="Generator\C\CGeneratorOptions.cs" />
     <Compile Include="Generator\C\MachineUnitGenerator.cs" />

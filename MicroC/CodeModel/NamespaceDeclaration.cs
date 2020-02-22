@@ -61,19 +61,19 @@
         /// Comprova si te noms per importar.
         /// </summary>
         /// 
-        public bool HasImports => imports != null;
+        public bool HasImports => (imports != null) && (imports.Count > 0);
 
         /// <summary>
         /// Comprova si te membres.
         /// </summary>
         /// 
-        public bool HasMembers => members != null;
+        public bool HasMembers => (members != null) && (members.Count > 0);
 
         /// <summary>
         /// Comprova si te espais de noms.
         /// </summary>
         /// 
-        public bool HasNamespaces => namespaces != null;
+        public bool HasNamespaces => (namespaces != null) && (namespaces.Count > 0);
 
         /// <summary>
         /// Obte o asigna la llista no noms per importar.

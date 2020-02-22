@@ -100,7 +100,7 @@
             StatementList statements = new StatementList();
             foreach (var stateName in machine.GetStateNames())
                 statements.Add(new InlineStatement(
-                    String.Format("states[(int)StateID::{0}] = new {0}(this)", stateName)));
+                    String.Format("states[int(StateID::{0})] = new {0}(this)", stateName)));
 
             return new ConstructorDeclaration {
                 Access = AccessSpecifier.Public,
@@ -112,7 +112,7 @@
 
             BlockStatement body = new BlockStatement();
             body.Statements.Add(
-                new InlineStatement("return states[(int)id]"));
+                new InlineStatement("return states[int(id)]"));
 
             return new FunctionDeclaration {
                 Name = "getStateInstance",
@@ -142,15 +142,10 @@
                 if (statements != null)
                     bodyStatements.AddRange(statements);
             }
-            if (machine.Start.EnterAction != null) {
-                var statements = MakeActionStatements(machine.Start.EnterAction);
-                if (statements != null)
-                    bodyStatements.AddRange(statements);
-            }
             bodyStatements.Add(
                 new FunctionCallStatement(
                     new FunctionCallExpression(
-                        new IdentifierExpression("setState"),
+                        new IdentifierExpression("initialize"),
                         new FunctionCallExpression(
                             new IdentifierExpression("getStateInstance"),
                             new IdentifierExpression(

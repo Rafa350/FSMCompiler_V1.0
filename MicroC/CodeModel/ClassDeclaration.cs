@@ -68,7 +68,7 @@
         /// Indica si conmte membres.
         /// </summary>
         /// 
-        public bool HasMembers => members != null;
+        public bool HasMembers => (members != null) && (members.Count > 0);
 
         /// <summary>
         /// Obte o asigna la llista de membres.

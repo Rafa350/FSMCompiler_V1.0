@@ -2,29 +2,40 @@
 
     using System;
     using System.Linq;
-    using System.Text;
     using MicroCompiler.CodeModel;
 
     public sealed class HeaderGenerator {
 
         private sealed class GeneratorVisitor : DefaultVisitor {
 
-            private readonly StringBuilder sb;
-            private int indent;
+            private readonly CodeBuilder cb;
             private ClassDeclaration currentClass;
 
-            public GeneratorVisitor(StringBuilder sb, int indent = 0) {
-                this.sb = sb ?? throw new ArgumentNullException(nameof(sb));
-                this.indent = indent;
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="cb">Objecte constructor de codi.</param>
+            /// 
+            public GeneratorVisitor(CodeBuilder cb) {
+
+                this.cb = cb ?? throw new ArgumentNullException(nameof(cb));
             }
 
+            /// <summary>
+            /// Visita un objecte 'ArgumentDeclaration'
+            /// </summary>
+            /// <param name="decl">L'objecte a visitar.</param>
+            /// 
             public override void Visit(ArgumentDeclaration decl) {
 
-                sb.Append(decl.ValueType.Name);
-                sb.Append(' ');
-                sb.Append(decl.Name);
+                cb.Write("{0} {1}", decl.ValueType.Name, decl.Name);
             }
 
+            /// <summary>
+            /// Visita un objecte 'ClassDeclaration'.
+            /// </summary>
+            /// <param name="decl">L'objecte a visitar.</param>
+            /// 
             public override void Visit(ClassDeclaration decl) {
 
                 string ToString(AccessSpecifier access) {
@@ -46,16 +57,16 @@
                 ClassDeclaration oldClass = currentClass;
                 currentClass = decl;
 
-                sb.AppendIndent(indent);
-                sb.Append("class ");
-                sb.Append(decl.Name);
+                cb.WriteIndent();
+                cb.Write("class ");
+                cb.Write(decl.Name);
                 if (!String.IsNullOrEmpty(decl.BaseName))
-                    sb.AppendFormat(": {0} {1}", ToString(decl.BaseAccess), decl.BaseName);
+                    cb.Write(": {0} {1}", ToString(decl.BaseAccess), decl.BaseName);
 
-                sb.Append(" {");
-                sb.AppendLine();
+                cb.Write(" {");
+                cb.WriteLine();
 
-                indent++;
+                cb.Indent();
 
                 bool hasMembers = decl.HasMembers;
 
@@ -69,14 +80,14 @@
                         if (first || (access != enumeration.Access)) {
                             access = enumeration.Access;
                             first = false;
-                            sb.AppendIndent(indent);
-                            sb.AppendFormat("{0}:", ToString(access));
-                            sb.AppendLine();
+                            cb.WriteIndent();
+                            cb.Write("{0}:", ToString(access));
+                            cb.WriteLine();
                         }
 
-                        indent++;
+                        cb.Indent();
                         enumeration.AcceptVisitor(this);
-                        indent--;
+                        cb.Unindent();
                     }
                 }
 
@@ -90,14 +101,14 @@
                         if (first || (access != variable.Access)) {
                             access = variable.Access;
                             first = false;
-                            sb.AppendIndent(indent);
-                            sb.AppendFormat("{0}:", ToString(access));
-                            sb.AppendLine();
+                            cb.WriteIndent();
+                            cb.Write("{0}:", ToString(access));
+                            cb.WriteLine();
                         }
 
-                        indent++;
+                        cb.Indent();
                         variable.AcceptVisitor(this);
-                        indent--;
+                        cb.Unindent();
                     }
                 }
 
@@ -111,14 +122,14 @@
                         if (first || (access != constructor.Access)) {
                             access = constructor.Access;
                             first = false;
-                            sb.AppendIndent(indent);
-                            sb.AppendFormat("{0}:", ToString(access));
-                            sb.AppendLine();
+                            cb.WriteIndent();
+                            cb.Write("{0}:", ToString(access));
+                            cb.WriteLine();
                         }
 
-                        indent++;
+                        cb.Indent();
                         constructor.AcceptVisitor(this);
-                        indent--;
+                        cb.Unindent();
                     }
                 }
 
@@ -126,12 +137,13 @@
                 //
                 if (hasMembers) {
                     foreach (var destructor in decl.Members.OfType<DestructorDeclaration>()) {
-                        sb.AppendIndent(indent);
-                        sb.AppendFormat("{0}:", ToString(destructor.Access));
-                        sb.AppendLine();
-                        indent++;
+                        cb.WriteIndent();
+                        cb.Write("{0}:", ToString(destructor.Access));
+                        cb.WriteLine();
+
+                        cb.Indent();
                         destructor.AcceptVisitor(this);
-                        indent--;
+                        cb.Unindent();
                     }
                 }
 
@@ -145,31 +157,36 @@
                         if (first || (access != function.Access)) {
                             access = function.Access;
                             first = false;
-                            sb.AppendIndent(indent);
-                            sb.AppendFormat("{0}:", ToString(access));
-                            sb.AppendLine();
+                            cb.WriteIndent();
+                            cb.Write("{0}:", ToString(access));
+                            cb.WriteLine();
                         }
 
-                        indent++;
+                        cb.Indent();
                         function.AcceptVisitor(this);
-                        indent--;
+                        cb.Unindent();
                     }
                 }
 
-                indent--;
+                cb.Unindent();
 
-                sb.AppendIndent(indent);
-                sb.Append("};");
-                sb.AppendLine();
-                sb.AppendLine();
+                cb.WriteIndent();
+                cb.Write("};");
+                cb.WriteLine();
+                cb.WriteLine();
 
                 currentClass = oldClass;
             }
 
+            /// <summary>
+            /// Visita un objecte 'ConstructorDeclaration'.
+            /// </summary>
+            /// <param name="decl">L'objecte a visitar.</param>
+            /// 
             public override void Visit(ConstructorDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("{0}(", currentClass.Name);
+                cb.WriteIndent();
+                cb.Write("{0}(", currentClass.Name);
 
                 if (decl.Arguments != null) {
                     bool first = true;
@@ -177,64 +194,61 @@
                         if (first)
                             first = false;
                         else
-                            sb.Append(", ");
+                            cb.Write(", ");
 
                         argument.AcceptVisitor(this);
                     }
                 }
 
-                sb.Append(");");
-                sb.AppendLine();
+                cb.Write(");");
+                cb.WriteLine();
             }
 
             public override void Visit(ForwardClassDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("class {0};", decl.Name);
-                sb.AppendLine();
-                sb.AppendLine();
+                cb.WriteLine("class {0};", decl.Name);
+                cb.WriteLine();
             }
 
             public override void Visit(EnumerationDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("enum class {0} {{", decl.Name);
-                sb.AppendLine();
-                indent++;
+                cb.WriteLine("enum class {0} {{", decl.Name);
+
+                cb.Indent();
 
                 bool first = true;
                 foreach (var element in decl.Elements) {
                     if (first)
                         first = false;
                     else {
-                        sb.Append(',');
-                        sb.AppendLine();
+                        cb.Write(',');
+                        cb.WriteLine();
                     }
-                    sb.AppendIndent(indent);
-                    sb.Append(element);
+                    cb.WriteIndent();
+                    cb.Write(element);
                 }
-                sb.AppendLine();
+                cb.WriteLine();
 
-                indent--;
-                sb.AppendIndent(indent);
-                sb.Append("};");
-                sb.AppendLine();
+                cb.Unindent();
+                cb.WriteIndent();
+                cb.Write("};");
+                cb.WriteLine();
             }
 
             public override void Visit(FunctionDeclaration decl) {
 
                 bool isClassMember = currentClass != null;
 
-                sb.AppendIndent(indent);
+                cb.WriteIndent();
 
                 if (isClassMember)
                     switch (decl.Implementation) {
                         case ImplementationSpecifier.Virtual:
-                            sb.Append("virtual ");
+                            cb.Write("virtual ");
                             break;
 
                         case ImplementationSpecifier.Static:
-                            sb.Append("static ");
+                            cb.Write("static ");
                             break;
 
                         case ImplementationSpecifier.Default:
@@ -246,10 +260,10 @@
                             throw new InvalidOperationException(
                                 String.Format("El especificador de implementacion '{0}' no es valido.", decl.Implementation.ToString()));
                     }
-                else 
+                else
                     switch (decl.Access) {
                         case AccessSpecifier.Private:
-                            sb.Append("static ");
+                            cb.Write("static ");
                             break;
 
                         case AccessSpecifier.Public:
@@ -261,99 +275,114 @@
                                 String.Format("El especificador de acceso '{0}' no es valido.", decl.Access.ToString()));
                     }
 
-                sb.AppendFormat("{0} {1}(", decl.ReturnType.Name, decl.Name);
+                cb.Write("{0} {1}(", decl.ReturnType.Name, decl.Name);
                 if (decl.Arguments != null) {
                     bool first = true;
                     foreach (var argument in decl.Arguments) {
-                        if (first) {
+                        if (first)
                             first = false;
-                        }
-                        else {
-                            sb.Append(", ");
-                        }
+                        else
+                            cb.Write(", ");
 
                         argument.AcceptVisitor(this);
                     }
                 }
-                sb.Append(")");
+                cb.Write(')');
 
                 if (isClassMember)
                     switch (decl.Implementation) {
                         case ImplementationSpecifier.Abstract:
-                            sb.Append(" = 0;");
+                            cb.Write(" = 0;");
                             break;
 
                         case ImplementationSpecifier.Override:
-                            sb.Append(" override;");
+                            cb.Write(" override;");
                             break;
 
                         default:
-                            sb.Append(';');
+                            cb.Write(';');
                             break;
                     }
                 else
-                    sb.Append(';');
+                    cb.Write(';');
 
-                sb.AppendLine();
+                cb.WriteLine();
             }
 
             public override void Visit(VariableDeclaration decl) {
 
                 bool isClassMember = currentClass != null;
 
-                sb.AppendIndent(indent);
+                cb.WriteIndent();
                 if (isClassMember) {
                     switch (decl.Implementation) {
                         case ImplementationSpecifier.Static:
-                            sb.Append("static ");
+                            cb.Write("static ");
                             break;
                     }
                 }
                 else if (decl.Access == AccessSpecifier.Private)
-                    sb.Append("static ");
+                    cb.Write("static ");
 
-                sb.AppendLine("{0} {1};", decl.ValueType.Name, decl.Name);
+                cb.Write("{0} {1};", decl.ValueType.Name, decl.Name);
+                cb.WriteLine();
             }
 
+            /// <summary>
+            /// Visita un objecte 'NamespaceDeclaration.
+            /// </summary>
+            /// <param name="decl">L'objecte a visitar.</param>
+            /// 
             public override void Visit(NamespaceDeclaration decl) {
 
                 bool global = decl.Name == "::";
 
                 if (!global) {
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("namespace {0} {{", decl.Name);
-                    sb.AppendLine();
-                    indent++;
+                    cb.WriteIndent();
+                    cb.WriteLine("namespace {0} {{", decl.Name);
+                    cb.WriteLine();
+                    cb.Indent();
                 }
 
                 base.Visit(decl);
 
                 if (!global) {
-                    indent--;
-                    sb.AppendIndent(indent);
-                    sb.Append('}');
-                    sb.AppendLine();
+                    cb.Unindent();
+                    cb.WriteIndent();
+                    cb.Write('}');
+                    cb.WriteLine();
                 }
             }
 
-            public override void Visit(UnitDeclaration unit) {
+            /// <summary>
+            /// Visita un objecte 'UnitDeclaration'.
+            /// </summary>
+            /// <param name="decl">L'objecte a visitar.</param>
+            /// 
+            public override void Visit(UnitDeclaration decl) {
 
-                if (unit.Namespace != null)
-                    unit.Namespace.AcceptVisitor(this);
+                if (decl.Namespace != null)
+                    decl.Namespace.AcceptVisitor(this);
             }
         }
 
-        public static string Generate(UnitDeclaration unitDeclaration) {
+        /// <summary>
+        /// Genera el codi font.
+        /// </summary>
+        /// <param name="unitDecl">Objecte 'UnitDeclaration'.</param>
+        /// <returns>El codi generat.</returns>
+        /// 
+        public static string Generate(UnitDeclaration unitDecl) {
 
-            if (unitDeclaration == null)
-                throw new ArgumentNullException(nameof(unitDeclaration));
+            if (unitDecl == null)
+                throw new ArgumentNullException(nameof(unitDecl));
 
-            StringBuilder sb = new StringBuilder();
-            var visitor = new GeneratorVisitor(sb);
+            var cb = new CodeBuilder();
+            var visitor = new GeneratorVisitor(cb);
 
-            visitor.Visit(unitDeclaration);
+            visitor.Visit(unitDecl);
 
-            return sb.ToString();
+            return cb.ToString();
         }
     }
 }

@@ -71,7 +71,7 @@
 
                 sb.AppendIndent(indent);
                 sb.AppendFormat("{0} {1}(", dec.ReturnType.Name, dec.Name);
-                if (dec.Arguments == null) {
+                if (!dec.HasArguments) {
                     sb.AppendLine("void) {");
                     indent++;
                 }
@@ -93,9 +93,8 @@
                 }
                 sb.AppendLine();
 
-                if (dec.Body != null) {
+                if (dec.Body != null) 
                     dec.Body.AcceptVisitor(this);
-                }
 
                 indent--;
                 sb.AppendIndent(indent);

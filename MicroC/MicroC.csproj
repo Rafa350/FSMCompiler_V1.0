@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGenerator\CodeBuilder.cs" />
     <Compile Include="CodeModel\ArgumentDeclarationList.cs" />
     <Compile Include="CodeGenerator\C\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\C\HeaderGenerator.cs" />
@@ -67,7 +68,6 @@
     <Compile Include="CodeModel\ConstructorDeclaration.cs" />
     <Compile Include="CodeModel\DefaultVisitor.cs" />
     <Compile Include="CodeModel\DestructorDeclaration.cs" />
-    <Compile Include="CodeModel\DestructorVirtualMode.cs" />
     <Compile Include="CodeModel\Expression.cs" />
     <Compile Include="CodeModel\Expressions\BinaryExpression.cs" />
     <Compile Include="CodeModel\Expressions\ConditionalExpression.cs" />
