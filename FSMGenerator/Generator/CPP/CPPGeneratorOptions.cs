@@ -3,6 +3,7 @@
     public sealed class CPPGeneratorOptions {
 
         public string NsName { get; set; }
+        public string OwnerClassName { get; set; }
         public string ContextBaseClassName { get; set; }
         public string ContextClassName { get; set; }
         public string ContextHeaderFileName { get; set; }
@@ -17,6 +18,8 @@
         public CPPGeneratorOptions() {
 
             NsName = "app";
+
+            OwnerClassName = "Owner";
 
             ContextBaseClassName = null;
             ContextClassName = "Context";

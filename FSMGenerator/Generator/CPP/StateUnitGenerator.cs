@@ -7,33 +7,48 @@
     using MikroPicDesigns.FSMCompiler.v1.Model;
     using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
-    public static class StateUnitGenerator {
+    public class StateUnitGenerator {
 
         public enum Variant {
             Header,
             Code
         }
 
-        public static UnitDeclaration Generate(Machine machine, CPPGeneratorOptions options, Variant variant) {
+        private readonly string nsName;
+        private readonly string ownerClassName;
+        private readonly string contextClassName;
+        private readonly string stateClassName;
+        private readonly string stateBaseClassName;
+
+        public StateUnitGenerator(CPPGeneratorOptions options) {
+
+            nsName = options.NsName;
+            ownerClassName = options.OwnerClassName;
+            contextClassName = options.ContextClassName;
+            stateClassName = options.StateClassName;
+            stateBaseClassName = options.StateBaseClassName;
+        }
+
+        public UnitDeclaration Generate(Machine machine, Variant variant) {
 
             UnitBuilder ub = new UnitBuilder();
 
             TypeIdentifier voidTypeIdentifier = TypeIdentifier.FromName("void");
-            TypeIdentifier contextTypePtrIdentifier = TypeIdentifier.FromName(String.Format("{0}*", options.ContextClassName));
+            TypeIdentifier contextTypePtrIdentifier = TypeIdentifier.FromName(String.Format("{0}*", contextClassName));
 
             // Obra un espai de noms si cal.
             //
-            if (!String.IsNullOrEmpty(options.NsName))
-                ub.BeginNamespace(options.NsName);
+            if (!String.IsNullOrEmpty(nsName))
+                ub.BeginNamespace(nsName);
 
             // Declara la clase de context
             //
             if (variant == Variant.Header)
-                ub.AddForwardClassDeclaration(options.ContextClassName);
+                ub.AddForwardClassDeclaration(contextClassName);
 
             // Declara la clase d'estat base
             //
-            ub.BeginClass(options.StateClassName, options.StateBaseClassName, AccessSpecifier.Public);
+            ub.BeginClass(stateClassName, stateBaseClassName, AccessSpecifier.Public);
 
             // Declara el constructor
             //
@@ -44,7 +59,7 @@
                 },
                 Initializers = new ConstructorInitializerList {
                     new ConstructorInitializer(
-                        TypeIdentifier.FromName(options.StateBaseClassName),
+                        stateBaseClassName,
                         new IdentifierExpression("context"))
                 }
             });
@@ -84,7 +99,7 @@
             //
             foreach (var state in machine.States) {
 
-                ub.BeginClass(String.Format("{0}", state.Name), options.StateClassName, AccessSpecifier.Public);
+                ub.BeginClass(String.Format("{0}", state.Name), stateClassName, AccessSpecifier.Public);
 
                 // Declara el constructor.
                 //
@@ -95,7 +110,7 @@
                     },
                     Initializers = new ConstructorInitializerList {
                         new ConstructorInitializer(
-                            TypeIdentifier.FromName(options.StateClassName),
+                            stateClassName,
                             new IdentifierExpression("context"))
                     }
                 });
@@ -103,17 +118,17 @@
                 // Declara la fuincio 'enter'.
                 //
                 if (state.EnterAction != null)
-                    ub.AddMemberDeclaration(MakeOnEnterFunction(state, options.ContextClassName));
+                    ub.AddMemberDeclaration(MakeOnEnterFunction(state, contextClassName, ownerClassName));
 
                 // Declara la funcio 'exit'
                 //
                 if (state.ExitAction != null)
-                    ub.AddMemberDeclaration(MakeOnExitFunction(state, options.ContextClassName));
+                    ub.AddMemberDeclaration(MakeOnExitFunction(state, contextClassName, ownerClassName));
 
                 // Declara les funcions de transicio
                 //
                 foreach (var transitionName in state.GetTransitionNames())
-                    ub.AddMemberDeclaration(MakeOnTransitionFunction(state, transitionName, options.ContextClassName));
+                    ub.AddMemberDeclaration(MakeOnTransitionFunction(state, transitionName, contextClassName, ownerClassName));
 
                 ub.EndClass();
             }
@@ -127,12 +142,15 @@
         /// <param name="state">L'estat.</param>
         /// <returns>La funcio.</returns>
         /// 
-        private static FunctionDeclaration MakeOnEnterFunction(State state, string contextClassName) {
+        private FunctionDeclaration MakeOnEnterFunction(State state, string contextClassName, string ownerClassName) {
 
             BlockStatement body = new BlockStatement();
             body.Statements.Add(
                 new InlineStatement(
                     String.Format("{0}* ctx = static_cast<{0}*>(getContext())", contextClassName)));
+            body.Statements.Add(
+                new InlineStatement(
+                    String.Format("{0}* owner = ctx->getOwner()", ownerClassName)));
             body.Statements.AddRange(
                 MakeActionStatements(state.EnterAction));
 
@@ -151,13 +169,16 @@
         /// <param name="state">L'estat.</param>
         /// <returns>La funcio.</returns>
         /// 
-        private static FunctionDeclaration MakeOnExitFunction(State state, string contextClassName) {
+        private FunctionDeclaration MakeOnExitFunction(State state, string contextClassName, string ownerClassName) {
 
             BlockStatement body = new BlockStatement();
 
             body.Statements.Add(
                 new InlineStatement(
                     String.Format("{0}* ctx = static_cast<{0}*>(getContext())", contextClassName)));
+            body.Statements.Add(
+                new InlineStatement(
+                    String.Format("{0}* owner = ctx->getOwner()", ownerClassName)));
             body.Statements.AddRange(
                 MakeActionStatements(state.ExitAction));
 
@@ -177,7 +198,7 @@
         /// <param name="transitionName">El nom de la transicio.</param>
         /// <returns>La funcio.</returns>
         /// 
-        private static FunctionDeclaration MakeOnTransitionFunction(State state, string transitionName, string contextClassName) {
+        private FunctionDeclaration MakeOnTransitionFunction(State state, string transitionName, string contextClassName, string ownerClassName) {
 
             StatementList bodyStatements = new StatementList();
 
@@ -186,6 +207,9 @@
             bodyStatements.Add(
                 new InlineStatement(
                     String.Format("{0}* ctx = static_cast<{0}*>(getContext())", contextClassName)));
+            bodyStatements.Add(
+                new InlineStatement(
+                    String.Format("{0}* owner = ctx->getOwner()", ownerClassName)));
 
             foreach (Transition transition in state.Transitions) {
                 if (transition.Name == transitionName) {
@@ -232,7 +256,7 @@
         /// <param name="action">La accio.</param>
         /// <returns>La llista d'instruccions.</returns>
         /// 
-        private static StatementList MakeActionStatements(Model.Action action) {
+        private StatementList MakeActionStatements(Model.Action action) {
 
             if (action.Activities == null)
                 return null;
@@ -243,7 +267,7 @@
                     if (activity is RunActivity callActivity) {
                         Statement statement = new InvokeStatement(
                             new InvokeExpression(
-                                new IdentifierExpression(String.Format("ctx->do{0}", callActivity.ProcessName))));
+                                new IdentifierExpression(String.Format("owner->do{0}", callActivity.ProcessName))));
                         statements.Add(statement);
                     }
                 }

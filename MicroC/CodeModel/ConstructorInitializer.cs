@@ -7,9 +7,9 @@
         public ConstructorInitializer() {
         }
 
-        public ConstructorInitializer(TypeIdentifier typeId, Expression expression) {
+        public ConstructorInitializer(string name, Expression expression) {
 
-            TypeId = typeId;
+            Name = name;
             Expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
@@ -21,7 +21,7 @@
             visitor.Visit(this);
         }
 
-        public TypeIdentifier TypeId { get; set; }
+        public string Name { get; set; }
 
         public Expression Expression { get; set; }
     }

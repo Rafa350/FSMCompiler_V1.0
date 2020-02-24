@@ -30,9 +30,8 @@
         public override void Generate(Machine machine) {
 
             string folder = options.OutputPath;
-            if (String.IsNullOrEmpty(folder)) {
+            if (String.IsNullOrEmpty(folder)) 
                 folder = @".\";
-            }
 
             // Genera els noms de les guardes i de les accions
             //
@@ -41,23 +40,19 @@
             Dictionary<Model.Action, string> actionName = new Dictionary<Model.Action, string>();
             Dictionary<Guard, string> guardName = new Dictionary<Guard, string>();
 
-            if (machine.InitializeAction != null) {
+            if (machine.InitializeAction != null) 
                 actionName.Add(machine.InitializeAction, MakeActionName(actionCount++));
-            }
 
-            if (machine.TerminateAction != null) {
+            if (machine.TerminateAction != null) 
                 actionName.Add(machine.TerminateAction, MakeActionName(actionCount++));
-            }
 
             foreach (State state in machine.States) {
 
-                if (state.EnterAction != null) {
+                if (state.EnterAction != null) 
                     actionName.Add(state.EnterAction, MakeActionName(actionCount++));
-                }
 
-                if (state.ExitAction != null) {
+                if (state.ExitAction != null) 
                     actionName.Add(state.ExitAction, MakeActionName(actionCount++));
-                }
 
                 if (state.HasTransitions)
                     foreach (Transition transition in state.Transitions) {

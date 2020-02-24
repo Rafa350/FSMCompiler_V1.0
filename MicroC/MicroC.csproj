@@ -105,7 +105,6 @@
     <Compile Include="CodeModel\VariableDeclaration.cs" />
     <Compile Include="CodeGenerator\Cpp\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\Cpp\HeaderGenerator.cs" />
-    <Compile Include="CodeGenerator\StringBuilderExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

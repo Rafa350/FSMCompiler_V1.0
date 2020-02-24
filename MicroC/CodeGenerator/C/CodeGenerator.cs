@@ -1,7 +1,6 @@
 ﻿namespace MicroCompiler.CodeGenerator.C {
 
     using System;
-    using System.Text;
     using MicroCompiler.CodeModel;
     using MicroCompiler.CodeModel.Expressions;
     using MicroCompiler.CodeModel.Statements;
@@ -10,220 +9,213 @@
 
         private class GeneratorVisitor : DefaultVisitor {
 
-            private readonly StringBuilder sb;
-            private int indent;
+            private readonly CodeBuilder cb;
 
-            public GeneratorVisitor(StringBuilder sb, int indent = 0) {
+            public GeneratorVisitor(CodeBuilder cb) {
 
-                this.sb = sb ?? throw new ArgumentNullException(nameof(sb));
-                this.indent = indent;
+                this.cb = cb ?? throw new ArgumentNullException(nameof(cb));
             }
 
             public override void Visit(AssignStatement stmt) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("{0} = ", stmt.Name);
+                cb.WriteIndent();
+                cb.Write("{0} = ", stmt.Name);
 
                 stmt.ValueExp.AcceptVisitor(this);
 
-                sb.AppendLine(";");
+                cb.Write(";");
+                cb.WriteLine();
             }
 
             public override void Visit(EnumerationDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.Append("typedef enum {");
-                indent++;
+                cb.WriteIndent();
+                cb.Write("typedef enum {");
+                cb.Indent();
                 bool first = true;
                 foreach (var element in decl.Elements) {
                     if (first)
                         first = false;
                     else
-                        sb.Append(',');
-                    sb.AppendLine();
-                    sb.AppendIndent(indent);
-                    sb.Append(element);
+                        cb.Write(',');
+                    cb.WriteLine();
+                    cb.WriteIndent();
+                    cb.Write(element);
                 }
-                sb.AppendLine();
-                indent--;
-                sb.AppendFormat("}} {0};", decl.Name);
-                sb.AppendLine();
-                sb.AppendLine();
+                cb.WriteLine();
+                cb.Unindent();
+                cb.Write("}} {0};", decl.Name);
+                cb.WriteLine();
+                cb.WriteLine();
             }
 
             public override void Visit(InvokeExpression exp) {
 
                 exp.AddressEpr.AcceptVisitor(this);
-                sb.Append('(');
-                sb.Append(")");
+                cb.Write('(');
+                cb.Write(")");
             }
 
             public override void Visit(InvokeStatement stmt) {
 
                 if (stmt.InvokeExp != null) {
-                    sb.AppendIndent(indent);
+                    cb.WriteIndent();
                     stmt.InvokeExp.AcceptVisitor(this);
-                    sb.AppendLine(";");
+                    cb.Write(";");
+                    cb.WriteLine();
                 }
             }
 
             public override void Visit(FunctionDeclaration dec) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("{0} {1}(", dec.ReturnType.Name, dec.Name);
+                cb.WriteIndent();
+                cb.Write("{0} {1}(", dec.ReturnType.Name, dec.Name);
                 if (!dec.HasArguments) {
-                    sb.AppendLine("void) {");
-                    indent++;
+                    cb.WriteLine("void) {");
+                    cb.Indent();
                 }
                 else {
-                    indent++;
+                    cb.Indent();
                     bool first = true;
                     foreach (var argument in dec.Arguments) {
                         if (first) {
                             first = false;
                         }
                         else {
-                            sb.Append(",");
-                            sb.AppendLine();
+                            cb.Write(",");
+                            cb.WriteLine();
                         }
-                        sb.AppendIndent(indent);
+                        cb.WriteIndent();
                         argument.AcceptVisitor(this);
                     }
-                    sb.AppendLine(") {");
+                    cb.WriteLine(") {");
                 }
-                sb.AppendLine();
+                cb.WriteLine();
 
                 if (dec.Body != null) 
                     dec.Body.AcceptVisitor(this);
 
-                indent--;
-                sb.AppendIndent(indent);
-                sb.AppendLine("}");
-                sb.AppendLine();
+                cb.Unindent();
+                cb.WriteIndent();
+                cb.WriteLine("}");
+                cb.WriteLine();
             }
 
             public override void Visit(IfThenElseStatement stmt) {
 
-                sb.AppendIndent(indent);
-                sb.Append("if (");
+                cb.WriteIndent();
+                cb.Write("if (");
                 stmt.ConditionExp.AcceptVisitor(this);
-                sb.AppendLine(") {");
+                cb.Write(") {");
+                cb.WriteLine();
 
-                indent++;
+                cb.Indent();
                 stmt.TrueStmt.AcceptVisitor(this);
-                indent--;
+                cb.Unindent();
 
-                sb.AppendIndent(indent);
-                sb.AppendLine("}");
+                cb.WriteLine('}');
 
 
                 if (stmt.FalseStmt != null) {
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("else {");
+                    cb.WriteLine("else {");
 
-                    indent++;
+                    cb.Indent();
                     stmt.FalseStmt.AcceptVisitor(this);
-                    indent--;
+                    cb.Unindent();
 
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("}");
+                    cb.WriteLine("}");
                 }
             }
 
             public override void Visit(IdentifierExpression exp) {
 
-                sb.Append(exp.Name);
+                cb.Write(exp.Name);
             }
 
             public override void Visit(InlineExpression exp) {
 
-                sb.Append(exp.Code);
+                cb.Write(exp.Code);
             }
 
             public override void Visit(InlineStatement stmt) {
 
-                sb.AppendIndent(indent);
-                sb.Append(stmt.Code);
-                sb.AppendLine(";");
+                cb.WriteIndent();
+                cb.Write(stmt.Code);
+                cb.WriteLine(";");
             }
 
             public override void Visit(LiteralExpression exp) {
 
-                sb.Append(exp.Value);
+                cb.Write(exp.Value.ToString());
             }
 
             public override void Visit(CaseStatement stmt) {
 
-                sb.AppendIndent(indent);
-
-                sb.Append("case ");
+                cb.WriteIndent();
+                cb.Write("case ");
                 stmt.Expression.AcceptVisitor(this);
-                sb.AppendLine(":");
+                cb.Write(":");
+                cb.WriteLine();
 
-                indent++;
+                cb.Indent();
 
                 if (stmt.Stmt != null)
                     stmt.Stmt.AcceptVisitor(this);
 
-                sb.AppendIndent(indent);
-                sb.AppendLine("break;");
+                cb.WriteLine("break;");
 
-                indent--;
+                cb.Unindent();
 
-                sb.AppendLine();
+                cb.WriteLine();
             }
 
             public override void Visit(SwitchStatement stmt) {
 
-                sb.AppendIndent(indent);
-                sb.Append("switch (");
+                cb.WriteIndent();
+                cb.Write("switch (");
                 stmt.Expression.AcceptVisitor(this);
-                sb.AppendLine(") {");
+                cb.Write(") {");
+                cb.WriteLine();
 
-                indent++;
+                cb.Indent();
                 foreach (var switchCase in stmt.Cases)
                     switchCase.AcceptVisitor(this);
 
                 if (stmt.DefaultCaseStmt != null) {
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("default:");
-                    indent++;
+                    cb.WriteLine("default:");
+                    cb.Indent();
                     stmt.DefaultCaseStmt.AcceptVisitor(this);
-                    sb.AppendIndent(indent);
-                    sb.AppendLine("break;");
-                    indent--;
+                    cb.WriteLine("break;");
+                    cb.Unindent();
                 }
 
-                indent--;
-
-                sb.AppendIndent(indent);
-                sb.AppendLine("}");
+                cb.Unindent();
+                cb.WriteLine("}");
             }
 
             public override void Visit(VariableDeclaration decl) {
 
-                sb.AppendIndent(indent);
-                sb.AppendFormat("{0} {1}", decl.ValueType.Name, decl.Name);
+                cb.WriteIndent();
+                cb.Write("{0} {1}", decl.ValueType.Name, decl.Name);
                 if (decl.Initializer != null) {
 
                 }
-                sb.AppendLine(";");
-                sb.AppendLine();
+                cb.WriteLine(";");
+                cb.WriteLine();
             }
         }
 
-        public static string Generate(UnitDeclaration unitDeclaration) {
+        public static string Generate(UnitDeclaration unitDecl) {
 
-            if (unitDeclaration == null) {
-                throw new ArgumentNullException(nameof(unitDeclaration));
-            }
+            if (unitDecl == null) 
+                throw new ArgumentNullException(nameof(unitDecl));
 
-            StringBuilder sb = new StringBuilder();
+            var cb = new CodeBuilder();
+            var visitor = new GeneratorVisitor(cb);
 
-            var visitor = new GeneratorVisitor(sb, 0);
-            visitor.Visit(unitDeclaration);
+            visitor.Visit(unitDecl);
 
-            return sb.ToString();
+            return cb.ToString();
         }
     }
 }

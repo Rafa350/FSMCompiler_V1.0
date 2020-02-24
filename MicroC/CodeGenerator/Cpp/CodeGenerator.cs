@@ -104,7 +104,7 @@
 
             public override void Visit(ConstructorInitializer initializer) {
 
-                cb.Write("{0}(", initializer.TypeId.Name);
+                cb.Write("{0}(", initializer.Name);
                 initializer.Expression.AcceptVisitor(this);
                 cb.Write(')');
             }

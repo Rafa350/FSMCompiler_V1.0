@@ -30,22 +30,26 @@
         public override void Generate(Machine machine) {
 
             if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextHeader")) {
-                UnitDeclaration contextUnit = ContextUnitGenerator.Generate(machine, options, ContextUnitGenerator.Variant.Header);
+                ContextUnitGenerator generator = new ContextUnitGenerator(options);
+                UnitDeclaration contextUnit = generator.Generate(machine);
                 GenerateContextHeader(contextUnit);
             }
 
             if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "ContextCode")) {
-                UnitDeclaration contextUnit = ContextUnitGenerator.Generate(machine, options, ContextUnitGenerator.Variant.Code);
+                ContextUnitGenerator generator = new ContextUnitGenerator(options);
+                UnitDeclaration contextUnit = generator.Generate(machine);
                 GenerateContextCode(contextUnit);
             }
 
             if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateHeader")) {
-                UnitDeclaration stateUnit = StateUnitGenerator.Generate(machine, options, StateUnitGenerator.Variant.Header);
+                StateUnitGenerator generator = new StateUnitGenerator(options);
+                UnitDeclaration stateUnit = generator.Generate(machine, StateUnitGenerator.Variant.Header);
                 GenerateStateHeader(stateUnit);
             }
 
             if (String.IsNullOrEmpty(options.OutputType) || (options.OutputType == "StateCode")) {
-                UnitDeclaration stateUnit = StateUnitGenerator.Generate(machine, options, StateUnitGenerator.Variant.Code);
+                StateUnitGenerator generator = new StateUnitGenerator(options);
+                UnitDeclaration stateUnit = generator.Generate(machine, StateUnitGenerator.Variant.Code);
                 GenerateStateCode(stateUnit);
             }
         }

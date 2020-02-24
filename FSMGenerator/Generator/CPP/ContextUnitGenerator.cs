@@ -11,11 +11,27 @@
     /// <summary>
     /// Genera la clase de context.
     /// </summary>
-    public static class ContextUnitGenerator {
+    /// 
+    public class ContextUnitGenerator {
 
-        public enum Variant {
-            Header,
-            Code
+        private readonly string nsName;
+        private readonly string ownerClassName;
+        private readonly string contextClassName;
+        private readonly string contextBaseClassName;
+        private readonly string stateClassName;
+
+        /// <summary>
+        /// Constrcutor.
+        /// </summary>
+        /// <param name="options">Opcions.</param>
+        /// 
+        public ContextUnitGenerator(CPPGeneratorOptions options) {
+
+            nsName = options.NsName;
+            ownerClassName = options.OwnerClassName;
+            contextBaseClassName = options.ContextBaseClassName;
+            contextClassName = options.ContextClassName;
+            stateClassName = options.StateClassName;
         }
 
         /// <summary>
@@ -24,22 +40,23 @@
         /// <param name="machine">La maquina</param>
         /// <returns>La unitat de compilacio.</returns>
         /// 
-        public static UnitDeclaration Generate(Machine machine, CPPGeneratorOptions options, Variant variant) {
+        public UnitDeclaration Generate(Machine machine) {
 
             UnitBuilder ub = new UnitBuilder();
 
-            bool useNamespace = !String.IsNullOrEmpty(options.NsName);
+            bool useNamespace = !String.IsNullOrEmpty(nsName);
 
             // Obre un nou espai de noms, si cal
             //
             if (useNamespace)
-                ub.BeginNamespace(options.NsName);
+                ub.BeginNamespace(nsName);
 
-            ub.AddForwardClassDeclaration(options.StateClassName);
+            ub.AddForwardClassDeclaration(stateClassName);
+            ub.AddForwardClassDeclaration(ownerClassName);
 
             // Obra la declaracio de clase 'Context'
             //
-            ub.BeginClass(options.ContextClassName, options.ContextBaseClassName, AccessSpecifier.Public);
+            ub.BeginClass(contextClassName, contextBaseClassName, AccessSpecifier.Public);
 
             // Declara un enumerador pels estats
             //
@@ -51,10 +68,14 @@
 
             // Declara la variable per les instancies dels estats.
             //
-            ub.AddMemberDeclaration(new VariableDeclaration {
+            ub.AddMemberDeclaration(new VariableDeclaration { 
                 Name = String.Format("states[{0}]", elements.Count),
-                ValueType = TypeIdentifier.FromName("State*")
-            }); ;
+                ValueType = TypeIdentifier.FromName(String.Format("{0}*", stateClassName))
+            });
+
+            // Afegeix la variable pel punter al objecte propietari
+            //
+            ub.AddMemberDeclaration(MakeOwnerVariable(machine));
 
             // Afegeix el constructor
             //
@@ -63,17 +84,11 @@
             // Afegeix les funcions membre
             //
             ub.AddMemberDeclaration(MakeGetStateInstanceFunction(machine));
+            ub.AddMemberDeclaration(MakeGetOwnerFunction(machine));
             ub.AddMemberDeclaration(MakeStartFunction(machine));
             ub.AddMemberDeclaration(MakeEndFunction(machine));
             foreach (var transitionName in machine.GetTransitionNames())
-                ub.AddMemberDeclaration(MakeTransitionFunction(transitionName, options.StateClassName));
-
-            // Es defineixen en la capcelera, pero no en el codi, per que l'usuari defineixi les funcions en
-            // un altre fitxer.
-            //
-            if (variant == Variant.Header)
-                foreach (var activityName in machine.GetActivityNames())
-                    ub.AddMemberDeclaration(MakeActivityFunction(activityName));
+                ub.AddMemberDeclaration(MakeTransitionFunction(transitionName));
 
             // Tanca la declaracio de la clase 'Context'
             //
@@ -90,28 +105,52 @@
         }
 
         /// <summary>
+        /// Crea la declaracio de la variable 'owner'
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// <returns>La declaracio de la variable.</returns>
+        /// 
+        private VariableDeclaration MakeOwnerVariable(Machine machine) {
+
+            return new VariableDeclaration(
+                "owner",
+                AccessSpecifier.Private,
+                ImplementationSpecifier.Instance,
+                TypeIdentifier.FromName(String.Format("{0}*", ownerClassName)),
+                null);
+        }
+
+        /// <summary>
         /// Crea la declaracio del constructor.
         /// </summary>
         /// <param name="machine">La maquina.</param>
         /// <returns>La declaracio del constructor.</returns>
         /// 
-        private static ConstructorDeclaration MakeConstructor(Machine machine) {
+        private ConstructorDeclaration MakeConstructor(Machine machine) {
 
             StatementList statements = new StatementList();
             foreach (var stateName in machine.GetStateNames())
                 statements.Add(new InlineStatement(
                     String.Format("states[int(StateID::{0})] = new {0}(this)", stateName)));
 
-            return new ConstructorDeclaration {
-                Access = AccessSpecifier.Public,
-                Body = new BlockStatement(statements)
-            };
+            return new ConstructorDeclaration(
+                AccessSpecifier.Public,
+                new ArgumentDeclarationList(
+                    new ArgumentDeclaration("owner", TypeIdentifier.FromName(String.Format("{0}*", ownerClassName)))),
+                new ConstructorInitializerList(
+                    new ConstructorInitializer("owner", new IdentifierExpression("owner"))),
+                statements);
         }
 
-        private static FunctionDeclaration MakeGetStateInstanceFunction(Machine machine) {
+        /// <summary>
+        /// Crea la funcio 'getInstance'
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// <returns>La declaracio de la funcio.</returns>
+        /// 
+        private FunctionDeclaration MakeGetStateInstanceFunction(Machine machine) {
 
-            BlockStatement body = new BlockStatement();
-            body.Statements.Add(
+            StatementList statements = new StatementList(
                 new ReturnStatement(
                     new SubscriptExpression(
                         new IdentifierExpression("states"),
@@ -123,18 +162,32 @@
                 )
             );
 
-            return new FunctionDeclaration {
-                Name = "getStateInstance",
-                ReturnType = TypeIdentifier.FromName("State*"),
-                Access = AccessSpecifier.Public,
-                Arguments = new ArgumentDeclarationList {
-                    new ArgumentDeclaration {
-                        Name = "id",
-                        ValueType = TypeIdentifier.FromName("StateID")
-                    }
-                },
-                Body = body
-            };
+            return new FunctionDeclaration(
+                "getStateInstance",
+                AccessSpecifier.Public,
+                TypeIdentifier.FromName("State*"),
+                new ArgumentDeclarationList(new ArgumentDeclaration("id", TypeIdentifier.FromName("StateID"))),
+                statements);
+        }
+
+        /// <summary>
+        /// Crea la funcio 'getOwner'.
+        /// </summary>
+        /// <param name="machine">La maquina.</param>
+        /// <returns>La declaracio de la funcio.</returns>
+        /// 
+        private FunctionDeclaration MakeGetOwnerFunction(Machine machine) {
+
+            StatementList statements = new StatementList(
+                new ReturnStatement(
+                    new IdentifierExpression("owner")));
+
+            return new FunctionDeclaration(
+                "getOwner",
+                AccessSpecifier.Public,
+                TypeIdentifier.FromName(String.Format("{0}*", ownerClassName)),
+                null,
+                statements);
         }
 
         /// <summary>
@@ -143,7 +196,7 @@
         /// <param name="machine">La maquina.</param>
         /// <returns>La declaracio del metode.</returns>
         /// 
-        private static FunctionDeclaration MakeStartFunction(Machine machine) {
+        private FunctionDeclaration MakeStartFunction(Machine machine) {
 
             StatementList bodyStatements = new StatementList();
             if (machine.InitializeAction != null) {
@@ -160,12 +213,12 @@
                             new IdentifierExpression(
                                 String.Format("StateID::{0}", machine.Start.FullName))))));
 
-            return new FunctionDeclaration {
-                Name = "start",
-                ReturnType = TypeIdentifier.FromName("void"),
-                Access = AccessSpecifier.Public,
-                Body = new BlockStatement(bodyStatements)
-            };
+            return new FunctionDeclaration(
+                "start",
+                AccessSpecifier.Public,
+                TypeIdentifier.FromName("void"),
+                null,
+                bodyStatements);
         }
 
         /// <summary>
@@ -174,7 +227,7 @@
         /// <param name="machine">La maquina.</param>
         /// <returns>La declaracio del metode.</returns>
         /// 
-        private static FunctionDeclaration MakeEndFunction(Machine machine) {
+        private FunctionDeclaration MakeEndFunction(Machine machine) {
 
             return new FunctionDeclaration {
                 Name = "end",
@@ -189,7 +242,7 @@
         /// <param name="transitionName">Nom de la transicio.</param>
         /// <returns>La declaracio del metode.</returns>
         /// 
-        private static FunctionDeclaration MakeTransitionFunction(string transitionName, string stateClassName) {
+        private FunctionDeclaration MakeTransitionFunction(string transitionName) {
 
             return new FunctionDeclaration {
                 Name = String.Format("transition_{0}", transitionName),
@@ -205,27 +258,12 @@
         }
 
         /// <summary>
-        /// Crea la declaracio d'un metode d'activitat.
-        /// </summary>
-        /// <param name="activityName">El nom de l'activitat.</param>
-        /// <returns>La declaracio del metode.</returns>
-        /// 
-        private static FunctionDeclaration MakeActivityFunction(string activityName) {
-
-            return new FunctionDeclaration {
-                Name = String.Format("do{0}", activityName),
-                ReturnType = TypeIdentifier.FromName("void"),
-                Access = AccessSpecifier.Public
-            };
-        }
-
-        /// <summary>
         /// Crea les instruccions coresponent a una accio.
         /// </summary>
         /// <param name="action">La accio.</param>
         /// <returns>Llista d'instruccions.</returns>
         /// 
-        private static StatementList MakeActionStatements(Model.Action action) {
+        private StatementList MakeActionStatements(Model.Action action) {
 
             StatementList stmtList = null;
 
@@ -234,7 +272,7 @@
                     Statement stmt = new InvokeStatement(
                         new InvokeExpression(
                             new IdentifierExpression(
-                                String.Format("do{0}", callActivity.ProcessName))));
+                                String.Format("owner->do{0}", callActivity.ProcessName))));
                     if (stmtList == null)
                         stmtList = new StatementList();
 
