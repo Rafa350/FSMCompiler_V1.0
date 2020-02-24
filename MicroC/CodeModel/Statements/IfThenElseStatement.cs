@@ -10,19 +10,18 @@
         /// </summary>
         /// 
         public IfThenElseStatement() {
-
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="conditionExpression">Expressio de la condicio.</param>
-        /// <param name="trueStmt">Instruccions en fas true.</param>
-        /// <param name="falseStmt">Instruccions en cas false.</param>
+        /// <param name="conditionExp">Expressio de la condicio.</param>
+        /// <param name="trueStmt">Instruccio en cas true.</param>
+        /// <param name="falseStmt">Instruccio en cas false.</param>
         /// 
-        public IfThenElseStatement(Expression conditionExpression, Statement trueStmt, Statement falseStmt) {
+        public IfThenElseStatement(Expression conditionExp, Statement trueStmt, Statement falseStmt) {
 
-            ConditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
+            ConditionExp = conditionExp ?? throw new ArgumentNullException(nameof(conditionExp));
             TrueStmt = trueStmt ?? throw new ArgumentNullException(nameof(trueStmt));
             FalseStmt = falseStmt;
         }
@@ -44,7 +43,7 @@
         /// Obte o asigna l'espressio de la condicio.
         /// </summary>
         /// 
-        public Expression ConditionExpression { get; set; }
+        public Expression ConditionExp { get; set; }
 
         /// <summary>
         /// Obte o asigna les instruccion del cas true.

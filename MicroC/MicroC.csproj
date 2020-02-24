@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MicroCompiler</RootNamespace>
-    <AssemblyName>MicroCCore</AssemblyName>
+    <AssemblyName>MicroC</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -43,9 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -59,6 +57,8 @@
     <Compile Include="CodeModel\ConstructorInitializer.cs" />
     <Compile Include="CodeModel\ConstructorInitializerList.cs" />
     <Compile Include="CodeModel\EnumerationDeclaration.cs" />
+    <Compile Include="CodeModel\Expressions\CastExpression.cs" />
+    <Compile Include="CodeModel\Expressions\ThisReferenceExpression.cs" />
     <Compile Include="CodeModel\ForwardClassDeclaration.cs" />
     <Compile Include="CodeModel\NamespaceDeclarationList.cs" />
     <Compile Include="CodeModel\NamespaceImport.cs" />
@@ -71,7 +71,7 @@
     <Compile Include="CodeModel\Expression.cs" />
     <Compile Include="CodeModel\Expressions\BinaryExpression.cs" />
     <Compile Include="CodeModel\Expressions\ConditionalExpression.cs" />
-    <Compile Include="CodeModel\Expressions\FuncCallExpression.cs" />
+    <Compile Include="CodeModel\Expressions\InvokeExpression.cs" />
     <Compile Include="CodeModel\Expressions\IdentifierExpression.cs" />
     <Compile Include="CodeModel\Expressions\InlineExpression.cs" />
     <Compile Include="CodeModel\Expressions\LiteralExpression.cs" />
@@ -92,12 +92,12 @@
     <Compile Include="CodeModel\Statement.cs" />
     <Compile Include="CodeModel\StatementList.cs" />
     <Compile Include="CodeModel\Statements\AssignStatement.cs" />
-    <Compile Include="CodeModel\Statements\FunctionCallStatement.cs" />
+    <Compile Include="CodeModel\Statements\InvokeStatement.cs" />
     <Compile Include="CodeModel\Statements\IfThenElseStatement.cs" />
     <Compile Include="CodeModel\Statements\InlineStatement.cs" />
     <Compile Include="CodeModel\Statements\LoopStatement.cs" />
     <Compile Include="CodeModel\Statements\ReturnStatement.cs" />
-    <Compile Include="CodeModel\Statements\SwitchCaseStatement.cs" />
+    <Compile Include="CodeModel\Statements\CaseStatement.cs" />
     <Compile Include="CodeModel\Statements\SwitchStatement.cs" />
     <Compile Include="CodeModel\TypeIdentifier.cs" />
     <Compile Include="CodeModel\UnitDeclaration.cs" />

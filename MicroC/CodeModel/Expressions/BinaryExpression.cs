@@ -2,7 +2,7 @@
 
     using System;
 
-    public enum BinaryOpCode {
+    public enum BinaryOperation {
         Add,
         Sub,
         Mul,
@@ -29,20 +29,20 @@
     /// 
     public sealed class BinaryExpression : Expression {
 
-        private readonly BinaryOpCode opCode;
+        private readonly BinaryOperation operation;
         private readonly Expression leftExpression;
         private readonly Expression rightExpression;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="opCode">Codi d'operacio.</param>
+        /// <param name="operation">Codi d'operacio.</param>
         /// <param name="leftExpression">Expressio de la branca esquerra.</param>
         /// <param name="rightExpression">Expressio de la branca dreta.</param>
         /// 
-        public BinaryExpression(BinaryOpCode opCode, Expression leftExpression, Expression rightExpression) {
+        public BinaryExpression(BinaryOperation operation, Expression leftExpression, Expression rightExpression) {
 
-            this.opCode = opCode;
+            this.operation = operation;
             this.leftExpression = leftExpression ?? throw new ArgumentNullException(nameof(leftExpression));
             this.rightExpression = rightExpression ?? throw new ArgumentNullException(nameof(rightExpression));
         }
@@ -64,7 +64,7 @@
         /// Obte el codi d'operacio.
         /// </summary>
         /// 
-        public BinaryOpCode OpCode => opCode;
+        public BinaryOperation Operation => operation;
 
         /// <summary>
         /// Obte l'expressio de la branca esquerra.

@@ -62,7 +62,7 @@
         /// Indica si conte elements.
         /// </summary>
         /// 
-        public bool HasElements => elements != null;
+        public bool HasElements => (elements != null) && (elements.Count > 0);
 
         /// <summary>
         /// Obte o asigna els elements.

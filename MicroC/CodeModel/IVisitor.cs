@@ -9,6 +9,7 @@
         void Visit(AssignStatement stmt);
         void Visit(BinaryExpression exp);
         void Visit(BlockStatement block);
+        void Visit(CastExpression exp);
         void Visit(ClassDeclaration decl);
         void Visit(ConditionalExpression exp);
         void Visit(ConstructorDeclaration decl);
@@ -16,8 +17,8 @@
         void Visit(DestructorDeclaration decl);
         void Visit(EnumerationDeclaration decl);
         void Visit(ForwardClassDeclaration decl);
-        void Visit(FunctionCallExpression exp);
-        void Visit(FunctionCallStatement stmt);
+        void Visit(InvokeExpression exp);
+        void Visit(InvokeStatement stmt);
         void Visit(FunctionDeclaration dell);
         void Visit(IdentifierExpression exp);
         void Visit(IfThenElseStatement stmt);
@@ -29,8 +30,9 @@
         void Visit(NamespaceImport import);
         void Visit(ReturnStatement stmt);
         void Visit(SubscriptExpression exp);
-        void Visit(SwitchCaseStatement stmt);
+        void Visit(CaseStatement stmt);
         void Visit(SwitchStatement stmt);
+        void Visit(ThisReferenceExpression exp);
         void Visit(UnaryExpression exp);
         void Visit(UnitDeclaration exp);
         void Visit(VariableDeclaration decl);

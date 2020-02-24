@@ -5,12 +5,21 @@
 
     public sealed class ReturnStatement : Statement {
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// 
         public ReturnStatement() {
         }
 
-        public ReturnStatement(Expression expression) {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="valueExp">Expressio pel valor de retorn.</param>
+        /// 
+        public ReturnStatement(Expression valueExp) {
 
-            this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            ValueExp = valueExp ?? throw new ArgumentNullException(nameof(valueExp));
         }
 
         public override void AcceptVisitor(IVisitor visitor) {
@@ -21,6 +30,6 @@
             visitor.Visit(this);
         }
 
-        public Expression Expression { get; set; }
+        public Expression ValueExp { get; set; }
     }
 }

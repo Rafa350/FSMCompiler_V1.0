@@ -7,13 +7,13 @@
 
     public sealed class XmlUnitWriter : IUnitWriter {
 
-        public void Write(Stream stream, UnitDeclaration unit) {
+        public void Write(Stream stream, UnitDeclaration decl) {
 
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 
-            if (unit == null)
-                throw new ArgumentNullException(nameof(unit));
+            if (decl == null)
+                throw new ArgumentNullException(nameof(decl));
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.CloseOutput = false;
@@ -24,7 +24,7 @@
             XmlWriter wr = XmlWriter.Create(stream, settings);
             try {
                 IVisitor visitor = new XmlVisitor(wr);
-                unit.AcceptVisitor(visitor);
+                decl.AcceptVisitor(visitor);
             }
             finally {
                 wr.Close();

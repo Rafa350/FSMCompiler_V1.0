@@ -87,8 +87,8 @@
                 foreach (var activity in machine.Start.EnterAction.Activities)
                     if (activity is RunActivity callActivity)
                         bodyStmtList.Add(
-                            new FunctionCallStatement(
-                                new FunctionCallExpression(
+                            new InvokeStatement(
+                                new InvokeExpression(
                                     new IdentifierExpression(callActivity.ProcessName))));
 
             // Seleccio del estat inicial.
@@ -127,22 +127,22 @@
 
                             StatementList caseStmtBodyStmtList = new StatementList();
                             caseStmtBodyStmtList.Add(
-                                new FunctionCallStatement(
-                                    new FunctionCallExpression(
+                                new InvokeStatement(
+                                    new InvokeExpression(
                                         new IdentifierExpression(
                                             String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName)))));
 
-                            SwitchCaseStatement caseStmt = new SwitchCaseStatement(
+                            CaseStatement caseStmt = new CaseStatement(
                                 new LiteralExpression(
                                     String.Format("State_{0}", state.Name)),
                                 new BlockStatement(caseStmtBodyStmtList));
 
-                            switchStmt.AddSwitchCase(caseStmt);
+                            switchStmt.Cases.Add(caseStmt);
                         }
                     }
             }
 
-            switchStmt.DefaultBody = new BlockStatement();
+            switchStmt.DefaultCaseStmt = new BlockStatement();
 
             bodyStmtList.Add(switchStmt);
 
@@ -182,8 +182,8 @@
                         foreach (var activity in state.ExitAction.Activities)
                             if (activity is RunActivity callActivity)
                                 trueBlockStmtList.Add(
-                                    new FunctionCallStatement(
-                                        new FunctionCallExpression(
+                                    new InvokeStatement(
+                                        new InvokeExpression(
                                             new IdentifierExpression(callActivity.ProcessName))));
 
                     // Accions de la transicio
@@ -192,8 +192,8 @@
                         foreach (var activity in transition.Action.Activities)
                             if (activity is RunActivity callActivity)
                                 trueBlockStmtList.Add(
-                                    new FunctionCallStatement(
-                                        new FunctionCallExpression(
+                                    new InvokeStatement(
+                                        new InvokeExpression(
                                             new IdentifierExpression(callActivity.ProcessName))));
 
                     // Acciona d'entrada del nou estat
@@ -202,8 +202,8 @@
                         foreach (var activity in transition.NextState.EnterAction.Activities)
                             if (activity is RunActivity callActivity)
                                 trueBlockStmtList.Add(
-                                    new FunctionCallStatement(
-                                        new FunctionCallExpression(
+                                    new InvokeStatement(
+                                        new InvokeExpression(
                                             new IdentifierExpression(callActivity.ProcessName))));
 
                     // Seeccio el nou estat
@@ -223,7 +223,7 @@
                     }
                     else {
                         bodyStmtList.Add(new IfThenElseStatement(
-                            new FunctionCallExpression(
+                            new InvokeExpression(
                                 new IdentifierExpression(transition.Guard.Expression)),
                             new BlockStatement(trueBlockStmtList),
                             null));

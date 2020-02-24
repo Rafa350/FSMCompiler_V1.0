@@ -9,39 +9,39 @@
     /// 
     public sealed class SubscriptExpression : Expression {
 
-        private readonly Expression address;
-        private readonly List<Expression> indexList;
+        private readonly Expression addressExp;
+        private readonly List<Expression> indices;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Expressio pel calcul de l'adressa.</param>
-        /// <param name="indices">Llista de valors del s index.</param>
+        /// <param name="addressEpr">Expressio pel calcul de l'adressa.</param>
+        /// <param name="indices">Llista de valors dels index.</param>
         /// 
-        public SubscriptExpression(Expression address, List<Expression> indices) {
+        public SubscriptExpression(Expression addressEpr, List<Expression> indices) {
 
-            this.address = address ?? throw new ArgumentNullException(nameof(address));
-            indexList = indices ?? throw new ArgumentNullException(nameof(indices));
+            this.addressExp = addressEpr ?? throw new ArgumentNullException(nameof(addressEpr));
+            this.indices = indices ?? throw new ArgumentNullException(nameof(indices));
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Expressio pel calcul de l'adressa.</param>
+        /// <param name="addressExp">Expressio pel calcul de l'adressa.</param>
         /// <param name="indices">Llista de valors dels index.</param>
         /// 
-        public SubscriptExpression(Expression address, IEnumerable<Expression> indices) :
-            this(address, new List<Expression>(indices)) {
+        public SubscriptExpression(Expression addressExp, IEnumerable<Expression> indices) :
+            this(addressExp, new List<Expression>(indices)) {
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Expressio pel calcul de l'adressa..</param>
+        /// <param name="Exp">Expressio pel calcul de l'adressa..</param>
         /// <param name="indices">Llista de valors dels index.</param>
         /// 
-        public SubscriptExpression(Expression address, params Expression[] indices) :
-            this(address, new List<Expression>(indices)) {
+        public SubscriptExpression(Expression Exp, params Expression[] indices) :
+            this(Exp, new List<Expression>(indices)) {
         }
 
         /// <summary>
@@ -61,12 +61,18 @@
         /// Obte el nom.
         /// </summary>
         /// 
-        public Expression Address => address;
+        public Expression AddressExp => addressExp;
+
+        /// <summary>
+        /// Indica si conte index.
+        /// </summary>
+        /// 
+        public bool HasIndices => (indices != null) && (indices.Count > 0);
 
         /// <summary>
         /// Enumera els d'arguments.
         /// </summary>
         /// 
-        public IEnumerable<Expression> Indices => indexList;
+        public IEnumerable<Expression> Indices => indices;
     }
 }

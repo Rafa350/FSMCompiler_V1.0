@@ -13,24 +13,28 @@
         /// </summary>
         /// 
         public AssignStatement() {
-
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="name">El nom.</param>
-        /// <param name="expression">L'expressio.</param>
+        /// <param name="valueExp">L'expressio.</param>
         /// 
-        public AssignStatement(string name, Expression expression) {
+        public AssignStatement(string name, Expression valueExp) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
             this.Name = name;
-            this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            this.ValueExp = valueExp ?? throw new ArgumentNullException(nameof(valueExp));
         }
 
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
             if (visitor == null)
@@ -49,6 +53,6 @@
         /// Obte o asigna l'expressio.
         /// </summary>
         /// 
-        public Expression Expression { get; set; }
+        public Expression ValueExp { get; set; }
     }
 }

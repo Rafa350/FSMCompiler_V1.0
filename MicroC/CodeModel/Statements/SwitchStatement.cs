@@ -5,10 +5,34 @@
 
     public sealed class SwitchStatement : Statement {
 
-        private Expression expression;
-        private BlockStatement defaultBody;
-        private List<SwitchCaseStatement> switchCaseList;
+        private List<CaseStatement> cases;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// 
+        public SwitchStatement() {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="expression">Expressio pel calcul del valor de selccio.</param>
+        /// <param name="cases">Llista de casos</param>
+        /// <param name="defaultCaseStmt">Instruccio per defecte.</param>
+        /// 
+        public SwitchStatement(Expression expression, List<CaseStatement> cases, Statement defaultCaseStmt = null) {
+
+            Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            this.cases = cases ?? throw new ArgumentNullException(nameof(cases)); ;
+            DefaultCaseStmt = defaultCaseStmt;
+        }
+
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
         public override void AcceptVisitor(IVisitor visitor) {
 
             if (visitor == null)
@@ -17,31 +41,37 @@
             visitor.Visit(this);
         }
 
-        public void AddSwitchCase(SwitchCaseStatement switchCase) {
-
-            if (switchCase == null)
-                throw new ArgumentNullException(nameof(switchCase));
-
-            if (switchCaseList == null)
-                switchCaseList = new List<SwitchCaseStatement>();
-
-            switchCaseList.Add(switchCase);
-        }
-
         /// <summary>
         /// Obrte o asigna l'expressio.
         /// </summary>
         /// 
-        public Expression Expression {
-            get { return expression; }
-            set { expression = value; }
-        }
+        public Expression Expression { get; set; }
 
-        public BlockStatement DefaultBody {
-            get { return defaultBody; }
-            set { defaultBody = value; }
-        }
+        /// <summary>
+        /// Obte o asigna la instruccio del cas per defecte.
+        /// </summary>
+        /// 
+        public Statement DefaultCaseStmt { get; set; }
 
-        public IEnumerable<SwitchCaseStatement> SwitchCases => switchCaseList;
+        /// <summary>
+        /// Indica si conte cases.
+        /// </summary>
+        /// 
+        public bool HasCases => (cases != null) && (cases.Count > 0);
+
+        /// <summary>
+        /// Obte o asigna la llista de casos.
+        /// </summary>
+        /// 
+        public List<CaseStatement> Cases {
+            get {
+                if (cases == null)
+                    cases = new List<CaseStatement>();
+                return cases;
+            }
+            set {
+                cases = value;
+            }
+        }
     }
 }

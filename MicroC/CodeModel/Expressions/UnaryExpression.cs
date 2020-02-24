@@ -2,7 +2,7 @@
 
     using System;
 
-    public enum UnaryOpCode {
+    public enum UnaryOperation {
         Minus,
         Not,
         PostInc,
@@ -12,23 +12,23 @@
     }
 
     /// <summary>
-    /// Clase que represemta una operacio unitaria.
+    /// Clase que representa una operacio unitaria.
     /// </summary>
     /// 
     public class UnaryExpression : Expression {
 
-        private readonly UnaryOpCode opCode;
+        private readonly UnaryOperation operation;
         private readonly Expression expression;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="opCode">El codi d'operacio.</param>
+        /// <param name="operation">El codi d'operacio.</param>
         /// <param name="expression">Expressio a la que s'aplica l'operacio.</param>
         /// 
-        public UnaryExpression(UnaryOpCode opCode, Expression expression) {
+        public UnaryExpression(UnaryOperation operation, Expression expression) {
 
-            this.opCode = opCode;
+            this.operation = operation;
             this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
@@ -49,7 +49,7 @@
         /// Obte el codi d'operacio.
         /// </summary>
         /// 
-        public UnaryOpCode OpCode => opCode;
+        public UnaryOperation Operation => operation;
 
         /// <summary>
         /// Obte l'expressio.

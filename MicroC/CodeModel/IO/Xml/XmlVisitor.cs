@@ -12,31 +12,31 @@
             : base(wr) {
         }
 
-        public override void Visit(UnitDeclaration obj) {
+        public override void Visit(UnitDeclaration decl) {
 
             StartElement("unitDeclaration");
-            base.Visit(obj);
+            base.Visit(decl);
             EndElement();
         }
 
-        public override void Visit(NamespaceDeclaration obj) {
+        public override void Visit(NamespaceDeclaration decl) {
 
             StartElement("namespaceDeclaration");
-            if (!String.IsNullOrEmpty(obj.Name)) {
-                Attribute("name", obj.Name);
+            if (!String.IsNullOrEmpty(decl.Name)) {
+                Attribute("name", decl.Name);
             }
 
-            base.Visit(obj);
+            base.Visit(decl);
             EndElement();
         }
 
-        public override void Visit(ClassDeclaration obj) {
+        public override void Visit(ClassDeclaration decl) {
 
             StartElement("classDeclaration");
-            Attribute("name", obj.Name);
+            Attribute("name", decl.Name);
             //Attribute("access", obj.Access.ToString().ToLower());
             //Attribute("implementation", obj.Implementation.ToString().ToLower());
-            base.Visit(obj);
+            base.Visit(decl);
             EndElement();
         }
 
@@ -62,31 +62,31 @@
             EndElement();
         }
 
-        public override void Visit(ArgumentDeclaration obj) {
+        public override void Visit(ArgumentDeclaration decl) {
 
             StartElement("parameterDeclaration");
-            Attribute("name", obj.Name);
-            Attribute("type", obj.ValueType.Name);
+            Attribute("name", decl.Name);
+            Attribute("type", decl.ValueType.Name);
             EndElement();
         }
 
-        public override void Visit(VariableDeclaration obj) {
+        public override void Visit(VariableDeclaration decl) {
 
             StartElement("memberVariableDeclaration");
-            Attribute("name", obj.Name);
-            Attribute("type", obj.ValueType.Name);
-            Attribute("access", obj.Access.ToString().ToLower());
+            Attribute("name", decl.Name);
+            Attribute("type", decl.ValueType.Name);
+            Attribute("access", decl.Access.ToString().ToLower());
             //Attribute("implementation", obj.Implementation.ToString().ToLower());
             //Attribute("isReadonly", obj.IsReadonly);
             EndElement();
         }
 
-        public override void Visit(BlockStatement obj) {
+        public override void Visit(BlockStatement stmt) {
 
             StartElement("block");
-            if (obj.Statements != null) {
+            if (stmt.Statements != null) {
                 StartElement("statements");
-                foreach (var statement in obj.Statements) {
+                foreach (var statement in stmt.Statements) {
                     statement.AcceptVisitor(this);
                 }
 
@@ -95,102 +95,102 @@
             EndElement();
         }
 
-        public override void Visit(ReturnStatement obj) {
+        public override void Visit(ReturnStatement stmt) {
 
             StartElement("returnStatement");
-            if (obj.Expression != null) {
-                obj.Expression.AcceptVisitor(this);
+            if (stmt.ValueExp != null) {
+                stmt.ValueExp.AcceptVisitor(this);
             }
 
             EndElement();
         }
 
-        public override void Visit(AssignStatement obj) {
+        public override void Visit(AssignStatement stmt) {
 
             StartElement("assignStatement");
-            Attribute("identifier", obj.Name);
-            obj.Expression.AcceptVisitor(this);
+            Attribute("identifier", stmt.Name);
+            stmt.ValueExp.AcceptVisitor(this);
             EndElement();
         }
 
-        public override void Visit(FunctionCallStatement obj) {
+        public override void Visit(InvokeStatement stmt) {
 
             StartElement("callStatement");
-            obj.Expression.AcceptVisitor(this);
+            stmt.InvokeExp.AcceptVisitor(this);
             EndElement();
         }
 
-        public override void Visit(IfThenElseStatement obj) {
+        public override void Visit(IfThenElseStatement stmt) {
 
             StartElement("conditionalStatement");
-            obj.ConditionExpression.AcceptVisitor(this);
-            obj.TrueStmt.AcceptVisitor(this);
-            if (obj.FalseStmt != null) {
-                obj.FalseStmt.AcceptVisitor(this);
+            stmt.ConditionExp.AcceptVisitor(this);
+            stmt.TrueStmt.AcceptVisitor(this);
+            if (stmt.FalseStmt != null) {
+                stmt.FalseStmt.AcceptVisitor(this);
             }
 
             EndElement();
         }
 
-        public override void Visit(LoopStatement obj) {
+        public override void Visit(LoopStatement stmt) {
 
             StartElement("loopStatement");
-            Attribute("conditionPosition", obj.ConditionPosition);
-            obj.ConditionExpression.AcceptVisitor(this);
-            if (obj.Body != null) {
-                obj.Body.AcceptVisitor(this);
+            Attribute("conditionPosition", stmt.ConditionPos);
+            stmt.ConditionExp.AcceptVisitor(this);
+            if (stmt.Stmt != null) {
+                stmt.Stmt.AcceptVisitor(this);
             }
 
             EndElement();
         }
 
-        public override void Visit(UnaryExpression obj) {
+        public override void Visit(UnaryExpression exp) {
 
             StartElement("unaryExpression");
-            Attribute("operand", obj.OpCode);
-            obj.Expression.AcceptVisitor(this);
+            Attribute("operand", exp.Operation);
+            exp.Expression.AcceptVisitor(this);
             EndElement();
         }
 
-        public override void Visit(BinaryExpression obj) {
+        public override void Visit(BinaryExpression exp) {
 
             StartElement("binaryExpression");
-            Attribute("operand", obj.OpCode);
-            obj.LeftExpression.AcceptVisitor(this);
-            obj.RightExpression.AcceptVisitor(this);
+            Attribute("operand", exp.Operation);
+            exp.LeftExpression.AcceptVisitor(this);
+            exp.RightExpression.AcceptVisitor(this);
             EndElement();
         }
 
-        public override void Visit(ConditionalExpression obj) {
+        public override void Visit(ConditionalExpression exp) {
 
             StartElement("conditionalExpression");
-            obj.ConditionExpression.AcceptVisitor(this);
-            obj.TrueExpression.AcceptVisitor(this);
-            obj.FalseExpression.AcceptVisitor(this);
+            exp.ConditionExp.AcceptVisitor(this);
+            exp.TrueExp.AcceptVisitor(this);
+            exp.FalseExp.AcceptVisitor(this);
             EndElement();
         }
 
-        public override void Visit(IdentifierExpression obj) {
+        public override void Visit(IdentifierExpression exp) {
 
             StartElement("identifier");
-            Attribute("name", obj.Name);
+            Attribute("name", exp.Name);
             EndElement();
         }
 
-        public override void Visit(LiteralExpression obj) {
+        public override void Visit(LiteralExpression exp) {
 
             StartElement("literal");
-            Attribute("value", obj.Value);
+            Attribute("value", exp.Value);
             EndElement();
         }
 
-        public override void Visit(FunctionCallExpression obj) {
+        public override void Visit(InvokeExpression exp) {
 
             StartElement("callExpression");
-            obj.Function.AcceptVisitor(this);
-            if (obj.Arguments != null) {
+            exp.AddressEpr.AcceptVisitor(this);
+            if (exp.Arguments != null) {
                 StartElement("parameters");
-                foreach (var argument in obj.Arguments) {
+                foreach (var argument in exp.Arguments) {
                     argument.AcceptVisitor(this);
                 }
 

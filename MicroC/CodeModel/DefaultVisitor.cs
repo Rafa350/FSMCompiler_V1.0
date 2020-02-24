@@ -21,6 +21,12 @@
                     statements.AcceptVisitor(this);
         }
 
+        public virtual void Visit(CastExpression exp) {
+
+            if (exp.Expression != null)
+                exp.Expression.AcceptVisitor(this);
+        }
+
         public virtual void Visit(ClassDeclaration decl) {
 
             if (decl.HasMembers)
@@ -46,19 +52,19 @@
         public virtual void Visit(ForwardClassDeclaration decl) {
         }
 
-        public virtual void Visit(FunctionCallExpression exp) {
+        public virtual void Visit(InvokeExpression exp) {
 
-            exp.Function.AcceptVisitor(this);
+            exp.AddressEpr.AcceptVisitor(this);
 
             if (exp.HasArguments)
                 foreach (var argument in exp.Arguments)
                     argument.AcceptVisitor(this);
         }
 
-        public virtual void Visit(FunctionCallStatement stmt) {
+        public virtual void Visit(InvokeStatement stmt) {
 
-            if (stmt.Expression != null)
-                stmt.Expression.AcceptVisitor(this);
+            if (stmt.InvokeExp != null)
+                stmt.InvokeExp.AcceptVisitor(this);
         }
 
         public virtual void Visit(FunctionDeclaration decl) {
@@ -102,20 +108,20 @@
 
         public virtual void Visit(ReturnStatement stmt) {
 
-            if (stmt.Expression != null)
-                stmt.Expression.AcceptVisitor(this);
+            if (stmt.ValueExp != null)
+                stmt.ValueExp.AcceptVisitor(this);
         }
 
         public virtual void Visit(SubscriptExpression exp) {
 
-            exp.Address.AcceptVisitor(this);
+            exp.AddressExp.AcceptVisitor(this);
 
             if (exp.Indices != null)
                 foreach (var index in exp.Indices)
                     index.AcceptVisitor(this);
         }
 
-        public virtual void Visit(SwitchCaseStatement stmt) {
+        public virtual void Visit(CaseStatement stmt) {
 
         }
 
@@ -123,12 +129,15 @@
 
             stmt.Expression.AcceptVisitor(this);
 
-            if (stmt.SwitchCases != null)
-                foreach (var switchCase in stmt.SwitchCases)
+            if (stmt.Cases != null)
+                foreach (var switchCase in stmt.Cases)
                     switchCase.AcceptVisitor(this);
 
-            if (stmt.DefaultBody != null)
-                stmt.DefaultBody.AcceptVisitor(this);
+            if (stmt.DefaultCaseStmt != null)
+                stmt.DefaultCaseStmt.AcceptVisitor(this);
+        }
+
+        public virtual void Visit(ThisReferenceExpression exp) {
         }
 
         public virtual void Visit(UnaryExpression exp) {

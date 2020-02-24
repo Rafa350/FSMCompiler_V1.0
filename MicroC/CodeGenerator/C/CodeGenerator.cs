@@ -24,7 +24,7 @@
                 sb.AppendIndent(indent);
                 sb.AppendFormat("{0} = ", stmt.Name);
 
-                stmt.Expression.AcceptVisitor(this);
+                stmt.ValueExp.AcceptVisitor(this);
 
                 sb.AppendLine(";");
             }
@@ -51,18 +51,18 @@
                 sb.AppendLine();
             }
 
-            public override void Visit(FunctionCallExpression exp) {
+            public override void Visit(InvokeExpression exp) {
 
-                exp.Function.AcceptVisitor(this);
+                exp.AddressEpr.AcceptVisitor(this);
                 sb.Append('(');
                 sb.Append(")");
             }
 
-            public override void Visit(FunctionCallStatement stmt) {
+            public override void Visit(InvokeStatement stmt) {
 
-                if (stmt.Expression != null) {
+                if (stmt.InvokeExp != null) {
                     sb.AppendIndent(indent);
-                    stmt.Expression.AcceptVisitor(this);
+                    stmt.InvokeExp.AcceptVisitor(this);
                     sb.AppendLine(";");
                 }
             }
@@ -106,7 +106,7 @@
 
                 sb.AppendIndent(indent);
                 sb.Append("if (");
-                stmt.ConditionExpression.AcceptVisitor(this);
+                stmt.ConditionExp.AcceptVisitor(this);
                 sb.AppendLine(") {");
 
                 indent++;
@@ -152,7 +152,7 @@
                 sb.Append(exp.Value);
             }
 
-            public override void Visit(SwitchCaseStatement stmt) {
+            public override void Visit(CaseStatement stmt) {
 
                 sb.AppendIndent(indent);
 
@@ -162,8 +162,8 @@
 
                 indent++;
 
-                if (stmt.Body != null)
-                    stmt.Body.AcceptVisitor(this);
+                if (stmt.Stmt != null)
+                    stmt.Stmt.AcceptVisitor(this);
 
                 sb.AppendIndent(indent);
                 sb.AppendLine("break;");
@@ -181,14 +181,14 @@
                 sb.AppendLine(") {");
 
                 indent++;
-                foreach (var switchCase in stmt.SwitchCases)
+                foreach (var switchCase in stmt.Cases)
                     switchCase.AcceptVisitor(this);
 
-                if (stmt.DefaultBody != null) {
+                if (stmt.DefaultCaseStmt != null) {
                     sb.AppendIndent(indent);
                     sb.AppendLine("default:");
                     indent++;
-                    stmt.DefaultBody.AcceptVisitor(this);
+                    stmt.DefaultCaseStmt.AcceptVisitor(this);
                     sb.AppendIndent(indent);
                     sb.AppendLine("break;");
                     indent--;

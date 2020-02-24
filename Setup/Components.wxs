@@ -25,6 +25,15 @@
                     KeyPath="yes"/>
             </Component>
         
+            <!-- MicroC.Dll-->
+            <Component
+                Id="MicroC.Dll"
+                Guid="{1F15064C-DB55-4C65-892B-45243BB5ADBD}">
+                <File
+                    Source="$(var.MicroC.TargetDir)\MicroC.dll"
+                    KeyPath="yes"/>
+            </Component>
+
             <!-- FSMCompiler.Exe-->
             <Component
                 Id="FSMCompiler.Exe"
@@ -33,7 +42,7 @@
                     Source="$(var.FSMCompiler.TargetDir)\FSMCompiler.exe"
                     KeyPath="yes"/>
             </Component>
-
+            
         </DirectoryRef>
     </Fragment>
 
@@ -42,6 +51,7 @@
             Id="ProductComponents">
             <ComponentRef Id="FSMModel.Dll"/>
             <ComponentRef Id="FSMGenerator.Dll"/>
+            <ComponentRef Id="MicroC.Dll"/>
             <ComponentRef Id="FSMCompiler.Exe"/>
         </ComponentGroup>
     </Fragment>

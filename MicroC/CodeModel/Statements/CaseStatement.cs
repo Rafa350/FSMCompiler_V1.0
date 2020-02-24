@@ -4,31 +4,24 @@
     using MicroCompiler.CodeModel;
     using MicroCompiler.CodeModel.Expressions;
 
-    public sealed class SwitchCaseStatement : IVisitable {
+    public sealed class CaseStatement : IVisitable {
 
         private readonly LiteralExpression expression;
-        private readonly BlockStatement body;
+        private readonly Statement stmt;
 
-        /// <summary>
-        /// Constructor (El cas de 'default'
-        /// </summary>
-        /// <param name="body"></param>
-        /// 
-        public SwitchCaseStatement(BlockStatement body) {
-
-            this.body = body ?? throw new ArgumentNullException(nameof(body));
+        public CaseStatement() {
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="expression"></param>
-        /// <param name="body"></param>
+        /// <param name="stmt"></param>
         /// 
-        public SwitchCaseStatement(LiteralExpression expression, BlockStatement body) {
+        public CaseStatement(LiteralExpression expression, Statement stmt) {
 
             this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
-            this.body = body ?? throw new ArgumentNullException(nameof(body));
+            this.stmt = stmt ?? throw new ArgumentNullException(nameof(stmt));
         }
 
         /// <summary>
@@ -54,6 +47,6 @@
         /// Obte o asigna el cos.
         /// </summary>
         /// 
-        public BlockStatement Body => body;
+        public Statement Stmt => stmt;
     }
 }

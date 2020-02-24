@@ -3,13 +3,14 @@
     using System;
     using MicroCompiler.CodeModel.Expressions;
 
-    public sealed class FunctionCallStatement : Statement {
+    public sealed class InvokeStatement : Statement {
 
-        private readonly FunctionCallExpression expression;
+        public InvokeStatement() {
+        }
 
-        public FunctionCallStatement(FunctionCallExpression expression) {
+        public InvokeStatement(InvokeExpression invokeExp) {
 
-            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            InvokeExp = invokeExp ?? throw new ArgumentNullException(nameof(invokeExp));
         }
 
         /// <summary>
@@ -29,6 +30,6 @@
         /// Obte o asigna la expressio.
         /// </summary>
         /// 
-        public FunctionCallExpression Expression => expression;
+        public InvokeExpression InvokeExp { get; set; }
     }
 }

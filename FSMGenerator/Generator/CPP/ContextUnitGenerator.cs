@@ -112,7 +112,16 @@
 
             BlockStatement body = new BlockStatement();
             body.Statements.Add(
-                new InlineStatement("return states[int(id)]"));
+                new ReturnStatement(
+                    new SubscriptExpression(
+                        new IdentifierExpression("states"),
+                        new CastExpression(
+                            TypeIdentifier.FromName("int"),
+                            new IdentifierExpression("id")
+                        )
+                    )
+                )
+            );
 
             return new FunctionDeclaration {
                 Name = "getStateInstance",
@@ -143,10 +152,10 @@
                     bodyStatements.AddRange(statements);
             }
             bodyStatements.Add(
-                new FunctionCallStatement(
-                    new FunctionCallExpression(
+                new InvokeStatement(
+                    new InvokeExpression(
                         new IdentifierExpression("initialize"),
-                        new FunctionCallExpression(
+                        new InvokeExpression(
                             new IdentifierExpression("getStateInstance"),
                             new IdentifierExpression(
                                 String.Format("StateID::{0}", machine.Start.FullName))))));
@@ -222,8 +231,8 @@
 
             foreach (var activity in action.Activities) {
                 if (activity is RunActivity callActivity) {
-                    Statement stmt = new FunctionCallStatement(
-                        new FunctionCallExpression(
+                    Statement stmt = new InvokeStatement(
+                        new InvokeExpression(
                             new IdentifierExpression(
                                 String.Format("do{0}", callActivity.ProcessName))));
                     if (stmtList == null)

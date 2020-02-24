@@ -19,7 +19,6 @@
             UnitBuilder ub = new UnitBuilder();
 
             TypeIdentifier voidTypeIdentifier = TypeIdentifier.FromName("void");
-            TypeIdentifier contextTypeIdentifier = TypeIdentifier.FromName(options.ContextClassName);
             TypeIdentifier contextTypePtrIdentifier = TypeIdentifier.FromName(String.Format("{0}*", options.ContextClassName));
 
             // Obra un espai de noms si cal.
@@ -45,7 +44,7 @@
                 },
                 Initializers = new ConstructorInitializerList {
                     new ConstructorInitializer(
-                        options.StateBaseClassName,
+                        TypeIdentifier.FromName(options.StateBaseClassName),
                         new IdentifierExpression("context"))
                 }
             });
@@ -96,7 +95,7 @@
                     },
                     Initializers = new ConstructorInitializerList {
                         new ConstructorInitializer(
-                            options.StateClassName,
+                            TypeIdentifier.FromName(options.StateClassName),
                             new IdentifierExpression("context"))
                     }
                 });
@@ -193,8 +192,8 @@
 
                     StatementList trueBodyStatements = new StatementList();
 
-                    trueBodyStatements.Add(new FunctionCallStatement(
-                        new FunctionCallExpression(
+                    trueBodyStatements.Add(new InvokeStatement(
+                        new InvokeExpression(
                             new IdentifierExpression("ctx->beginTransition"))));
 
                     // Accio de transicio.
@@ -202,10 +201,10 @@
                     if (transition.Action != null)
                         trueBodyStatements.AddRange(MakeActionStatements(transition.Action));
 
-                    trueBodyStatements.Add(new FunctionCallStatement(
-                        new FunctionCallExpression(
+                    trueBodyStatements.Add(new InvokeStatement(
+                        new InvokeExpression(
                             new IdentifierExpression("ctx->endTransition"),
-                            new FunctionCallExpression(
+                            new InvokeExpression(
                                 new IdentifierExpression("ctx->getStateInstance"),
                                 new IdentifierExpression(
                                     String.Format("Context::StateID::{0}", transition.NextState.Name))))));
@@ -242,8 +241,8 @@
                 StatementList statements = new StatementList();
                 foreach (var activity in action.Activities) {
                     if (activity is RunActivity callActivity) {
-                        Statement statement = new FunctionCallStatement(
-                            new FunctionCallExpression(
+                        Statement statement = new InvokeStatement(
+                            new InvokeExpression(
                                 new IdentifierExpression(String.Format("ctx->do{0}", callActivity.ProcessName))));
                         statements.Add(statement);
                     }

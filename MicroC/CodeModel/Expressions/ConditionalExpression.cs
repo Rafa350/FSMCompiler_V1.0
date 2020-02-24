@@ -8,22 +8,22 @@
     /// 
     public sealed class ConditionalExpression : Expression {
 
-        private readonly Expression conditionExpression;
-        private readonly Expression trueExpression;
-        private readonly Expression falseExpression;
+        private readonly Expression conditionExp;
+        private readonly Expression trueExp;
+        private readonly Expression falseExp;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="conditionExpression">Expressio de la condicio.</param>
-        /// <param name="trueExpression">Expressio de la branca true.</param>
-        /// <param name="falseExpression">Expressio de la branca false.</param>
+        /// <param name="conditionExp">Expressio de la condicio.</param>
+        /// <param name="trueExp">Expressio de la branca true.</param>
+        /// <param name="falseExp">Expressio de la branca false.</param>
         /// 
-        public ConditionalExpression(Expression conditionExpression, Expression trueExpression, Expression falseExpression) {
+        public ConditionalExpression(Expression conditionExp, Expression trueExp, Expression falseExp) {
 
-            this.conditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
-            this.trueExpression = trueExpression ?? throw new ArgumentNullException(nameof(trueExpression));
-            this.falseExpression = falseExpression ?? throw new ArgumentNullException(nameof(falseExpression));
+            this.conditionExp = conditionExp ?? throw new ArgumentNullException(nameof(conditionExp));
+            this.trueExp = trueExp ?? throw new ArgumentNullException(nameof(trueExp));
+            this.falseExp = falseExp ?? throw new ArgumentNullException(nameof(falseExp));
         }
 
         /// <summary>
@@ -43,18 +43,18 @@
         /// Obte l'expressio de la condicio.
         /// </summary>
         /// 
-        public Expression ConditionExpression => conditionExpression;
+        public Expression ConditionExp => conditionExp;
 
         /// <summary>
         /// Obte l'expressio de la branca true.
         /// </summary>
         /// 
-        public Expression TrueExpression => trueExpression;
+        public Expression TrueExp => trueExp;
 
         /// <summary>
         /// Obte l'expressio de la branca false.
         /// </summary>
         /// 
-        public Expression FalseExpression => falseExpression;
+        public Expression FalseExp => falseExp;
     }
 }

@@ -47,12 +47,12 @@
             wr.WriteAttributeString(name, Convert(value));
         }
 
-        protected void Attribute(string name, UnaryOpCode value) {
+        protected void Attribute(string name, UnaryOperation value) {
 
             wr.WriteAttributeString(name, Convert(value));
         }
 
-        protected void Attribute(string name, BinaryOpCode value) {
+        protected void Attribute(string name, BinaryOperation value) {
 
             wr.WriteAttributeString(name, Convert(value));
         }
@@ -71,10 +71,10 @@
                 return "preLoop";
         }
 
-        private static string Convert(UnaryOpCode opCode) {
+        private static string Convert(UnaryOperation opCode) {
 
             switch (opCode) {
-                case UnaryOpCode.Not:
+                case UnaryOperation.Not:
                     return "not";
 
                 default:
@@ -82,55 +82,55 @@
             }
         }
 
-        private static string Convert(BinaryOpCode opCode) {
+        private static string Convert(BinaryOperation opCode) {
 
             switch (opCode) {
-                case BinaryOpCode.Add:
+                case BinaryOperation.Add:
                     return "add";
 
-                case BinaryOpCode.Sub:
+                case BinaryOperation.Sub:
                     return "sub";
 
-                case BinaryOpCode.Mul:
+                case BinaryOperation.Mul:
                     return "mult";
 
-                case BinaryOpCode.Div:
+                case BinaryOperation.Div:
                     return "div";
 
-                case BinaryOpCode.Mod:
+                case BinaryOperation.Mod:
                     return "mod";
 
-                case BinaryOpCode.And:
+                case BinaryOperation.And:
                     return "and";
 
-                case BinaryOpCode.Or:
+                case BinaryOperation.Or:
                     return "or";
 
-                case BinaryOpCode.Xor:
+                case BinaryOperation.Xor:
                     return "xor";
 
-                case BinaryOpCode.LogicalAnd:
+                case BinaryOperation.LogicalAnd:
                     return "logicalAnd";
 
-                case BinaryOpCode.LogicalOr:
+                case BinaryOperation.LogicalOr:
                     return "logicalOr";
 
-                case BinaryOpCode.Equal:
+                case BinaryOperation.Equal:
                     return "equal";
 
-                case BinaryOpCode.NoEqual:
+                case BinaryOperation.NoEqual:
                     return "noEqual";
 
-                case BinaryOpCode.Less:
+                case BinaryOperation.Less:
                     return "less";
 
-                case BinaryOpCode.LessOrEqual:
+                case BinaryOperation.LessOrEqual:
                     return "lessOrEqual";
 
-                case BinaryOpCode.Greather:
+                case BinaryOperation.Greather:
                     return "greather";
 
-                case BinaryOpCode.GreatherOrEqual:
+                case BinaryOperation.GreatherOrEqual:
                     return "greatherOrEqual";
 
                 default:

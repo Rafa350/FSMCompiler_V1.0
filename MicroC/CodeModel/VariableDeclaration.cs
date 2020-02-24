@@ -19,16 +19,18 @@
         /// </summary>
         /// <param name="name">El nom.</param>
         /// <param name="access">Especificador d'acces.</param>
+        /// <param name="implementation">Implementacio.</param>
         /// <param name="valueType">El tipus del valor.</param>
         /// <param name="initializer">Expressio d'inicialitzacio.</param>
         /// 
-        public VariableDeclaration(string name, AccessSpecifier access, TypeIdentifier valueType, Expression initializer) {
+        public VariableDeclaration(string name, AccessSpecifier access, ImplementationSpecifier implementation, TypeIdentifier valueType, Expression initializer) {
 
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
             Name = name;
             Access = access;
+            Implementation = implementation;
             ValueType = valueType;
             Initializer = initializer;
         }

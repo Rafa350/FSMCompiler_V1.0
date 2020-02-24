@@ -7,52 +7,52 @@
     /// Clase que representa una crida a una funcio.
     /// </summary>
     /// 
-    public sealed class FunctionCallExpression : Expression {
+    public sealed class InvokeExpression : Expression {
 
-        private readonly Expression address;
-        private readonly List<Expression> argumentList;
+        private readonly Expression addressExp;
+        private readonly List<Expression> arguments;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Adressa de la funcio.</param>
+        /// <param name="addressEpr">Adressa de la funcio.</param>
         /// 
-        public FunctionCallExpression(Expression address) {
+        public InvokeExpression(Expression addressEpr) {
 
-            this.address = address ?? throw new ArgumentNullException(nameof(address));
+            this.addressExp = addressEpr ?? throw new ArgumentNullException(nameof(addressEpr));
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Adressa de la funcio.</param>
+        /// <param name="addressEpr">Adressa de la funcio.</param>
         /// <param name="arguments">Llista d'arguments.</param>
         /// 
-        public FunctionCallExpression(Expression address, List<Expression> arguments) {
+        public InvokeExpression(Expression addressEpr, List<Expression> arguments) {
 
-            this.address = address ?? throw new ArgumentNullException(nameof(address));
-            argumentList = arguments ?? throw new ArgumentNullException(nameof(arguments));
+            this.addressExp = addressEpr ?? throw new ArgumentNullException(nameof(addressEpr));
+            this.arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Adressa funcio.</param>
+        /// <param name="addressEpr">Adressa funcio.</param>
         /// <param name="arguments">Llista d'arguments de la funcio</param>
         /// 
-        public FunctionCallExpression(Expression address, IEnumerable<Expression> arguments) :
-            this(address, new List<Expression>(arguments)) {
+        public InvokeExpression(Expression addressEpr, IEnumerable<Expression> arguments) :
+            this(addressEpr, new List<Expression>(arguments)) {
 
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="address">Adressa de la funcio.</param>
+        /// <param name="addressExp">Adressa de la funcio.</param>
         /// <param name="arguments">Llista d'arguments de la funcio.</param>
         /// 
-        public FunctionCallExpression(Expression address, params Expression[] arguments) :
-            this(address, new List<Expression>(arguments)) {
+        public InvokeExpression(Expression addressExp, params Expression[] arguments) :
+            this(addressExp, new List<Expression>(arguments)) {
         }
 
         /// <summary>
@@ -72,18 +72,18 @@
         /// Obte el nom.
         /// </summary>
         /// 
-        public Expression Function => address;
+        public Expression AddressEpr => addressExp;
 
         /// <summary>
         /// Indica si hi han arguments.
         /// </summary>
         /// 
-        public bool HasArguments => argumentList != null;
+        public bool HasArguments => (arguments != null) && (arguments.Count > 0);
 
         /// <summary>
         /// Enumera els d'arguments.
         /// </summary>
         /// 
-        public IEnumerable<Expression> Arguments => argumentList;
+        public IEnumerable<Expression> Arguments => arguments;
     }
 }

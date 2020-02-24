@@ -9,27 +9,44 @@
 
     public sealed class LoopStatement : Statement {
 
-        private readonly ConditionPosition conditionPosition;
-        private readonly Expression conditionExpression;
-        private readonly BlockStatement body;
-
-        public LoopStatement(ConditionPosition conditionPosition, Expression conditionExpression, BlockStatement body) {
-
-            this.conditionPosition = conditionPosition;
-            this.conditionExpression = conditionExpression ?? throw new ArgumentNullException(nameof(conditionExpression));
-            this.body = body;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// 
+        public LoopStatement() {
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="conditionPos">Situacio de la condicio.</param>
+        /// <param name="conditionExp">Expressio de la condicio.</param>
+        /// <param name="stmt">Instruccio.</param>
+        /// 
+        public LoopStatement(ConditionPosition conditionPos, Expression conditionExp, Statement stmt) {
+
+            ConditionPos = conditionPos;
+            ConditionExp = conditionExp ?? throw new ArgumentNullException(nameof(conditionExp));
+            Stmt = stmt;
+        }
+
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
         public override void AcceptVisitor(IVisitor visitor) {
+
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
 
             visitor.Visit(this);
         }
 
-        public ConditionPosition ConditionPosition => conditionPosition;
+        public ConditionPosition ConditionPos {get;set;}
 
-        public Expression ConditionExpression => conditionExpression;
+        public Expression ConditionExp { get; set; }
 
-        public BlockStatement Body => body;
-
+        public Statement Stmt { get; set; }
     }
 }

@@ -26,6 +26,13 @@
                 cb.Write(decl.Name);
             }
 
+            public override void Visit(CastExpression exp) {
+
+                cb.Write("{0}(", exp.TypeId.Name);
+                base.Visit(exp);
+                cb.Write(')');
+            }
+
             public override void Visit(ClassDeclaration decl) {
 
                 ClassDeclaration oldClass = currentClass;
@@ -97,7 +104,7 @@
 
             public override void Visit(ConstructorInitializer initializer) {
 
-                cb.Write("{0}(", initializer.Name);
+                cb.Write("{0}(", initializer.TypeId.Name);
                 initializer.Expression.AcceptVisitor(this);
                 cb.Write(')');
             }
@@ -108,9 +115,9 @@
                 cb.WriteLine();
             }
 
-            public override void Visit(FunctionCallExpression exp) {
+            public override void Visit(InvokeExpression exp) {
 
-                exp.Function.AcceptVisitor(this);
+                exp.AddressEpr.AcceptVisitor(this);
                 cb.Write('(');
                 if (exp.HasArguments)
                     foreach (var argument in exp.Arguments)
@@ -119,7 +126,7 @@
                 cb.Write(')');
             }
 
-            public override void Visit(FunctionCallStatement stmt) {
+            public override void Visit(InvokeStatement stmt) {
 
                 cb.WriteIndent();
                 base.Visit(stmt);
@@ -136,10 +143,10 @@
 
                 cb.WriteIndent();
                 cb.Write("if (");
-                if (stmt.ConditionExpression == null)
+                if (stmt.ConditionExp == null)
                     throw new InvalidOperationException("No se especifico la condicion.");
 
-                stmt.ConditionExpression.AcceptVisitor(this);
+                stmt.ConditionExp.AcceptVisitor(this);
                 cb.Write(") {");
                 cb.WriteLine();
                 cb.Indent();
@@ -178,20 +185,6 @@
                 cb.Write(obj.Value.ToString());
             }
 
-            public override void Visit(VariableDeclaration decl) {
-
-                if (decl.Implementation == ImplementationSpecifier.Static) {
-                    cb.WriteIndent();
-                    cb.Write("{0} {1}::{2}", decl.ValueType.Name, currentClass.Name, decl.Name);
-                    if (decl.Initializer != null) {
-                        cb.Write(" = ");
-                        decl.Initializer.AcceptVisitor(this);
-                    }
-                    cb.Write(';');
-                    cb.WriteLine();
-                    cb.WriteLine();
-                }
-            }
 
             public override void Visit(FunctionDeclaration decl) {
 
@@ -252,13 +245,38 @@
 
                 cb.WriteIndent();
                 cb.Write("return");
-                if (stmt.Expression != null) {
+                if (stmt.ValueExp != null) {
                     cb.Write(' ');
-                    stmt.Expression.AcceptVisitor(this);
+                    stmt.ValueExp.AcceptVisitor(this);
                 }
                 cb.Write(';');
                 cb.WriteLine();
             }
+
+            public override void Visit(SubscriptExpression exp) {
+
+                exp.AddressExp.AcceptVisitor(this);
+                foreach(var index in exp.Indices) {
+                    cb.Write('[');
+                    index.AcceptVisitor(this);
+                    cb.Write(']');
+                }
+            }
+
+            public override void Visit(VariableDeclaration decl) {
+
+                if (decl.Implementation == ImplementationSpecifier.Static) {
+                    cb.WriteIndent();
+                    cb.Write("{0} {1}::{2}", decl.ValueType.Name, currentClass.Name, decl.Name);
+                    if (decl.Initializer != null) {
+                        cb.Write(" = ");
+                        decl.Initializer.AcceptVisitor(this);
+                    }
+                    cb.Write(';');
+                    cb.WriteLine();
+                    cb.WriteLine();
+                }
+            }     
         }
 
         public static string Generate(UnitDeclaration unitDecl) {
