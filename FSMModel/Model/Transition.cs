@@ -12,8 +12,8 @@
 
     public sealed class Transition : IVisitable {
 
-        private readonly string name;
-        private Guard guard;
+        private readonly Event transitionEvent;
+        private readonly Guard guard;
         private Action action;
         private State nextState;
         private TransitionMode mode = TransitionMode.InternalLoop;
@@ -21,15 +21,13 @@
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="name">El nom de la transicio.</param>
+        /// <param name="transitionEvent">L'event que activa la transicio.</param>
+        /// <param name="guard">La guarda que autoritza la transicio.</param>
         /// 
-        public Transition(string name) {
+        public Transition(Event transitionEvent, Guard guard) {
 
-            if (String.IsNullOrEmpty(name)) {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            this.name = name;
+            this.transitionEvent = transitionEvent ?? throw new ArgumentNullException(nameof(transitionEvent));
+            this.guard = guard;
         }
 
         /// <summary>
@@ -39,27 +37,23 @@
         /// 
         public void AcceptVisitor(IVisitor visitor) {
 
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
+
             visitor.Visit(this);
         }
 
         /// <summary>
-        /// Obte el nom de la transicio.
+        /// Obte l'event que activa aquesta transicio.
         /// </summary>
         /// 
-        public string Name => name;
+        public Event TransitionEvent => transitionEvent;
 
         /// <summary>
-        /// Obte o asigna la guarda d'aquesta transicio.
+        /// Obte la guarda que autoritza aquesta transicio.
         /// </summary>
         /// 
-        public Guard Guard {
-            get {
-                return guard;
-            }
-            set {
-                guard = value;
-            }
-        }
+        public Guard Guard => guard;
 
         /// <summary>
         /// Obte o asigna l'accio.

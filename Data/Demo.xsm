@@ -25,7 +25,7 @@
 		
         <!-- Es prem el boto SW1
         -->
-        <transition name="SW1_ON" state="WaitingSW2">
+        <transition event="SW1_ON" state="WaitingSW2">
 			<run name="WaitingSW1_Transition_SW1_ON" />
         </transition>
 
@@ -41,7 +41,7 @@
 
         <!-- Es prem el boto SW2
         -->
-        <transition name="SW2_ON" state="WaitingSW3">
+        <transition event="SW2_ON" arguments="perico* k" state="WaitingSW3">
 			<run name="WaitingSW2_Transition_SW2_ON" />
         </transition>
 
@@ -53,7 +53,7 @@
 	
         <!-- Es prem el boto SW3
         -->
-        <transition name="SW3_ON" state="WaitingTMR1">
+        <transition event="SW3_ON" state="WaitingTMR1">
 			<run name="WaitingSW3_Transition_SW3_ON" />
         </transition>
 		
@@ -65,7 +65,7 @@
         
         <!-- Timeout del temporitzador TIMER1
         -->
-        <transition name="TMR1_TIMEOUT" state="WaitingSW1">
+        <transition event="TMR1_TIMEOUT" state="WaitingSW1">
 			<run name="WaitingTMR1_OnTMR1_TIMEOUT" />
 		</transition>
 

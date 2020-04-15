@@ -2,7 +2,7 @@
 
     using System;
 
-    public sealed class Guard {
+    public sealed class Guard: IVisitable {
 
         private readonly string expression;
 
@@ -17,6 +17,19 @@
                 throw new ArgumentNullException(nameof(expression));
 
             this.expression = expression;
+        }
+
+        /// <summary>
+        /// Accepta un visitador.
+        /// </summary>
+        /// <param name="visitor">El visitador.</param>
+        /// 
+        public void AcceptVisitor(IVisitor visitor) {
+
+            if (visitor == null)
+                throw new ArgumentNullException(nameof(visitor));
+
+            visitor.Visit(this);
         }
 
         /// <summary>

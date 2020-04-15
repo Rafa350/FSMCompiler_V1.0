@@ -123,7 +123,7 @@
             foreach (var state in machine.States) {
                 if (state.HasTransitions)
                     foreach (var transition in state.Transitions) {
-                        if (transition.Name == transitionName) {
+                        if (transition.TransitionEvent.Name == transitionName) {
 
                             StatementList caseStmtBodyStmtList = new StatementList();
                             caseStmtBodyStmtList.Add(
@@ -172,7 +172,7 @@
             StatementList bodyStmtList = new StatementList();
 
             foreach (var transition in state.Transitions) {
-                if (transition.Name == transitionName) {
+                if (transition.TransitionEvent.Name == transitionName) {
 
                     StatementList trueBlockStmtList = new StatementList(); ;
 

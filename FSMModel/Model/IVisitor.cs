@@ -4,11 +4,12 @@
 
     public interface IVisitor {
 
+        void Visit(Action action);
+        void Visit(Event ev);
+        void Visit(Guard guard);
         void Visit(Machine machine);
         void Visit(State state);
         void Visit(Transition transition);
-        void Visit(Guard guard);
-        void Visit(Action action);
 
         void Visit(InlineActity action);
         void Visit(RunActivity action);

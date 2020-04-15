@@ -48,6 +48,7 @@
     <Compile Include="Generator\CPP\ContextUnitGenerator.cs" />
     <Compile Include="Generator\CPP\CPPGenerator.cs" />
     <Compile Include="Generator\CPP\CPPGeneratorOptions.cs" />
+    <Compile Include="Generator\EventExtensions.cs" />
     <Compile Include="Generator\MachineExtensions.cs" />
     <Compile Include="Generator\StateExtensions.cs" />
     <Compile Include="Generator\CPP\StateUnitGenerator.cs" />

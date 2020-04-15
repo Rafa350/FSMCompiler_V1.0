@@ -38,9 +38,8 @@
                 foreach (var activity in action.Activities) {
                     if (activity is RunActivity callActivity) {
                         string name = callActivity.ProcessName;
-                        if (!names.Contains(name)) {
+                        if (!names.Contains(name)) 
                             names.Add(name);
-                        }
                     }
                 }
             }

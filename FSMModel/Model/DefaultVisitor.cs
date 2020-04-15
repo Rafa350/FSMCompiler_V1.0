@@ -25,8 +25,17 @@
 
         public virtual void Visit(Transition transition) {
 
+            transition.TransitionEvent.AcceptVisitor(this);
+            
+            if (transition.Guard != null)
+                transition.Guard.AcceptVisitor(this);
+
             if (transition.Action != null)
                 transition.Action.AcceptVisitor(this);
+        }
+
+        public virtual void Visit(Event ev) {
+
         }
 
         public virtual void Visit(Guard guard) {

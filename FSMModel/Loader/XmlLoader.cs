@@ -187,7 +187,7 @@
         /// Procesa un node 'throw'
         /// </summary>
         /// <param name="actionNode">El node.</param>
-        /// <returns>'objecte 'Activity'</returns>
+        /// <returns>L'objecte 'Activity'</returns>
         /// 
         private Activity ProcessThrowActivityNode(XmlNode actionNode) {
 
@@ -195,21 +195,33 @@
             return new ThrowActivity(transitionName);
         }
 
+        /// <summary>
+        /// Procesa un node 'transition'
+        /// </summary>
+        /// <param name="transitionNode">El node.</param>
+        /// <returns>L'objecte 'Transition'.</returns>
+        /// 
         private Transition ProcessTransitionNode(XmlNode transitionNode) {
 
             // Obte el nom
             //
-            string transitionName = GetAttribute(transitionNode, "name");
-            if (String.IsNullOrEmpty(transitionName))
-                throw new Exception("No se especifico el atributo 'name'");
+            string eventName = GetAttribute(transitionNode, "event");
+            if (String.IsNullOrEmpty(eventName))
+                throw new Exception("No se especifico el atributo 'event'");
 
-            Transition transition = new Transition(transitionName);
+            // Obte els parametres
+            //
+            string eventArgs = GetAttribute(transitionNode, "arguments");
 
             // Obte la guarda
             //
             string condition = GetAttribute(transitionNode, "guard");
-            if (!String.IsNullOrEmpty(condition))
-                transition.Guard = new Guard(condition);
+
+            Transition transition = new Transition(
+                new Event(
+                    eventName,
+                    String.IsNullOrEmpty(eventArgs) ? null : new EventArguments(eventArgs)),
+                String.IsNullOrEmpty(condition) ? null : new Guard(condition));
 
             // Obte el nou estat
             //

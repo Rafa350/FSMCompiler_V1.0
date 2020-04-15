@@ -212,7 +212,7 @@
                     String.Format("{0}* owner = ctx->getOwner()", ownerClassName)));
 
             foreach (Transition transition in state.Transitions) {
-                if (transition.Name == transitionName) {
+                if (transition.TransitionEvent.Name == transitionName) {
 
                     StatementList trueBodyStatements = new StatementList();
 

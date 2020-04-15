@@ -57,8 +57,10 @@
     <Compile Include="Model\IVisitable.cs" />
     <Compile Include="Model\IVisitor.cs" />
     <Compile Include="Model\Machine.cs" />
+    <Compile Include="Model\EventArguments.cs" />
     <Compile Include="Model\State.cs" />
     <Compile Include="Model\Transition.cs" />
+    <Compile Include="Model\Event.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
