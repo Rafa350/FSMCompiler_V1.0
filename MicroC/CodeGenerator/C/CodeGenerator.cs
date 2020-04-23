@@ -141,7 +141,8 @@
 
                 cb.WriteIndent();
                 cb.Write(stmt.Code);
-                cb.WriteLine(";");
+                cb.Write(";");
+                cb.WriteLine();
             }
 
             public override void Visit(LiteralExpression exp) {

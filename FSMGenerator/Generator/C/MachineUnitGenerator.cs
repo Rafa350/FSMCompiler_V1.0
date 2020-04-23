@@ -85,11 +85,7 @@
             //
             if ((machine.Start.EnterAction != null) && machine.Start.EnterAction.HasActivities)
                 foreach (var activity in machine.Start.EnterAction.Activities)
-                    if (activity is RunActivity callActivity)
-                        bodyStmtList.Add(
-                            new InvokeStatement(
-                                new InvokeExpression(
-                                    new IdentifierExpression(callActivity.ProcessName))));
+                    bodyStmtList.Add(MakeActivity(activity));
 
             // Seleccio del estat inicial.
             //
@@ -180,31 +176,19 @@
                     //
                     if ((state.ExitAction != null) && state.ExitAction.HasActivities)
                         foreach (var activity in state.ExitAction.Activities)
-                            if (activity is RunActivity callActivity)
-                                trueBlockStmtList.Add(
-                                    new InvokeStatement(
-                                        new InvokeExpression(
-                                            new IdentifierExpression(callActivity.ProcessName))));
+                            trueBlockStmtList.Add(MakeActivity(activity));
 
                     // Accions de la transicio
                     //
                     if ((transition.Action != null) && transition.Action.HasActivities)
                         foreach (var activity in transition.Action.Activities)
-                            if (activity is RunActivity callActivity)
-                                trueBlockStmtList.Add(
-                                    new InvokeStatement(
-                                        new InvokeExpression(
-                                            new IdentifierExpression(callActivity.ProcessName))));
+                            trueBlockStmtList.Add(MakeActivity(activity));
 
                     // Acciona d'entrada del nou estat
                     //
                     if ((transition.NextState != null) && (transition.NextState.EnterAction != null) && transition.NextState.EnterAction.HasActivities)
                         foreach (var activity in transition.NextState.EnterAction.Activities)
-                            if (activity is RunActivity callActivity)
-                                trueBlockStmtList.Add(
-                                    new InvokeStatement(
-                                        new InvokeExpression(
-                                            new IdentifierExpression(callActivity.ProcessName))));
+                            trueBlockStmtList.Add(MakeActivity(activity));
 
                     // Seeccio el nou estat
                     //
@@ -232,6 +216,20 @@
             }
 
             return new BlockStatement(bodyStmtList);
+        }
+
+        private static Statement MakeActivity(Activity activity) {
+
+            if (activity is RunActivity runActivity)
+                return new InvokeStatement(
+                    new InvokeExpression(
+                        new IdentifierExpression(runActivity.ProcessName)));
+
+            else if (activity is InlineActity inlineActivity)
+                return new InlineStatement(inlineActivity.Text);
+
+            else
+                throw new InvalidOperationException("Tipo de actividad no reconocida.");
         }
     }
 }

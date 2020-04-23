@@ -180,7 +180,8 @@
         private Activity ProcessRunActivityNode(XmlNode actionNode) {
 
             string processName = GetAttribute(actionNode, "name");
-            return new RunActivity(processName);
+            string arguments = GetAttribute(actionNode, "arguments");
+            return new RunActivity(processName, null);
         }
 
         /// <summary>

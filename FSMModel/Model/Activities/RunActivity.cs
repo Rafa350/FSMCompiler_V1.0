@@ -5,18 +5,20 @@
     public sealed class RunActivity : Activity {
 
         private readonly string processName;
+        private readonly string arguments;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processName">El nom del process.</param>
         /// 
-        public RunActivity(string processName) {
+        public RunActivity(string processName, string arguments) {
 
             if (String.IsNullOrEmpty(processName))
                 throw new ArgumentNullException(nameof(processName));
 
             this.processName = processName;
+            this.arguments = arguments;
         }
 
         /// <summary>
@@ -37,5 +39,11 @@
         /// </summary>
         /// 
         public string ProcessName => processName;
+
+        /// <summary>
+        /// Obte els arguments del proces.
+        /// 
+        /// </summary>
+        public string Arguments => arguments;
     }
 }
