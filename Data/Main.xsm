@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<machine name="MainMachine" start="Idle">
+
+	<!-- Estat inicial quant s'inicia el programa
+	-->
+	<state name="Idle">	
+		<enter>
+			<!-- Iniciar TIM_DELAY -->
+			<!-- Retraccio del pisto -->
+		</enter>		
+		<transition event="DelayTimeout" state="PrintWaiting"/>
+	</state>
+	
+	
+	<!-- ***************************************************************** -->
+	<!-- PRINT LABEL: Proces d'impressio de l'etiqueta                     -->
+	<!-- ***************************************************************** -->
+	
+    <!-- Inici del process d'impressio de l'etiqueta
+	-->
+	<state name="PrintWaiting">	
+		<transition event="S0" guard="isWaitingForS0" state="PrintStart"/>
+		<transition event="S1" guard="isWaitingForS1" state="PrintStart"/>
+		<transition event="S2" guard="isWaitingForS2" state="PrintStart"/>
+		<transition event="S3" guard="isWaitingForS3" state="PrintStart"/>
+		<transition event="PA" guard="isWaitingForPA" state="PrintStart"/>
+		<transition event="X0" guard="isWaitingForX0" state="PrintStart"/>
+	</state>
+	
+	<!-- Espera la senyal per continuar
+	-->
+	<state name="PrintStart">
+		<enter>
+			<inline>timStart(TIM_TASKDELAY, varGet(VAR_Print_PreDelay))</inline>
+		</enter>		
+		<transition event="TaskDelayTimeout" state="PrintProcess"/>
+	</state>
+	
+	<!-- Proces d'impresio de l'etiqueta
+	-->	
+	<state name="PrintProcess">	
+		<enter>
+			<inline>PrintController_Label()</inline>
+			<inline>PrintController_AssistOn()</inline>
+			<inline>PrintController_VacuumOn()</inline>
+			<inline>timStart(TIM_TASKLIMIT, varGet(VAR_Print_Timeout))</inline>
+		</enter>		
+		<transition event="TaskLimitTimeout" state="PrintError">
+			<inline>PrintController_AssistOff()</inline>
+			<inline>PrintController_VacuumOff()</inline>
+		</transition>
+		<transition event="LabelSignal" state="PrintFinish">
+			<inline>PrintController_AssistOff()</inline>
+		</transition>
+	</state>
+	
+	<!-- Final del proces d'impressio de l'etiqueta 
+	-->
+	<state name="PrintFinish">	
+		<enter>
+			<inline>timStart(TIM_TASKDELAY, varGet(VAR_Print_PostDelay))</inline>
+		</enter>		
+		<transition event="TaskDelayTimeout" state="ExtendStart">
+		</transition>
+	</state>
+	
+	<!-- Error en el proces d'impressio de l'etiqueta 
+	-->
+	<state name="PrintError">	
+		<enter>
+		</enter>	
+		<transition event="RestartSignal" state="Idle">
+		</transition>
+	</state>
+	
+	
+	
+	<!-- ***************************************************************** -->
+	<!-- ARM EXTEND: Proces d'extensio del pisto                           -->
+	<!-- ***************************************************************** -->
+	
+	<!-- Inici del proces d'extensio del pisto
+	-->
+	<state name="ExtendStart">
+		<enter>
+		</enter>
+		<transition event="TaskDelayTimeout" state="Extend">
+		</transition>
+	</state>
+	
+	<!-- Finalitza el process d'extenssio del pisto
+	-->
+	<state name="Extend">
+		<enter>
+		</enter>
+		<transition event="TaskDelayTimeout" state="ApplyProcess">
+		</transition>
+	</state>
+	
+	
+	<!-- ***************************************************************** -->
+	<!-- ARM RETRACT: Proces de retraccio del pisto                        -->
+	<!-- ***************************************************************** -->
+	
+	<!-- ***************************************************************** -->
+	<!-- APPLY: Proces d'aplicacio de l'etiqueta                           -->
+	<!-- ***************************************************************** -->
+		
+	<!-- Aplicacio per contacte
+	-->
+	<state name="ApplyProcess">
+		<transition event="Impact" state="Idle">
+			<inline>ApplyController_Stop()</inline>
+			<inline>ApplyController_VacuumOff()</inline>
+			<inline>ApplyController_Jet()</inline>
+		</transition>
+		<transition event="TaskLimitTimeout" state="ApplyError">
+			<inline>ApplyController_Stop()</inline>
+			<inline>ApplyController_VacuumOff()</inline>
+		</transition>
+	</state>
+	
+	<!-- Error en l'aplicacio per contacte
+	-->
+	<state name="ApplyError">
+		<enter>
+			<!-- Passar al estat ERROR -->
+		</enter>
+		<transition event="RestartSignal" state="Idle">
+			<!-- Passa al estat OK -->
+		</transition>
+	</state>
+	
+</machine>

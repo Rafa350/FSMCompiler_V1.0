@@ -16,14 +16,18 @@
 
             public override void Visit(FunctionDeclaration decl) {
 
-                cb.WriteIndent();
-                cb.Write("{0} {1}(", decl.ReturnType.Name, decl.Name);
-                if (!decl.HasArguments)
-                    cb.Write("void");
-                cb.Write(");");
-                cb.WriteLine();
+                if ((decl.Access == AccessSpecifier.Default) ||
+                    (decl.Access == AccessSpecifier.Public)) {
 
-                base.Visit(decl);
+                    cb.WriteIndent();
+                    cb.Write("{0} {1}(", decl.ReturnType.Name, decl.Name);
+                    if (!decl.HasArguments)
+                        cb.Write("void");
+                    cb.Write(");");
+                    cb.WriteLine();
+
+                    base.Visit(decl);
+                }
             }
 
         }

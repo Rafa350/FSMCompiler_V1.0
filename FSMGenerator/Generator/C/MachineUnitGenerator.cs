@@ -30,24 +30,25 @@
             // Crea la variabe 'state'
             //
             VariableDeclaration stateVariable = new VariableDeclaration();
+            stateVariable.Access = AccessSpecifier.Private;
             stateVariable.Name = String.Format("{0}_state", machine.Name);
             stateVariable.ValueType = TypeIdentifier.FromName("State");
             memberList.Add(stateVariable);
+
+            // Crea les funcions de transicio [machine]_[state]_[transition]()
+            //
+            foreach (var state in machine.States)
+                foreach (var transitionName in state.GetTransitionNames())
+                    memberList.Add(MakeStateTransitionFunction(machine, state, transitionName));
 
             // Crea la funcio [machine]_Start()
             //
             memberList.Add(MakeStartFunction(machine));
 
-            // Crea les funcions de deptch de les transicions [machine]_on[transition]()
+            // Crea les funcions de despatch de les transicions [machine]_[transition]()
             //
             foreach (var transitionName in machine.GetTransitionNames())
                 memberList.Add(MakeMachineTransitionFunction(machine, transitionName));
-
-            // Crea les funcions de transicio [machine]_[state]_on[transition]()
-            //
-            foreach (var state in machine.States)
-                foreach (var transitionName in state.GetTransitionNames())
-                    memberList.Add(MakeStateTransitionFunction(machine, state, transitionName));
 
             return new UnitDeclaration(new NamespaceDeclaration {
                 Name = "",
@@ -101,7 +102,7 @@
         private static FunctionDeclaration MakeMachineTransitionFunction(Machine machine, string transitionName) {
 
             FunctionDeclaration function = new FunctionDeclaration();
-            function.Name = String.Format("{0}_on{1}", machine.Name, transitionName);
+            function.Name = String.Format("{0}_{1}", machine.Name, transitionName);
             function.ReturnType = TypeIdentifier.FromName("void");
             function.Body = MakeMachineTransitionFunctionBody(machine, transitionName);
 
@@ -126,7 +127,7 @@
                                 new InvokeStatement(
                                     new InvokeExpression(
                                         new IdentifierExpression(
-                                            String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName)))));
+                                            String.Format("{0}_{1}_{2}", machine.Name, state.Name, transitionName)))));
 
                             CaseStatement caseStmt = new CaseStatement(
                                 new LiteralExpression(
@@ -156,7 +157,8 @@
         private static FunctionDeclaration MakeStateTransitionFunction(Machine machine, State state, string transitionName) {
 
             FunctionDeclaration function = new FunctionDeclaration();
-            function.Name = String.Format("{0}_{1}_on{2}", machine.Name, state.Name, transitionName);
+            function.Access = AccessSpecifier.Private;
+            function.Name = String.Format("{0}_{1}_{2}", machine.Name, state.Name, transitionName);
             function.ReturnType = TypeIdentifier.FromName("void");
             function.Body = MakeStateTransitionFunctionBody(machine, state, transitionName);
 
@@ -207,8 +209,7 @@
                     }
                     else {
                         bodyStmtList.Add(new IfThenElseStatement(
-                            new InvokeExpression(
-                                new IdentifierExpression(transition.Guard.Expression)),
+                            new InlineExpression(transition.Guard.Expression),
                             new BlockStatement(trueBlockStmtList),
                             null));
                     }

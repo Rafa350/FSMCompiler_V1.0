@@ -66,18 +66,21 @@
                 }
             }
 
-            public override void Visit(FunctionDeclaration dec) {
+            public override void Visit(FunctionDeclaration decl) {
 
                 cb.WriteIndent();
-                cb.Write("{0} {1}(", dec.ReturnType.Name, dec.Name);
-                if (!dec.HasArguments) {
+                if ((decl.Access != AccessSpecifier.Default) &&
+                    (decl.Access != AccessSpecifier.Public))
+                    cb.Write("static ");
+                cb.Write("{0} {1}(", decl.ReturnType.Name, decl.Name);
+                if (!decl.HasArguments) {
                     cb.WriteLine("void) {");
                     cb.Indent();
                 }
                 else {
                     cb.Indent();
                     bool first = true;
-                    foreach (var argument in dec.Arguments) {
+                    foreach (var argument in decl.Arguments) {
                         if (first) {
                             first = false;
                         }
@@ -92,8 +95,8 @@
                 }
                 cb.WriteLine();
 
-                if (dec.Body != null) 
-                    dec.Body.AcceptVisitor(this);
+                if (decl.Body != null) 
+                    decl.Body.AcceptVisitor(this);
 
                 cb.Unindent();
                 cb.WriteIndent();
@@ -197,6 +200,9 @@
             public override void Visit(VariableDeclaration decl) {
 
                 cb.WriteIndent();
+                if ((decl.Access != AccessSpecifier.Default) &&
+                    (decl.Access != AccessSpecifier.Public))
+                    cb.Write("static ");
                 cb.Write("{0} {1}", decl.ValueType.Name, decl.Name);
                 if (decl.Initializer != null) {
 

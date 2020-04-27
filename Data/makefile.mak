@@ -1,19 +1,22 @@
 # Compilador de XSM a C
-cgen = ..\bin\Debug\FsmCompiler.exe
-cgen_options = /G:C
+cgen = C:\Users\Rafael\Documents\Projectes\Net\FSMCompiler\bin\Debug\FsmCompiler.exe
+cgen_opt = /G:C 
+cgen_opt_code = $(cgen_opt) /P:OutputType=MachineCode
+cgen_opt_header = $(cgen_opt) /P:OutputType=MachineHeader /P:IncludeFileName=Services/Engine/appMachine.h
 
 # Compilador de XSM a DOT
-dotgen = ..\bin\Debug\FsmCompiler.exe
-dotgen_options = /G:DOT
+dotgen = C:\Users\Rafael\Documents\Projectes\Net\FSMCompiler\bin\Debug\FsmCompiler.exe
+dotgen_opt = /G:DOT
 
 # Compilador de DOT a PDF: 
-dot = $(ProgramFiles)\Graphviz2.38\bin\dot.exe
-dot_options = -Tpdf
+dot = C:\PROGRA~2\Graphviz2.38\bin\dot.exe
+dot_opt = -Tpdf
 
 targets = \
-       fsm_Demo.c \
-	   fsm_Demo.dot \
-	   fsm_Demo.pdf
+	MainMachine.c \
+	MainMachine.h \
+	MainMachine.pdf
+
 
 .SUFFIXES: .xsm .dot .c .pdf
 .PHONY: all clean
@@ -21,13 +24,16 @@ targets = \
 all: $(targets)
 
 clean:
-	rm -rf fsm_*.pdf fsm_*.dot fsm_*.c
+	rm -rf *.pdf *.dot *.c *.h
 
-fsm_%.c: %.xsm
-	$(cgen) $(cgen_options) $*.xsm
+%Machine.c: %.xsm
+	$(cgen) $(cgen_opt_code) /P:MachineCodeFileName=$*Machine.c /P:MachineHeaderFileName=$*Machine.h $*.xsm
 	
-fsm_%.dot: %.xsm
-	$(dotgen) $(dotgen_options)	$*.xsm
+%Machine.h: %.xsm
+	$(cgen) $(cgen_opt_header) /P:MachineHeaderFileName=$*Machine.h $*.xsm
+
+%Machine.dot: %.xsm
+	$(dotgen) $(dotgen_opt)	$*.xsm
 	
 .dot.pdf:
-	$(dot) $(dot_options) $*.dot -o $*.pdf
+	$(dot) $(dot_opt) $*.dot -o $*.pdf
