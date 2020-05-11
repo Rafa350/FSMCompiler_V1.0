@@ -119,8 +119,8 @@
 
             foreach (var state in machine.States) {
                 if (state.HasTransitions)
-                    foreach (var transition in state.Transitions) {
-                        if (transition.TransitionEvent.Name == transitionName) {
+                    foreach (var stateTransitionName in state.GetTransitionNames()) {
+                        if (stateTransitionName == transitionName) {
 
                             StatementList caseStmtBodyStmtList = new StatementList();
                             caseStmtBodyStmtList.Add(
