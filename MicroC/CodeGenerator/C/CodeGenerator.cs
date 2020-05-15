@@ -150,7 +150,11 @@
 
             public override void Visit(LiteralExpression exp) {
 
-                cb.Write(exp.Value.ToString());
+                if (exp.Value is Boolean) 
+                    cb.Write((bool) exp.Value ? "true" : "false");
+
+                else
+                    cb.Write(exp.Value.ToString());
             }
 
             public override void Visit(CaseStatement stmt) {
@@ -170,6 +174,16 @@
 
                 cb.Unindent();
 
+                cb.WriteLine();
+            }
+
+            public override void Visit(ReturnStatement stmt) {
+
+                cb.WriteIndent();
+                cb.Write("return");
+                if (stmt.ValueExp != null)
+                    stmt.ValueExp.AcceptVisitor(this);
+                cb.Write(';');
                 cb.WriteLine();
             }
 

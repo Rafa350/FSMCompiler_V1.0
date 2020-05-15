@@ -192,7 +192,7 @@
                         foreach (var activity in transition.NextState.EnterAction.Activities)
                             trueBlockStmtList.Add(MakeActivity(activity));
 
-                    // Seeccio el nou estat
+                    // Seleccio el nou estat
                     //
                     if (transition.NextState != null)
                         trueBlockStmtList.Add(
@@ -201,18 +201,16 @@
                             new LiteralExpression(
                                 String.Format("State_{0}", transition.NextState.Name))));
 
-                    if (transition.Guard == null) {
-                        bodyStmtList.Add(new IfThenElseStatement(
-                            new LiteralExpression(1),
-                            new BlockStatement(trueBlockStmtList),
-                            null));
-                    }
-                    else {
-                        bodyStmtList.Add(new IfThenElseStatement(
-                            new InlineExpression(transition.Guard.Expression),
-                            new BlockStatement(trueBlockStmtList),
-                            null));
-                    }
+                    // Retorn
+                    //
+                    trueBlockStmtList.Add(new ReturnStatement());
+
+                    bodyStmtList.Add(new IfThenElseStatement(
+                        transition.Guard == null ? 
+                            (Expression) new LiteralExpression(true) : 
+                            (Expression) new InlineExpression(transition.Guard.Expression),
+                        new BlockStatement(trueBlockStmtList),
+                        null));
                 }
             }
 
