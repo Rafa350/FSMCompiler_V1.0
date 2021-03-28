@@ -9,7 +9,7 @@ dotgen = C:\Users\Rafael\Documents\Projectes\Net\FSMCompiler\bin\Debug\FsmCompil
 dotgen_opt = /G:DOT
 
 # Compilador de DOT a PDF: 
-dot = C:\PROGRA~2\Graphviz2.38\bin\dot.exe
+dot = C:\PROGRA~1\Graphviz\bin\dot.exe
 dot_opt = -Tpdf
 
 targets = \
