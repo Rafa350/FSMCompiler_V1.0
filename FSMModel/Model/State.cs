@@ -1,16 +1,16 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
+﻿using System;
+using System.Collections.Generic;
 
-    using System;
-    using System.Collections.Generic;
+namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
     public sealed class State : IVisitable {
 
-        private readonly List<State> childs = new List<State>();
-        private List<Transition> transitionList;
-        private readonly State parent;
-        private readonly string name;
-        private Action enterAction;
-        private Action exitAction;
+        private readonly List<State> _childs = new List<State>();
+        private List<Transition> _transitionList;
+        private readonly State _parent;
+        private readonly string _name;
+        private Action _enterAction;
+        private Action _exitAction;
 
         /// <summary>
         /// Constructor de l'objecte.
@@ -32,11 +32,11 @@
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            this.parent = parent;
-            this.name = name;
+            _parent = parent;
+            _name = name;
 
             if (parent != null)
-                parent.childs.Add(this);
+                parent._childs.Add(this);
         }
 
         /// <summary>
@@ -62,57 +62,54 @@
             if (transition == null)
                 throw new ArgumentNullException(nameof(transition));
 
-            if (transitionList == null)
-                transitionList = new List<Transition>();
+            if (_transitionList == null)
+                _transitionList = new List<Transition>();
 
-            transitionList.Add(transition);
+            _transitionList.Add(transition);
         }
 
         /// <summary>
         /// Obte l'estat pare
         /// </summary>
         /// 
-        public State Parent => parent;
+        public State Parent => 
+            _parent;
 
         /// <summary>
         /// Obte el nom.
         /// </summary>
         /// 
-        public string Name => name;
+        public string Name => 
+            _name;
 
         /// <summary>
         /// Obte el nom complert, seguint la ruta pare-fill.
         /// </summary>
         /// 
-        public string FullName => (parent == null) ? name : String.Format("{0}{1}", parent.FullName, name);
+        public string FullName => 
+            (_parent == null) ? _name : String.Format("{0}{1}", _parent.FullName, _name);
 
         /// <summary>
         /// Indica si hi han transisions.
         /// </summary>
         /// 
-        public bool HasTransitions => transitionList != null;
+        public bool HasTransitions => 
+            _transitionList != null;
 
         /// <summary>
         /// Obte un enumerador per les transicions.
         /// </summary>
         /// 
-        public IEnumerable<Transition> Transitions {
-            get {
-                return transitionList;
-            }
-        }
+        public IEnumerable<Transition> Transitions =>
+            _transitionList;
 
         /// <summary>
         /// Obte o asigna l'accio d'entrada.
         /// </summary>
         /// 
         public Action EnterAction {
-            get {
-                return enterAction;
-            }
-            set {
-                enterAction = value;
-            }
+            get => _enterAction;
+            set => _enterAction = value;
         }
 
         /// <summary>
@@ -120,31 +117,21 @@
         /// </summary>
         /// 
         public Action ExitAction {
-            get {
-                return exitAction;
-            }
-            set {
-                exitAction = value;
-            }
+            get => _exitAction;
+            set => _exitAction = value;
         }
 
         /// <summary>
         /// Obte un enumerador dels fills.
         /// </summary>
-        public IEnumerable<State> Childs {
-            get {
-                return childs;
-            }
-        }
+        public IEnumerable<State> Childs =>
+            _childs;
 
         /// <summary>
         /// Indica si conte fills.
         /// </summary>
         /// 
-        public bool HasChilds {
-            get {
-                return childs.Count > 0;
-            }
-        }
+        public bool HasChilds =>
+            _childs.Count > 0;
     }
 }

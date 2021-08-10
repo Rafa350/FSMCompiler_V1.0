@@ -61,6 +61,7 @@
     <Compile Include="Model\State.cs" />
     <Compile Include="Model\Transition.cs" />
     <Compile Include="Model\Event.cs" />
+    <Compile Include="Model\Variable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -69,9 +70,7 @@
     </EmbeddedResource>
     <None Include="signature.pfx" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\IO\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

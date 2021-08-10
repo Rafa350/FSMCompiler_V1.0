@@ -63,6 +63,12 @@
             XmlNode terminateNode = machineNode.SelectSingleNode("terminate");
             Model.Action terminateAction = (terminateNode == null) ? null : ProcessActionNode(terminateNode);
 
+            // Procesa cada variable
+            //
+            List<Variable> variableList = new List<Variable>();
+            foreach (XmlNode variableNode in machineNode.SelectNodes("variable"))
+                variableList.Add(ProcessVariableNode(variableNode));
+
             // Procesa cada estat i asigna els parametres
             //
             List<State> stateList = new List<State>();
@@ -75,6 +81,7 @@
             machine.InitializeAction = initializeAction;
             machine.TerminateAction = terminateAction;
             machine.AddStates(stateList);
+            machine.AddVariables(variableList);
             machine.Start = startState;
 
             return machine;
@@ -127,6 +134,23 @@
                 state.AddTransition(transition);
 
             return state;
+        }
+
+        /// <summary>
+        /// Procesa un n ode 'variable'
+        /// </summary>
+        /// <param name="variableNode">El node a procesar.</param>
+        /// <returns>La variable obtinguda.</returns>
+        /// 
+        private Variable ProcessVariableNode(XmlNode variableNode) {
+
+            // Obte el nom de la variable.
+            //
+            string name = GetAttribute(variableNode, "name");
+            string type = GetAttribute(variableNode, "type");
+            string value = GetAttribute(variableNode, "value");
+
+            return new Variable(name, type, value);
         }
 
         /// <summary>

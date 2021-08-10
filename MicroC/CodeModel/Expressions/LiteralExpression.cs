@@ -1,13 +1,13 @@
-﻿namespace MicroCompiler.CodeModel.Expressions {
+﻿using System;
 
-    using System;
+namespace MicroCompiler.CodeModel.Expressions {
 
     /// <summary>
     /// Clase que representa un valor literal.
     /// </summary>
     public sealed class LiteralExpression : Expression {
 
-        private readonly object value;
+        private readonly object _value;
 
         /// <summary>
         /// Constructor.
@@ -16,7 +16,7 @@
         /// 
         public LiteralExpression(object value) {
 
-            this.value = value;
+            _value = value;
         }
 
         /// <summary>
@@ -36,6 +36,7 @@
         /// Obte el valor del literal.
         /// </summary>
         /// 
-        public object Value => value;
+        public object Value => 
+            _value;
     }
 }

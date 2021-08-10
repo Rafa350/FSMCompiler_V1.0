@@ -1,6 +1,6 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
+﻿using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
 
-    using MikroPicDesigns.FSMCompiler.v1.Model.Activities;
+namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
     public abstract class DefaultVisitor : IVisitor {
 
@@ -46,6 +46,11 @@
             if (action.HasActivities)
                 foreach (var activity in action.Activities)
                     activity.AcceptVisitor(this);
+        }
+
+        public virtual void Visit(Variable variable) {
+
+            variable.AcceptVisitor(this);
         }
 
         public virtual void Visit(InlineActity activity) {

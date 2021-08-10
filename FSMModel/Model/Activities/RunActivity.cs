@@ -38,12 +38,14 @@
         /// Obte el nom del proces.
         /// </summary>
         /// 
-        public string ProcessName => processName;
+        public string ProcessName => 
+            processName;
 
         /// <summary>
         /// Obte els arguments del proces.
         /// 
         /// </summary>
-        public string Arguments => arguments;
+        public string Arguments => 
+            arguments;
     }
 }

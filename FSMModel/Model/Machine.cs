@@ -1,15 +1,17 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
-    using System;
-    using System.Collections.Generic;
+namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
     public sealed class Machine : IVisitable {
 
-        private List<State> stateList;
-        private readonly string name;
-        private State start;
-        private Action initializeAction;
-        private Action terminateAction;
+        private List<State> _stateList;
+        private List<Variable> _variableList;
+        private readonly string _name;
+        private State _start;
+        private Action _initializeAction;
+        private Action _terminateAction;
 
         /// <summary>
         /// Constructior.
@@ -21,7 +23,7 @@
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            this.name = name;
+            _name = name;
         }
 
         /// <summary>
@@ -47,18 +49,18 @@
             if (state == null)
                 throw new ArgumentNullException(nameof(state));
 
-            if (stateList == null)
-                stateList = new List<State>();
+            if (_stateList == null)
+                _stateList = new List<State>();
 
-            if (stateList.Contains(state))
+            if (_stateList.Contains(state))
                 throw new InvalidOperationException(
                     String.Format("El estado '{0}' ya ha sido agregado.", state.FullName));
 
-            stateList.Add(state);
+            _stateList.Add(state);
         }
 
         /// <summary>
-        /// Afegeix divesos estats a la maquina.
+        /// Afegeix una coleccio d'estats a la maquina.
         /// </summary>
         /// <param name="states">Els estats a afeigir.</param>
         /// 
@@ -83,8 +85,8 @@
             if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            if (stateList != null)
-                foreach (State state in stateList)
+            if (_stateList != null)
+                foreach (State state in _stateList)
                     if (state.Name == name)
                         return state;
 
@@ -96,10 +98,45 @@
         }
 
         /// <summary>
+        /// Afegeix una variable.
+        /// </summary>
+        /// <param name="variable">La variable.</param>
+        /// 
+        public void AddVariable(Variable variable) {
+
+            if (variable == null)
+                throw new ArgumentNullException(nameof(variable));
+
+            if (_variableList == null)
+                _variableList = new List<Variable>();
+
+            if (_variableList.Contains(variable))
+                throw new InvalidOperationException(
+                    String.Format("La variable '{0}' ya ha sido agregada.", variable.Name));
+
+            _variableList.Add(variable);
+        }
+
+        /// <summary>
+        /// Afegeixz una coleccio de variables.
+        /// </summary>
+        /// <param name="variables">Les variables.</param>
+        /// 
+        public void AddVariables(IEnumerable<Variable> variables) {
+
+            if (variables == null)
+                throw new ArgumentNullException(nameof(variables));
+
+            foreach (var variable in variables)
+                AddVariable(variable);
+        }
+
+        /// <summary>
         /// Obte el nom de la maquina.
         /// </summary>
         /// 
-        public string Name => name;
+        public string Name => 
+            _name;
 
         /// <summary>
         /// Obte l'estat inicial de la maquina.
@@ -107,62 +144,60 @@
         /// 
         public State Start {
             get {
-                return start;
+                return _start;
             }
             set {
-                if ((stateList == null) || !stateList.Contains(value)) {
+                if ((_stateList == null) || !_stateList.Contains(value)) {
                     throw new InvalidOperationException(
                         String.Format("El estado '{0}', no esta declarado en esta maquina.", value.Name));
                 }
 
-                start = value;
+                _start = value;
             }
         }
 
         public Action InitializeAction {
-            get {
-                return initializeAction;
-            }
-            set {
-                initializeAction = value;
-            }
+            get => _initializeAction;
+            set => _initializeAction = value;
         }
 
         public Action TerminateAction {
-            get {
-                return terminateAction;
-            }
-            set {
-                terminateAction = value;
-            }
+            get => _terminateAction;
+            set => _terminateAction = value;
         }
 
         /// <summary>
         /// Enumera els noms dels estats de la maquina.
         /// </summary>
         /// 
-        public IEnumerable<string> StateNames {
-            get {
-                foreach (State state in stateList) {
-                    yield return state.Name;
-                }
-            }
-        }
+        public IEnumerable<string> StateNames =>
+            _stateList.Select(state => state.Name);
 
         /// <summary>
         /// Enumera els estats de la maquina.
         /// </summary>
         /// 
-        public IEnumerable<State> States => stateList;
+        public IEnumerable<State> States => 
+            _stateList;
 
-        public IEnumerable<State> FinalStates {
-            get {
-                foreach (State state in stateList) {
-                    if (!state.HasChilds) {
-                        yield return state;
-                    }
-                }
-            }
-        }
+        public IEnumerable<State> FinalStates =>
+            _stateList.Where(state => !state.HasChilds);
+
+        /// <summary>
+        /// Enumera les variables de la maquina.
+        /// </summary>
+        /// 
+        public IEnumerable<Variable> Variables =>
+            _variableList;
+
+        /// <summary>
+        /// Enumera els noms de les variables.
+        /// </summary>
+        /// 
+        public IEnumerable<string> VariablesNames =>
+            _variableList.Select(variable => variable.Name);
+
+        public bool HasVariables =>
+            (_variableList != null) && (_variableList.Count > 0);
     }
 }

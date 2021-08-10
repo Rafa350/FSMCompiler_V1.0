@@ -1,10 +1,10 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
+﻿using System;
 
-    using System;
+namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
     public sealed class Guard: IVisitable {
 
-        private readonly string expression;
+        private readonly string _expression;
 
         /// <summary>
         /// Constructor de l'objecte.
@@ -16,7 +16,7 @@
             if (String.IsNullOrEmpty(expression))
                 throw new ArgumentNullException(nameof(expression));
 
-            this.expression = expression;
+            _expression = expression;
         }
 
         /// <summary>
@@ -36,6 +36,7 @@
         /// Obte la condicio.
         /// </summary>
         /// 
-        public string Expression => expression;
+        public string Expression => 
+            _expression;
     }
 }

@@ -1,11 +1,11 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
+﻿using System;
+using System.Collections.Generic;
 
-    using System;
-    using System.Collections.Generic;
+namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
     public sealed class Action : IVisitable {
 
-        private ActivityList activityList;
+        private ActivityList _activityList;
 
         /// <summary>
         /// Constructor de l'objecte.
@@ -21,7 +21,7 @@
         /// 
         public Action(ActivityList activities) {
 
-            activityList = activities ?? throw new ArgumentNullException(nameof(activities));
+            _activityList = activities ?? throw new ArgumentNullException(nameof(activities));
         }
 
         /// <summary>
@@ -67,22 +67,24 @@
             if (activity == null)
                 throw new ArgumentNullException(nameof(activity));
 
-            if (activityList == null)
-                activityList = new ActivityList();
+            if (_activityList == null)
+                _activityList = new ActivityList();
 
-            activityList.Add(activity);
+            _activityList.Add(activity);
         }
 
         /// <summary>
         /// Indica si te activitats.
         /// </summary>
         /// 
-        public bool HasActivities => activityList != null;
+        public bool HasActivities => 
+            _activityList != null;
 
         /// <summary>
         /// Enumera les comandes.
         /// </summary>
         /// 
-        public IEnumerable<Activity> Activities => activityList;
+        public IEnumerable<Activity> Activities => 
+            _activityList;
     }
 }

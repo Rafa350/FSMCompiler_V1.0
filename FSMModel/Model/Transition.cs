@@ -1,6 +1,6 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
+﻿using System;
 
-    using System;
+namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
     public enum TransitionMode {
         InternalLoop,
@@ -12,11 +12,11 @@
 
     public sealed class Transition : IVisitable {
 
-        private readonly Event transitionEvent;
-        private readonly Guard guard;
-        private Action action;
-        private State nextState;
-        private TransitionMode mode = TransitionMode.InternalLoop;
+        private readonly Event _transitionEvent;
+        private readonly Guard _guard;
+        private Action _action;
+        private State _nextState;
+        private TransitionMode _mode = TransitionMode.InternalLoop;
 
         /// <summary>
         /// Constructor.
@@ -26,8 +26,8 @@
         /// 
         public Transition(Event transitionEvent, Guard guard) {
 
-            this.transitionEvent = transitionEvent ?? throw new ArgumentNullException(nameof(transitionEvent));
-            this.guard = guard;
+            _transitionEvent = transitionEvent ?? throw new ArgumentNullException(nameof(transitionEvent));
+            _guard = guard;
         }
 
         /// <summary>
@@ -47,25 +47,23 @@
         /// Obte l'event que activa aquesta transicio.
         /// </summary>
         /// 
-        public Event TransitionEvent => transitionEvent;
+        public Event TransitionEvent => 
+            _transitionEvent;
 
         /// <summary>
         /// Obte la guarda que autoritza aquesta transicio.
         /// </summary>
         /// 
-        public Guard Guard => guard;
+        public Guard Guard => 
+            _guard;
 
         /// <summary>
         /// Obte o asigna l'accio.
         /// </summary>
         /// 
         public Action Action {
-            get {
-                return action;
-            }
-            set {
-                action = value;
-            }
+            get => _action;
+            set => _action = value;
         }
 
         /// <summary>
@@ -73,21 +71,13 @@
         /// </summary>
         /// 
         public State NextState {
-            get {
-                return nextState;
-            }
-            set {
-                nextState = value;
-            }
+            get => _nextState;
+            set => _nextState = value;
         }
 
         public TransitionMode Mode {
-            get {
-                return mode;
-            }
-            set {
-                mode = value;
-            }
+            get => _mode;
+            set => _mode = value;
         }
     }
 }

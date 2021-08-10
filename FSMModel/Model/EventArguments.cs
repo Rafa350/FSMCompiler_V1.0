@@ -4,7 +4,7 @@
     
     public sealed class EventArguments {
 
-        private readonly string expression;
+        private readonly string _expression;
 
         /// <summary>
         /// Constructor de l'objecte.
@@ -13,13 +13,14 @@
         /// 
         public EventArguments(string expression) {
 
-            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            _expression = expression ?? throw new ArgumentNullException(nameof(expression));
         }
 
         /// <summary>
         /// Obte l'expressio dels parametres.
         /// </summary>
         /// 
-        public string Expression => expression;
+        public string Expression => 
+            _expression;
     }
 }

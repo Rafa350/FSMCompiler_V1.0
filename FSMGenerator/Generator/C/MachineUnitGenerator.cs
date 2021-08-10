@@ -29,11 +29,23 @@
 
             // Crea la variabe 'state'
             //
-            VariableDeclaration stateVariable = new VariableDeclaration();
-            stateVariable.Access = AccessSpecifier.Private;
-            stateVariable.Name = String.Format("{0}_state", machine.Name);
-            stateVariable.ValueType = TypeIdentifier.FromName("State");
-            memberList.Add(stateVariable);
+            VariableDeclaration stateDeclaration = new VariableDeclaration();
+            stateDeclaration.Access = AccessSpecifier.Private;
+            stateDeclaration.Name = String.Format("{0}_state", machine.Name);
+            stateDeclaration.ValueType = TypeIdentifier.FromName("State");
+            memberList.Add(stateDeclaration);
+
+            // Crea les variables 'variable'
+            //
+            if (machine.HasVariables)
+                foreach (var variable in machine.Variables) {
+                    VariableDeclaration variableDeclaration = new VariableDeclaration();
+                    variableDeclaration.Access = AccessSpecifier.Private;
+                    variableDeclaration.Name = String.Format("{0}", variable.Name);
+                    variableDeclaration.ValueType = TypeIdentifier.FromName(variable.Type);
+                    variableDeclaration.Initializer = new LiteralExpression(variable.Value);
+                    memberList.Add(variableDeclaration);
+                }
 
             // Crea les funcions de transicio [machine]_[state]_[transition]()
             //

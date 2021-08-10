@@ -1,6 +1,6 @@
-﻿namespace MikroPicDesigns.FSMCompiler.v1.Model {
+﻿using System.Collections.Generic;
 
-    using System.Collections.Generic;
+namespace MikroPicDesigns.FSMCompiler.v1.Model {
 
     public sealed class ActivityList : List<Activity> {
 

@@ -219,7 +219,8 @@
                     cb.Write("static ");
                 cb.Write("{0} {1}", decl.ValueType.Name, decl.Name);
                 if (decl.Initializer != null) {
-
+                    cb.Write(" = ");
+                    decl.Initializer.AcceptVisitor(this);
                 }
                 cb.WriteLine(";");
                 cb.WriteLine();
